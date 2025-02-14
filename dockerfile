@@ -21,6 +21,17 @@ RUN cp 'src/app/GenerateTypes.js' 'src/app/GenerateTypes.cjs'
 RUN rm 'src/app/GenerateTypes.js'
 RUN node 'src/app/GenerateTypes.cjs'
 
+# Accept build arguments for environment variables
+ARG VITE_HANDLE_URL
+ARG VITE_FRIENDLY_CAPTCHA_SITEKEY
+ARG VITE_CORDRA_PASSWORD
+
+# Create .env file using build arguments
+RUN echo "VITE_HANDLE_URL=$VITE_HANDLE_URL" >> .env
+RUN echo "VITE_FRIENDLY_CAPTCHA_SITEKEY=$VITE_FRIENDLY_CAPTCHA_SITEKEY" >> .env
+RUN echo "VITE_CORDRA_PASSWORD=$VITE_CORDRA_PASSWORD" >> .env
+RUN echo "VITE_DEV=false" >> .env
+
 # Setting app to production build
 RUN npm run build
 
