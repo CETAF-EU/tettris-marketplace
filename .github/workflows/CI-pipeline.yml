@@ -1,0 +1,71 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  DOCKERHUB_REPOSITORY: ${{ secrets.DOCCKERHUB_REPO }}
+  DOCKER_IMAGE_TAG: ${{ github.sha }}
+  VITE_HANDLE_URL: ${{ secrets.VITE_HANDLE_URL }}
+  VITE_FRIENDLY_CAPTCHA_SITEKEY: ${{ secrets.VITE_FRIENDLY_CAPTCHA_SITEKEY }}
+  VITE_CORDRA_PASSWORD: ${{ secrets.VITE_CORDRA_PASSWORD }}
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.x
+      
+    - name: Create .env file
+      run: |
+        echo "VITE_HANDLE_URL=${{ env.VITE_HANDLE_URL }}" >> .env
+        echo "VITE_FRIENDLY_CAPTCHA_SITEKEY=${{ env.VITE_FRIENDLY_CAPTCHA_SITEKEY }}" >> .env
+        echo "VITE_CORDRA_PASSWORD=${{ env.VITE_CORDRA_PASSWORD }}" >> .env
+  
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Build        
+      run: npm run build
+
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build Docker image
+      run: |
+        docker build \
+          --build-arg VITE_HANDLE_URL=${{ env.VITE_HANDLE_URL }} \
+          --build-arg VITE_FRIENDLY_CAPTCHA_SITEKEY=${{ env.VITE_FRIENDLY_CAPTCHA_SITEKEY }} \
+          --build-arg VITE_CORDRA_PASSWORD=${{ env.VITE_CORDRA_PASSWORD }} \
+          -t ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }} .
+
+    - name: Tag Docker image with 'latest'        
+      run: |
+        docker tag ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }} \
+          ${{ env.DOCKERHUB_REPOSITORY }}:latest
+
+    - name: Push Docker images to Docker Hub
+      run: |
+        docker push ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }}
+        docker push ${{ env.DOCKERHUB_REPOSITORY }}:latest
