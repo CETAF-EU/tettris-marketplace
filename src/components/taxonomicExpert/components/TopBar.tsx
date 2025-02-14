@@ -38,7 +38,9 @@ const TopBar = (props: Props) => {
             </Col>
             <Col lg="auto" className="d-none d-lg-block">
                 <Button type="submit" variant='tertiary'>
-                    <p>EMAIL</p>
+                    <a href={`mailto:${taxonomicExpert?.taxonomicExpert['schema:email']}`} className=''>
+                        <i className="bi bi-envelope"></i> EMAIL
+                    </a>
                 </Button>
             </Col>
         </Row>
@@ -50,6 +52,22 @@ const TopBar = (props: Props) => {
                 <Row className='mb-3 mt-3'>
                     <Col>
                         <p className='fs-lg-3 fw-bold'>{taxonomicExpert.taxonomicExpert['schema:headline']}</p>
+                    </Col>
+                    <Col>
+                        <Row className="justify-content-end">
+                            <Col xs="auto">
+                                <i className="bi bi-twitter"></i>
+                            </Col>
+                            <Col xs="auto">
+                                <i className="bi bi-linkedin"></i>
+                            </Col>
+                            <Col xs="auto">
+                                <i className="bi bi-github"></i>
+                            </Col>
+                            <Col xs="auto">
+                                <i className="bi bi-facebook"></i>
+                            </Col>
+                        </Row>
                     </Col>
                 </Row>
                 <Row>
@@ -64,7 +82,11 @@ const TopBar = (props: Props) => {
                         </p>
                     </Col>
                     <Col>
-                        <p>ROR ID</p>
+                        <p>
+                            <a href="url" target="_blank" rel="noopener noreferrer">
+                                <i className="bi bi-link-45deg"></i>ROR ID
+                            </a>
+                        </p>
                     </Col>
                 </Row>
             </Col>
