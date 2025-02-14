@@ -1,0 +1,68 @@
+name: Track Time Spent on Issues
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+
+jobs:
+  track_time:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for Time Tracking Command
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Match "/time Xh Ym" (e.g., "/time 3h 30m")
+          if [[ "$COMMENT_BODY" =~ ^/time\ ([0-9]+)h\ ?([0-9]*)m?$ ]]; then
+            HOURS="${BASH_REMATCH[1]}"
+            MINUTES="${BASH_REMATCH[2]:-0}"  # Default to 0 if empty
+            TOTAL_MINUTES=$((HOURS * 60 + MINUTES))
+            TOTAL_HOURS=$((TOTAL_MINUTES / 60))
+            REMAINING_MINUTES=$((TOTAL_MINUTES % 60))
+            FORMATTED_TIME="${TOTAL_HOURS}h ${REMAINING_MINUTES}m"
+
+            # Get the current issue body
+            ISSUE_BODY=$(gh issue view "$ISSUE_NUMBER" --repo "$REPO" --json body -q ".body")
+
+            # Check if "Actual Time Spent" section exists
+            if echo "$ISSUE_BODY" | grep -q "### 🕒 Actual Time Spent"; then
+              # Extract previous total time
+              PREV_HOURS=$(echo "$ISSUE_BODY" | grep "Total Time Spent:" | grep -oE '[0-9]+h' | grep -oE '[0-9]+')
+              PREV_MINUTES=$(echo "$ISSUE_BODY" | grep "Total Time Spent:" | grep -oE '[0-9]+m' | grep -oE '[0-9]+')
+
+              PREV_HOURS=${PREV_HOURS:-0}
+              PREV_MINUTES=${PREV_MINUTES:-0}
+              PREV_TOTAL_MINUTES=$((PREV_HOURS * 60 + PREV_MINUTES))
+
+              NEW_TOTAL_MINUTES=$((PREV_TOTAL_MINUTES + TOTAL_MINUTES))
+              NEW_TOTAL_HOURS=$((NEW_TOTAL_MINUTES / 60))
+              NEW_REMAINING_MINUTES=$((NEW_TOTAL_MINUTES % 60))
+              NEW_FORMATTED_TIME="${NEW_TOTAL_HOURS}h ${NEW_REMAINING_MINUTES}m"
+
+              UPDATED_BODY=$(echo "$ISSUE_BODY" | sed -E "s/(Total Time Spent: )[0-9]+h [0-9]+m/\1$NEW_FORMATTED_TIME/")
+            else
+              # Create a new "Actual Time Spent" section if it doesn't exist
+              UPDATED_BODY="$ISSUE_BODY
+              
+              ### 🕒 Actual Time Spent
+              - Total Time Spent: ${FORMATTED_TIME}"
+            fi
+
+            # Update the issue with the new time tracking info
+            gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --body "$UPDATED_BODY"
+
+            # Add a comment summarizing the update
+            gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "✅ Logged **$FORMATTED_TIME** to this issue.  
+            🔄 **Total Time Spent:** $NEW_TOTAL_HOURS h $NEW_REMAINING_MINUTES m"
+
+            echo "Updated issue #$ISSUE_NUMBER with $FORMATTED_TIME."
+          else
+            echo "No time tracking command found."
+          fi
+        shell: bash
