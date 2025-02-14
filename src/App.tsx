@@ -1,5 +1,6 @@
 /* Import Dependencies */
 import { BrowserRouter as Router, Routes } from 'react-router-dom';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 /* Import Routes */
 import AppRoutes from 'app/Routes';

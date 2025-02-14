@@ -350,7 +350,7 @@
                 "title": "ORCID",
                 "description": "A unique identifier to identify the author; ORCID identifiers are valid",
                 "type": "string",
-                "required": true
+                "required": false
             },
             {
                 "jsonPath": "$['schema:author']['index']['schema:affiliation']",

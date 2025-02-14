@@ -64,7 +64,7 @@ const FormBuilder = (props: Props) => {
     /* Base variables */
     /* Determine color */
     const color = getColor(window.location) as Color;
-    
+
 
     const [serviceTypes, setServiceTypes] = useState<string[] | undefined>();
     const [loading, setLoading] = useState<boolean>(false);
@@ -265,7 +265,10 @@ const FormBuilder = (props: Props) => {
                     const ValidateArrayComponentObject = (value: Dict) => {
                         Object.values(value).forEach(subValue => {
                             if (isEmpty(subValue)) {
-                                validationFlag = false;
+                                // ! \\ DEBUG TO ACCEPT EMPTY ROR affiliation
+                                if (value.hasOwnProperty('schema:affiliation')) {
+                                    validationFlag = false;
+                                }
                             }
                         });
                     };

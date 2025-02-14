@@ -1,5 +1,6 @@
 /* Import Dependencies */
 import { Row, Col } from 'react-bootstrap';
+import { Chart } from "react-google-charts";
 
 /* Props Type */
 type Props = {
@@ -15,6 +16,28 @@ type Props = {
 const ExperienceBlock = (props: Props) => {
     const { name } = props;
 
+
+    const data = [
+        [
+          "Element",
+          "Years of experience",
+          { role: "style" },
+          {
+            role: "annotation",
+            type: "string",
+          },
+        ],
+        ["", 10, "#7BC1DC", ""],
+    ];
+      
+    const options = {
+        width: 400,
+        height: 80,
+        bar: { groupWidth: "70%" },
+        legend: { position: "none" },
+        backgroundColor: 'transparent',
+    };
+
     return (
         <div className="h-100 d-flex flex-column">
             {/* Name of block */}
@@ -29,6 +52,28 @@ const ExperienceBlock = (props: Props) => {
             <Row className="flex-grow-1">
                 <Col>
                     <div className="h-100 b-tertiary px-4 py-3">
+                        <Row>
+                            <Col>
+                                <p>Education level - PhD</p>
+                            </Col>
+                            <Col>
+                                <p>Employment status - Full Time scientist</p>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <p>Years of experience</p>
+                            </Col>
+                            <Col>
+                                <Chart
+                                    chartType="BarChart"
+                                    width="100%"
+                                    height="100px"
+                                    data={data}
+                                    options={options}
+                                    />                          
+                            </Col>
+                        </Row>
                     </div>
                 </Col>
             </Row>

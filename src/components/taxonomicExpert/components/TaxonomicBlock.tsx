@@ -1,5 +1,7 @@
 /* Import Dependencies */
 import { Row, Col } from 'react-bootstrap';
+import { Chart } from "react-google-charts";
+import WorldMap from './WorldMap';
 
 /* Props Type */
 type Props = {
@@ -15,6 +17,19 @@ type Props = {
 const TaxonomicBlock = (props: Props) => {
     const { name } = props;
 
+    const data = [
+        ["Type", "Number"],
+        ["Identification Keys", 11],
+        ["Papers", 2],
+        ["Books", 2],
+        ["Other", 2],
+      ];
+      
+    const options = {
+        pieHole: 0.4,
+        is3D: false,
+      };
+
     return (
         <div className="h-100 d-flex flex-column">
             {/* Name of block */}
@@ -29,6 +44,34 @@ const TaxonomicBlock = (props: Props) => {
             <Row className="flex-grow-1">
                 <Col>
                     <div className="h-100 b-tertiary px-4 py-3">
+                        {DisplayRowData("Discipline", "Biology")}
+                        {DisplayRowData("Sub discipline", "Insects")}
+                        {DisplayRowData("Taxonomic Scope", "Bees")}
+                        <Row>
+                            <Col>
+                                <p>Geographic region</p>
+                            </Col>
+                            <Col>
+                                <WorldMap />
+                            </Col>
+                        </Row>
+                        {DisplayRowData("Methodologies", "Morphological")}
+                        {DisplayRowData("Applied Research", "Anatomy, biomechanics")}
+                        <Row>
+                            <Col>
+                                <p>Publication Number</p>
+                            </Col>
+                            <Col>
+                                <Chart
+                                    chartType="PieChart"
+                                    width="100%"
+                                    height="150px"
+                                    data={data}
+                                    options={{ ...options, backgroundColor: 'transparent' }}
+                                />
+                            </Col>
+                        </Row>
+                        {DisplayRowData("Stratigraphic age", "Present")}
                     </div>
                 </Col>
             </Row>
@@ -37,3 +80,9 @@ const TaxonomicBlock = (props: Props) => {
 };
 
 export default TaxonomicBlock;
+
+function DisplayRowData(title: String, data: String) {
+    return <Row className='mb-3 mt-3'>
+        <p>{title} - {data}</p>
+    </Row>;
+}

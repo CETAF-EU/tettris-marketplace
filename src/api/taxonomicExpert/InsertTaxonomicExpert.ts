@@ -3,7 +3,7 @@ import axios from 'axios';
 
 /* Import Types */
 import { TaxonomicExpert, CordraResult, Dict } from 'app/Types';
-
+import SendEmail from 'api/email/SendEmail';
 
 /**
  * Function that sends a POST request to the API in order to insert a new taxonomic expert
@@ -50,6 +50,9 @@ const InsertTaxonomicExpert = async ({ taxonomicExpertRecord }: { taxonomicExper
 
             /* Set Taxonomic Expert */
             taxonomicExpert = data.attributes.content as TaxonomicExpert;
+            const url = "https://marketplace.cetaf.org/cordra/#objects/" + taxonomicExpert.taxonomicExpert['@id'];
+            const name = taxonomicExpert.taxonomicExpert['schema:name'] ? taxonomicExpert.taxonomicExpert['schema:name'] : "Taxonomic Expert";
+            SendEmail(name, url);
 
         } catch (error) {
             console.error(error);
