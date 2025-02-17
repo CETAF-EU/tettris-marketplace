@@ -81,7 +81,7 @@ const TaxonomicBlock = (props: Props) => {
 
 export default TaxonomicBlock;
 
-function DisplayRowData(title: String, data: String) {
+function DisplayRowData(title: string, data: string) {
     return <Row className='mb-3 mt-3'>
         <p>{title} - {data}</p>
     </Row>;

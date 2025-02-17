@@ -98,7 +98,7 @@ const TaxonomicExpert = () => {
                                 </Row>
                                 {/* Top bar */}
                                 <TopBar taxonomicExpert={taxonomicExpert} />
-                                <Row className="flex-grow-1 mb-3">
+                                <Row className="flex-grow-1 overflow-auto">
                                     <Col>
                                         <Row className="mb-3">
                                             <Col>
