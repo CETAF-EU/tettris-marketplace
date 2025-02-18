@@ -26,7 +26,7 @@ const WorldMap: React.FC = () => {
               <Geography
                 key={geo.rsmKey}
                 geography={geo}
-                fill="#EAEAEC"
+                fill="#7ba9dc"
                 stroke="#7BC1DC"
               />
             ))
