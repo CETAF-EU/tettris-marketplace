@@ -50,6 +50,8 @@ const InsertTaxonomicExpert = async ({ taxonomicExpertRecord }: { taxonomicExper
 
             /* Set Taxonomic Expert */
             taxonomicExpert = data.attributes.content as TaxonomicExpert;
+
+            /* Send email */
             const url = "https://marketplace.cetaf.org/cordra/#objects/" + taxonomicExpert.taxonomicExpert['@id'];
             const name = taxonomicExpert.taxonomicExpert['schema:name'] ? taxonomicExpert.taxonomicExpert['schema:name'] : "Taxonomic Expert";
             SendEmail(name, url);

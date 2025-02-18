@@ -259,7 +259,7 @@
             {
                 "jsonPath": "$['schema:taxonomicRange']",
                 "title": "Taxonomic Range",
-                "description": "The taxonomic grouping of the organism, e.g. 'No specific range' or 'Agromyzidae, Braconidae'",
+                "description": "The taxonomic grouping of the organism, e.g. 'No specific taxonomic range' or 'Agromyzidae, Braconidae'",
                 "type": "multi-string"
             },
             {
@@ -513,7 +513,7 @@
                 "title": "Content URL",
                 "description": "JPG, PNG or SVG file showing a screenshot or other relevant illustration of the resource. Add only files that are public domain",
                 "type": "string",
-                "required": true
+                "required": false
             }
         ]
     }

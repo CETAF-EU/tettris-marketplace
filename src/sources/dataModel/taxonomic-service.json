@@ -211,7 +211,7 @@
         },
         "schema:taxonomicRange": {
             "type": "array",
-            "description": "The taxonomic grouping of the organism, e.g. 'No specific range' or 'Agromyzidae, Braconidae'",
+            "description": "The taxonomic grouping of the organism, e.g. 'No specific taxonomic range' or 'Agromyzidae, Braconidae'",
             "items": {
                 "type": "string"
             }
