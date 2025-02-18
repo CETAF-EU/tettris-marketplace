@@ -17,21 +17,8 @@ type Props = {
 const TaxonomicBlock = (props: Props) => {
     const { name } = props;
 
-    const data = [
-        ["Type", "Number"],
-        ["Identification Keys", 11],
-        ["Papers", 2],
-        ["Books", 2],
-        ["Other", 2],
-      ];
-      
-    const options = {
-        pieHole: 0.4,
-        is3D: false,
-      };
-
     return (
-        <div className="h-100 d-flex flex-column">
+        <div className=" d-flex flex-column">
             {/* Name of block */}
             <Row>
                 <Col className="col-md-auto">
@@ -47,30 +34,10 @@ const TaxonomicBlock = (props: Props) => {
                         {DisplayRowData("Discipline", "Biology")}
                         {DisplayRowData("Sub discipline", "Insects")}
                         {DisplayRowData("Taxonomic Scope", "Bees")}
-                        <Row>
-                            <Col>
-                                <p>Geographic region</p>
-                            </Col>
-                            <Col>
-                                <WorldMap />
-                            </Col>
-                        </Row>
+                        {displayGeographicContent()}
                         {DisplayRowData("Methodologies", "Morphological")}
                         {DisplayRowData("Applied Research", "Anatomy, biomechanics")}
-                        <Row>
-                            <Col>
-                                <p>Publication Number</p>
-                            </Col>
-                            <Col>
-                                <Chart
-                                    chartType="PieChart"
-                                    width="100%"
-                                    height="150px"
-                                    data={data}
-                                    options={{ ...options, backgroundColor: 'transparent' }}
-                                />
-                            </Col>
-                        </Row>
+                        {displayPublicationChart()}
                         {DisplayRowData("Stratigraphic age", "Present")}
                     </div>
                 </Col>
@@ -81,8 +48,59 @@ const TaxonomicBlock = (props: Props) => {
 
 export default TaxonomicBlock;
 
-function DisplayRowData(title: String, data: String) {
-    return <Row className='mb-3 mt-3'>
-        <p>{title} - {data}</p>
+function displayPublicationChart() {
+    const data = [
+        ["Type", "Number"],
+        ["Identification Keys", 11],
+        ["Papers", 2],
+        ["Books", 2],
+        ["Other", 2],
+    ];
+
+    const options = {
+        width: 400,
+        height: 100,
+        chartArea: { width: "100%", height: "100%" },
+        bar: { groupWidth: "100%"},
+        backgroundColor: "transparent",
+        pieHole: 0.6,
+        pieSliceText: 'none',
+        colors: ['#7BC1DC', '#5DA9C7', '#3F91B2', '#21799D'],
+    };
+    
+    return <Row>
+        <Col>
+            <p className='fw-bold'>Publication Number</p>
+        </Col>
+        <Col xs='8'>
+            <Chart
+                chartType="PieChart"
+                width="100%"
+                height="150px"
+                data={data}
+                options={options} />
+        </Col>
     </Row>;
+}
+
+function displayGeographicContent() {
+    return <Row>
+        <Col>
+            <p className='fw-bold'>Geographic region</p>
+        </Col>
+        <Col>
+            <WorldMap />
+        </Col>
+    </Row>;
+}
+
+function DisplayRowData(title: string, data: string) {
+    return  <Row className="d-flex align-items-center mb-3">
+        <Col className="d-flex align-items-center">
+            <p className='fw-bold mb-0'>{title}</p>
+        </Col>
+        <Col xs='9' className="d-flex align-items-center">
+            <p className='mb-0'>{data}</p>                       
+        </Col>
+    </Row>
 }
