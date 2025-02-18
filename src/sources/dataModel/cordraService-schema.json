@@ -223,7 +223,7 @@
         "schema:taxonomicRange": {
           "type": "array",
           "title": "Taxonomic Range",
-          "description": "The taxonomic grouping of the organism, e.g. 'No specific range' or 'Agromyzidae, Braconidae'",
+          "description": "The taxonomic grouping of the organism, e.g. 'No specific taxonomic range' or 'Agromyzidae, Braconidae'",
           "items": {
             "type": "string"
           }
@@ -596,9 +596,6 @@
           "description": "Array of media objects that encodes this Service. This property is a synonym for encoding.",
           "items": {
             "type": "object",
-            "required": [
-              "schema:contentUrl"
-            ],
             "properties": {
               "schema:contentUrl": {
                 "type": "string",
