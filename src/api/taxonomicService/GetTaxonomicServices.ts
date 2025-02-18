@@ -30,7 +30,7 @@ const GetTaxonomicServices = async ({ pageNumber, pageSize, searchFilters }: { p
     filters = filters.concat(' AND /taxonomicService/schema\\:status:accepted');
 
     if (!isEmpty(searchFilters)) {
-        Object.entries(searchFilters).map(([key, value]) => {
+        Object.entries(searchFilters).forEach(([key, value]) => {
             const alias: string | undefined = TaxonomicServiceFilters.taxonomicServiceFilters.find(taxonomicSearchFilter => taxonomicSearchFilter.name === key)?.alias;
 
             switch (key) {

@@ -40,7 +40,7 @@ const TaxonomicExpert = () => {
     const taxonomicServiceID: string = `${params.prefix}/${params.suffix}`;
 
 
-    const text = "lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, vestibulum nunc sit amet, ultrices nunc sit";
+    const text = "lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, vestibulum nunc sit amet, ultrices nunc sit lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, vestibulum nunc sit amet, ultrices nunc sit lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, vestibulum nunc sit amet, ultrices nunc sit";
     /* Fetch taxonomic service */
     fetch.Fetch({
         Method: GetTaxonomicExpert,
@@ -97,12 +97,14 @@ const TaxonomicExpert = () => {
                                     </Col>
                                 </Row>
                                 {/* Top bar */}
-                                <TopBar taxonomicExpert={taxonomicExpert} />
-                                <Row className="flex-grow-1 mb-3">
+                                <Row className='m-1'>
+                                    <TopBar taxonomicExpert={taxonomicExpert} />
+                                </Row>
+                                <Row className="flex-grow-1 overflow-auto">
                                     <Col>
                                         <Row className="mb-3">
                                             <Col>
-                                                <BioBlock name="Expert Bio" text={text}/>
+                                                <BioBlock name="Expertise bio" text={text}/>
                                             </Col>
                                         </Row>
                                         <Row className="mb-3">

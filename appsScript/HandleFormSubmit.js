@@ -48,15 +48,61 @@ const ReferenceField = (fieldName) => {
  * Function to add a value to the taxonomic service object
  */
 const AddToTaxonomicService = (taxonomicService, itemTitle, itemResponse) => {
-  let index = 0;
-  let visibleIndex = 0;
+  const setNestedValue = (path, value) => {
+    path.reduce((acc, key, index) => {
+      if (index === path.length - 1) {
+        acc[key] = value;
+      } else {
+        acc[key] = acc[key] || (isNaN(path[index + 1]) ? {} : []);
+      }
+      return acc[key];
+    }, taxonomicService);
+  };
+
+  const parseIndex = (title) => {
+    const match = title.match(/\d+$/); // Match digits only at the end of the string
+    return match ? Number(match[0]) - 1 : -1;
+  };
+  
+
+  const handleMaintainer = (index, field, value) => {
+    if (!taxonomicService.schema?.Maintainer) taxonomicService['schema:Maintainer'] = [];
+    if (!taxonomicService['schema:Maintainer'][index]) taxonomicService['schema:Maintainer'][index] = {};
+
+    const path = field.includes('Organisation') 
+      ? ['schema:Maintainer', index, 'schema:Organization', field] 
+      : ['schema:Maintainer', index, field];
+
+    setNestedValue(path, value);
+  };
+
+  const handleAssociatedMedia = (index, field, value) => {
+    if (!taxonomicService['schema:AssociatedMedia']) taxonomicService['schema:AssociatedMedia'] = [];
+    if (!taxonomicService['schema:AssociatedMedia'][index]) taxonomicService['schema:AssociatedMedia'][index] = {};
+    
+    setNestedValue(['schema:AssociatedMedia', index, field], value);
+  };
+
+  const handleDefaultCases = () => {
+    if (/^(?:Identifier of Maintainer|Full Name|Organisation Identifier|Organisation Legal Name) \d+\b/.test(itemTitle)) {
+      handleMaintainer(parseIndex(itemTitle), ReferenceField(itemTitle.replace(/ \d+\b/, '')), itemResponse);
+    } else if (/^(?:Content URL|Media License) \d+\b/.test(itemTitle)) {
+      const index = parseIndex(itemTitle);
+      const field = ReferenceField(itemTitle.replace(/ \d+\b/, ''));
+      const value = itemTitle.includes('Media License') 
+        ? licences.licenses.find(licence => licence.name === itemResponse)?.licenseId || itemResponse 
+        : itemResponse;
+
+      handleAssociatedMedia(index, field, value);
+    } else {
+      setNestedValue([ReferenceField(itemTitle)], itemResponse);
+    }
+  };
 
   switch (itemTitle) {
     case 'Available Languages':
     case 'Taxonomic Range':
-      /* For each item separated by comma in string, push to array */
-      taxonomicService[ReferenceField(itemTitle)] = itemResponse.split(',').map(item => item.replace(' ', ''));
-
+      setNestedValue([ReferenceField(itemTitle)], itemResponse.split(',').map(item => item.trim()));
       break;
     case 'Service Type':
     case 'Name':
@@ -65,135 +111,37 @@ const AddToTaxonomicService = (taxonomicService, itemTitle, itemResponse) => {
     case 'Logo':
     case 'Date Modified':
     case 'Terms of Service':
-      taxonomicService['schema:service'][ReferenceField(itemTitle)] = itemResponse;
-
+      setNestedValue(['schema:service', ReferenceField(itemTitle)], itemResponse);
       break;
     case 'Contact Email':
     case 'Contact Webpage':
     case 'Webpage':
-      /* Check if contact point disctionary exists, else add */
-      if (!('schema:ContactPoin' in taxonomicService)) {
-        taxonomicService['schema:ContactPoint'] = {};
-      }
-
-      taxonomicService['schema:ContactPoint'][ReferenceField(itemTitle)] = itemResponse;
-
-      break;
-    case 'Identifier of Maintainer 1':
-    case 'Identifier of Maintainer 2':
-    case 'Identifier of Maintainer 3':
-    case 'Full Name 1':
-    case 'Full Name 2':
-    case 'Full Name 3':
-    case 'Organisation Identifier 1':
-    case 'Organisation Identifier 2':
-    case 'Organisation Identifier 3':
-    case 'Organisation Legal Name 1':
-    case 'Organisation Legal Name 2':
-    case 'Organisation Legal Name 3':
-      /* Get index from item title */
-      index = Number(itemTitle.slice(-1)) - 1;
-      visibleIndex = index + 1;
-
-      /* Check if maintainer object exists, otherwise create it first */
-      if (!taxonomicService['schema:Maintainer']) {
-        taxonomicService['schema:Maintainer'] = [
-          {
-            'schema:identifier': ''
-          }
-        ];
-      } else if (!taxonomicService['schema:Maintainer'][index]) {
-        taxonomicService['schema:Maintainer'][index] = {
-          'schema:identifier': ''
-        };
-      }
-
-      if (itemTitle.includes('Organisation')) {
-        if (!taxonomicService['schema:Maintainer'][index]['schema:Organization']) {
-          taxonomicService['schema:Maintainer'][index]['schema:Organization'] = {
-            [ReferenceField(itemTitle.replace(` ${visibleIndex}`, ''))]: itemResponse
-          };
-        } else {
-          taxonomicService['schema:Maintainer'][index]['schema:Organization'][ReferenceField(itemTitle.replace(` ${visibleIndex}`, ''))] = itemResponse;
-        }
-      } else {
-        taxonomicService['schema:Maintainer'][index][ReferenceField(itemTitle.replace(` ${visibleIndex}`, ''))] = itemResponse;
-      }
-
+      setNestedValue(['schema:ContactPoint', ReferenceField(itemTitle)], itemResponse);
       break;
     case 'Payment Model':
     case 'Funder Name':
-      /* Check if funder dictionary is present */
-      if (!('schema:FundingScheme' in taxonomicService)) {
-        taxonomicService['schema:FundingScheme'] = {};
-      }
-
-      if (itemTitle === 'Funder Name') {
-        taxonomicService['schema:FundingScheme']['schema:Funder'] = {
-          [ReferenceField(itemTitle)]: itemResponse
-        };
-      } else {
-        taxonomicService['schema:FundingScheme'][ReferenceField(itemTitle)] = itemResponse;
-      };
-
+      setNestedValue(['schema:FundingScheme', itemTitle === 'Funder Name' ? 'schema:Funder' : ReferenceField(itemTitle)], itemResponse);
       break;
     case 'Code Repository':
-      taxonomicService['schema:SoftwareSourceCode'] = {
-        [`${ReferenceField(itemTitle)}`]: itemResponse
-      };
-
+      setNestedValue(['schema:SoftwareSourceCode', ReferenceField(itemTitle)], itemResponse);
       break;
     case 'Programming Languages':
     case 'Change Log':
     case 'Runtime Platform':
     case 'Status':
-      if ('schema:SoftwareSourceCode' in taxonomicService) {
-        taxonomicService['schema:SoftwareSourceCode'][ReferenceField(itemTitle)] = itemResponse;
-      };
-
+      if (taxonomicService['schema:SoftwareSourceCode']) {
+        setNestedValue(['schema:SoftwareSourceCode', ReferenceField(itemTitle)], itemResponse);
+      }
       break;
     case 'Software License':
-      taxonomicService['schema:SoftwareSourceCode'][ReferenceField(itemTitle)] = licences.licenses.find(licence => licence.name === itemResponse).licenseId;
-
-      break;
-    case 'Content URL 1':
-    case 'Content URL 2':
-    case 'Content URL 3':
-    case 'Media License 1':
-    case 'Media License 2':
-    case 'Media License 3':
-      /* Get index from item title */
-      index = Number(itemTitle.slice(-1)) - 1;
-      visibleIndex = index + 1;
-
-      /* Check if associated media object exists, otherwise create it first */
-      if (!taxonomicService['schema:AssociatedMedia']) {
-        taxonomicService['schema:AssociatedMedia'] = [
-          {
-            'schema:contentUrl': ''
-          }
-        ];
-      } else if (!taxonomicService['schema:AssociatedMedia'][index]) {
-        taxonomicService['schema:AssociatedMedia'][index] = {
-          'schema:contentUrl': ''
-        };
-      }
-
-      if (itemTitle.includes('Media License')) {
-        taxonomicService['schema:AssociatedMedia'][index][`${ReferenceField(itemTitle.replace(` ${visibleIndex}`, ''))}`] = licences.licenses.find(licence => licence.name === itemResponse).licenseId;
-      } else {
-        taxonomicService['schema:AssociatedMedia'][index][`${ReferenceField(itemTitle.replace(` ${visibleIndex}`, ''))}`] = itemResponse;
-      }
-
-      break;
     case 'Service License':
-      taxonomicService[ReferenceField(itemTitle)] = licences.licenses.find(licence => licence.name === itemResponse).licenseId;
-
+      setNestedValue([ReferenceField(itemTitle)], licences.licenses.find(licence => licence.name === itemResponse)?.licenseId || itemResponse);
       break;
     default:
-      taxonomicService[ReferenceField(itemTitle)] = itemResponse;
-  };
+      handleDefaultCases();
+  }
 };
+
 
 /**
  * Function for handling a form submit

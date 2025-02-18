@@ -31,6 +31,12 @@ html {
   }
 }
 
+.custom-card {
+  border: 1px solid #ccc; /* Straight border */
+  border-radius: 0; /* Remove rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow */
+}
+
 body {
   height: 100%;
   margin: 0;

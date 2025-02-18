@@ -182,63 +182,7 @@ const FormBuilder = (props: Props) => {
      * @returns JSX Component of form field
      */
     const ConstructFormField = (field: FormField, values: Dict, SetFieldValue: Function, fieldValues?: any) => {
-        switch (field.type) {
-            case 'hidden': {
-                return <HiddenField field={field} />
-            } case 'boolean': {
-                return <BooleanField field={field} />;
-            } case 'date': {
-                let dateValue: Date;
-
-                if (fieldValues) {
-                    dateValue = new Date(fieldValues);
-                } else {
-                    dateValue = new Date();
-                }
-
-                return <DateField field={field}
-                    fieldValue={dateValue}
-                    SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
-                />;
-            } case 'multi-string': {
-                return <StringArrayField field={field}
-                    fieldValues={fieldValues as string[]}
-                    values={values}
-                />;
-            } case 'select': {
-                return <SelectField field={field}
-                    values={values}
-                    SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
-                />;
-            } case 'multi-select': {
-                return <MultiSelectField field={field}
-                    values={values}
-                    SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
-                    SetServiceTypes={field.title === 'Service Type' ? (serviceTypes: string[]) => setServiceTypes(serviceTypes) : undefined}
-                />;
-            } case 'ror': {
-                return <RORField field={field}
-                    fieldValue={fieldValues as Dict}
-                    values={values}
-                    SetFieldValue={(fieldName: string, value: Dict) => {
-                        SetFieldValue?.(fieldName, value)
-                    }}
-                />;
-            } case 'softwareLicense': {
-                return <SoftwareLicenses field={field}
-                    SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
-                />;
-            } case 'text': {
-                return <TextField field={field}
-                    values={values}
-                    SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
-                />;
-            } default: {
-                return <StringField field={field}
-                    values={values}
-                />;
-            }
-        };
+        return generateFieldComponent(field, fieldValues, SetFieldValue, values, setServiceTypes);
     };
 
     /**
@@ -444,3 +388,55 @@ const FormBuilder = (props: Props) => {
 };
 
 export default FormBuilder;
+
+function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValue: Function, values: Dict, setServiceTypes: (serviceTypes: string[]) => void) {
+    switch (field.type) {
+        case 'hidden': {
+            return <HiddenField field={field} />;
+        } case 'boolean': {
+            return <BooleanField field={field} />;
+        } case 'date': {
+            let dateValue: Date;
+
+            if (fieldValues) {
+                dateValue = new Date(fieldValues);
+            } else {
+                dateValue = new Date();
+            }
+
+            return <DateField field={field}
+                fieldValue={dateValue}
+                SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)} />;
+        } case 'multi-string': {
+            return <StringArrayField field={field}
+                fieldValues={fieldValues as string[]}
+                values={values} />;
+        } case 'select': {
+            return <SelectField field={field}
+                values={values}
+                SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)} />;
+        } case 'multi-select': {
+            return <MultiSelectField field={field}
+                values={values}
+                SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
+                SetServiceTypes={field.title === 'Service Type' ? (serviceTypes: string[]) => setServiceTypes(serviceTypes) : undefined} />;
+        } case 'ror': {
+            return <RORField field={field}
+                fieldValue={fieldValues as Dict}
+                values={values}
+                SetFieldValue={(fieldName: string, value: Dict) => {
+                    SetFieldValue?.(fieldName, value);
+                } } />;
+        } case 'softwareLicense': {
+            return <SoftwareLicenses field={field}
+                SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)} />;
+        } case 'text': {
+            return <TextField field={field}
+                values={values}
+                SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)} />;
+        } default: {
+            return <StringField field={field}
+                values={values} />;
+        }
+    };
+}

@@ -51,16 +51,7 @@ const TextField = (props: Props) => {
                     listsPlugin(),
                     maxLengthPlugin(2000),
                     toolbarPlugin({
-                        toolbarContents: () => (
-                            <>
-                                {' '}
-                                <UndoRedo />
-                                <BlockTypeSelect />
-                                <BoldItalicUnderlineToggles />
-                                <CreateLink />
-                                <ListsToggle />
-                            </>
-                        )
+                        toolbarContents: ToolbarContents
                     })
                 ]}
                 onChange={(text: string) => SetFieldValue(field.jsonPath.replace('$', ''), text)}
@@ -68,5 +59,16 @@ const TextField = (props: Props) => {
         </div>
     );
 };
+
+const ToolbarContents = () => (
+    <>
+        {' '}
+        <UndoRedo />
+        <BlockTypeSelect />
+        <BoldItalicUnderlineToggles />
+        <CreateLink />
+        <ListsToggle />
+    </>
+);
 
 export default TextField;
