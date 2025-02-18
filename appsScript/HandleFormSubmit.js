@@ -59,22 +59,44 @@ const AddToTaxonomicService = (taxonomicService, itemTitle, itemResponse) => {
     }, taxonomicService);
   };
 
+  const parseIndex = (title) => {
+    const match = title.match(/\d+$/); // Match digits only at the end of the string
+    return match ? Number(match[0]) - 1 : -1;
+  };
+  
+
   const handleMaintainer = (index, field, value) => {
-    const maintainerPath = ['schema:Maintainer', index];
     if (!taxonomicService.schema?.Maintainer) taxonomicService['schema:Maintainer'] = [];
     if (!taxonomicService['schema:Maintainer'][index]) taxonomicService['schema:Maintainer'][index] = {};
-    
-    if (field.includes('Organisation')) {
-      setNestedValue([...maintainerPath, 'schema:Organization', field], value);
-    } else {
-      setNestedValue([...maintainerPath, field], value);
-    }
+
+    const path = field.includes('Organisation') 
+      ? ['schema:Maintainer', index, 'schema:Organization', field] 
+      : ['schema:Maintainer', index, field];
+
+    setNestedValue(path, value);
   };
 
   const handleAssociatedMedia = (index, field, value) => {
     if (!taxonomicService['schema:AssociatedMedia']) taxonomicService['schema:AssociatedMedia'] = [];
     if (!taxonomicService['schema:AssociatedMedia'][index]) taxonomicService['schema:AssociatedMedia'][index] = {};
+    
     setNestedValue(['schema:AssociatedMedia', index, field], value);
+  };
+
+  const handleDefaultCases = () => {
+    if (/^(?:Identifier of Maintainer|Full Name|Organisation Identifier|Organisation Legal Name) \d+\b/.test(itemTitle)) {
+      handleMaintainer(parseIndex(itemTitle), ReferenceField(itemTitle.replace(/ \d+\b/, '')), itemResponse);
+    } else if (/^(?:Content URL|Media License) \d+\b/.test(itemTitle)) {
+      const index = parseIndex(itemTitle);
+      const field = ReferenceField(itemTitle.replace(/ \d+\b/, ''));
+      const value = itemTitle.includes('Media License') 
+        ? licences.licenses.find(licence => licence.name === itemResponse)?.licenseId || itemResponse 
+        : itemResponse;
+
+      handleAssociatedMedia(index, field, value);
+    } else {
+      setNestedValue([ReferenceField(itemTitle)], itemResponse);
+    }
   };
 
   switch (itemTitle) {
@@ -116,18 +138,10 @@ const AddToTaxonomicService = (taxonomicService, itemTitle, itemResponse) => {
       setNestedValue([ReferenceField(itemTitle)], licences.licenses.find(licence => licence.name === itemResponse)?.licenseId || itemResponse);
       break;
     default:
-      if (/^(Identifier of Maintainer|Full Name|Organisation Identifier|Organisation Legal Name) \d+$/.test(itemTitle)) {
-        const index = Number(itemTitle.match(/\d+$/)[0]) - 1;
-        handleMaintainer(index, ReferenceField(itemTitle.replace(/ \d+$/, '')), itemResponse);
-      } else if (/^(Content URL|Media License) \d+$/.test(itemTitle)) {
-        const index = Number(itemTitle.match(/\d+$/)[0]) - 1;
-        handleAssociatedMedia(index, ReferenceField(itemTitle.replace(/ \d+$/, '')), 
-          itemTitle.includes('Media License') ? licences.licenses.find(licence => licence.name === itemResponse)?.licenseId || itemResponse : itemResponse);
-      } else {
-        setNestedValue([ReferenceField(itemTitle)], itemResponse);
-      }
+      handleDefaultCases();
   }
 };
+
 
 /**
  * Function for handling a form submit

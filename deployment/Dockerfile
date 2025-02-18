@@ -10,7 +10,9 @@ ENV CORDRA_BASE_URI ${BASE_URI}
 ENV CORDRA_PREFIX ${PREFIX}
 ENV CORDRA_HDL_ADMIN ${HDL_ADMIN_ID}
 
-COPY . ./opt/cordra
+COPY ./cordra ./opt/cordra
+COPY ./nginx ./opt/cordra
+COPY docker-compose.yaml ./opt/cordra
 
 EXPOSE 8080
 EXPOSE 8443
