@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 
 /* Import Types */
 import { TaxonomicService, CordraResult, Dict } from 'app/Types';
+import SendEmail from 'api/email/SendEmail';
 
 
 /**
@@ -57,6 +58,11 @@ const InsertTaxonomicService = async ({ taxonomicServiceRecord }: { taxonomicSer
             /* Set created and modified */
             taxonomicService.taxonomicService['schema:dateCreated'] = format(new Date(data.attributes.metadata.createdOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
             taxonomicService.taxonomicService['schema:dateModified'] = format(new Date(data.attributes.metadata.modifiedOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+
+            /* Send email */
+            const url = "https://marketplace.cetaf.org/cordra/#objects/" + taxonomicService.taxonomicService['@id'];
+            const name = taxonomicService.taxonomicService['schema:service']['schema:name'] ? taxonomicService.taxonomicService['schema:service']['schema:name'] : "Taxonomic Service";
+            SendEmail(name, url);
         } catch (error) {
             console.error(error);
 

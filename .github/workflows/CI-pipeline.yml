@@ -12,6 +12,9 @@ env:
   VITE_HANDLE_URL: ${{ secrets.VITE_HANDLE_URL }}
   VITE_FRIENDLY_CAPTCHA_SITEKEY: ${{ secrets.VITE_FRIENDLY_CAPTCHA_SITEKEY }}
   VITE_CORDRA_PASSWORD: ${{ secrets.VITE_CORDRA_PASSWORD }}
+  VITE_EMAILJS_ID: ${{ secrets.VITE_EMAILJS_ID }}
+  VITE_EMAILJS_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_TEMPLATE_ID }}
+V ITE_EMAILJS_USER_ID: ${{ secrets.VITE_EMAILJS_USER_ID }}
   
 jobs:
   build:
@@ -31,6 +34,9 @@ jobs:
         echo "VITE_HANDLE_URL=${{ env.VITE_HANDLE_URL }}" >> .env
         echo "VITE_FRIENDLY_CAPTCHA_SITEKEY=${{ env.VITE_FRIENDLY_CAPTCHA_SITEKEY }}" >> .env
         echo "VITE_CORDRA_PASSWORD=${{ env.VITE_CORDRA_PASSWORD }}" >> .env
+        echo "VITE_EMAILJS_ID=${{ env.VITE_EMAILJS_ID }}" >> .env
+        echo "VITE_EMAILJS_TEMPLATE_ID=${{ env.VITE_EMAILJS_TEMPLATE_ID }}" >> .env
+        echo "VITE_EMAILJS_USER_ID=${{ env.VITE_EMAILJS_USER_ID }}" >> .env
   
     - name: Install dependencies
       run: npm install
@@ -58,6 +64,9 @@ jobs:
           --build-arg VITE_HANDLE_URL=${{ env.VITE_HANDLE_URL }} \
           --build-arg VITE_FRIENDLY_CAPTCHA_SITEKEY=${{ env.VITE_FRIENDLY_CAPTCHA_SITEKEY }} \
           --build-arg VITE_CORDRA_PASSWORD=${{ env.VITE_CORDRA_PASSWORD }} \
+          --build-arg VITE_EMAILJS_ID=${{ env.VITE_EMAILJS_ID }} \
+          --build-arg VITE_EMAILJS_TEMPLATE_ID=${{ env.VITE_EMAILJS_TEMPLATE_ID }} \
+          --build-arg VITE_EMAILJS_USER_ID=${{ env.VITE_EMAILJS_USER_ID }} \
           -t ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }} .
 
     - name: Tag Docker image with 'latest'        
