@@ -1,5 +1,5 @@
 
-# TETTRIs Marketplace
+# [TETTRIs Marketplace](https://marketplace.cetaf.org/)
 
 ## Overview
 
@@ -18,7 +18,7 @@
 1. **Clone the Repository**: Start by cloning the repository to your local machine.
 
 ```bash
-git clone https://github.com/your-organization/tettris-marketplace.git
+git clone https://github.com/CETAF-EU/tettris-marketplace.git
 ```
 
 2. **Install Dependencies**:
