@@ -26,8 +26,14 @@ git clone https://github.com/CETAF-EU/tettris-marketplace.git
 ```bash
 npm install
 ```
+3. **Set the env variables**:
 
-3. **Run the Development Server**:
+```bash
+touch .env
+```
+Contact the CETAF Developers to retrieve the variables
+
+4. **Run the Development Server**:
 
 ```bash
 npm start
