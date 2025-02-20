@@ -7,7 +7,6 @@ import { TaxonomicExpert } from 'app/Types';
 /* Import Components */
 import { Button } from 'components/general/CustomComponents';
 
-
 /* Props Type */
 type Props = {
     taxonomicExpert: TaxonomicExpert
@@ -21,22 +20,27 @@ type Props = {
  */
 const TopBar = (props: Props) => {
     const { taxonomicExpert } = props;
+    
+    const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] as string || '';
+    const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] as string || '';
+    const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] as string || '';
+    const language = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language']?.join(' / ').toUpperCase() || '';
 
     return (<>
         <Row className="mt-3 pt-lg-0">
             <Col lg="8">
                 <Row className='ms-2'>
                     <Col xs="2">
-                        <h1 className="fs-3 fs-lg-2">{taxonomicExpert?.taxonomicExpert['schema:name']}</h1>
+                        <h1 className="fs-3 fs-lg-2">{name}</h1>
                     </Col>
                     <Col xs="2">
                         <p className="fw-lightBold bi bi-link-45deg">ORCID ID</p>
                     </Col>
                     <Col xs="2">
-                        <p className='fw-lightBold bi bi-geo-alt-fill'>{taxonomicExpert?.taxonomicExpert['schema:location']}</p>
+                        <p className='fw-lightBold bi bi-geo-alt-fill'>{location}</p>
                     </Col>
                     <Col>
-                        <p className='fw-lightBold bi bi-globe2'> {taxonomicExpert?.taxonomicExpert['schema:language']?.join(' / ').toUpperCase()}</p>
+                        <p className='fw-lightBold bi bi-globe2'> {language}</p>
                     </Col>
                 </Row>
             </Col>
@@ -57,7 +61,7 @@ const TopBar = (props: Props) => {
             <Col className='ms-3'>
                 <Row className='mb-3 mt-3'>
                     <Col>
-                        <p className="fs-3 fw-bold">{taxonomicExpert.taxonomicExpert['schema:headline']}</p>
+                        <p className="fs-3 fw-bold">{headline}</p>
                     </Col>
                     <Col className="fs-3 d-flex justify-content-end me-2">
                         <i className="bi bi-twitter mx-1"></i>

@@ -17,53 +17,56 @@ export interface TaxonomicExpert {
    * The type of the object, in this case TaxonomicExpert
    */
   "@type"?: "TaxonomicExpert";
-  /**
-   * The name of the Taxonomic Expert
-   */
-  "schema:name"?: string;
-  /**
-   * The email of the Taxonomic Expert
-   */
-  "schema:email"?: string;
-  /**
-   * A short description of the Taxonomic Expert
-   */
-  "schema:headline"?: string;
-  /**
-   * Languages the user is proficient or fluent in.
-   */
-  "schema:language"?: (
-    | "bg"
-    | "hr"
-    | "cs"
-    | "da"
-    | "lb"
-    | "nl"
-    | "en"
-    | "et"
-    | "fi"
-    | "fr"
-    | "de"
-    | "el"
-    | "hu"
-    | "ga"
-    | "it"
-    | "lv"
-    | "lt"
-    | "mt"
-    | "pl"
-    | "pt"
-    | "ro"
-    | "ru"
-    | "sk"
-    | "es"
-    | "sv"
-    | "tk"
-    | "uk"
-  )[];
-  /**
-   * The location of the Taxonomic Expert
-   */
-  "schema:location"?: string;
+  "schema:person"?: {
+    /**
+     * The name of the Taxonomic Expert
+     */
+    "schema:name"?: string;
+    /**
+     * The email of the Taxonomic Expert
+     */
+    "schema:email"?: string;
+    /**
+     * A short description of the Taxonomic Expert
+     */
+    "schema:headline"?: string;
+    /**
+     * Languages the user is proficient or fluent in.
+     */
+    "schema:language"?: (
+      | "bg"
+      | "hr"
+      | "cs"
+      | "da"
+      | "lb"
+      | "nl"
+      | "en"
+      | "et"
+      | "fi"
+      | "fr"
+      | "de"
+      | "el"
+      | "hu"
+      | "ga"
+      | "it"
+      | "lv"
+      | "lt"
+      | "mt"
+      | "pl"
+      | "pt"
+      | "ro"
+      | "ru"
+      | "sk"
+      | "es"
+      | "sv"
+      | "tk"
+      | "uk"
+    )[];
+    /**
+     * The location of the Taxonomic Expert
+     */
+    "schema:location"?: string;
+    [k: string]: unknown;
+  };
   [k: string]: unknown;
 }

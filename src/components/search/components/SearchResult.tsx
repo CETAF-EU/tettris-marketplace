@@ -161,7 +161,10 @@ const SearchResult = (props: Props) => {
             navigate(`/te/${taxonomicExpert.taxonomicExpert['@id'].replace(import.meta.env.VITE_HANDLE_URL as string, '')}`);
         }
 
-        const languages = taxonomicExpert.taxonomicExpert['schema:language']?.join(' / ').toUpperCase();
+        const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] || '';
+        const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] || '';
+        const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] || '';
+        const languages = (taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language'] || []).join(' / ').toUpperCase() || '';
 
         return (
             <div className={`${styles.searchResult} w-100 bgc-white mt-lg-1 pt-3 pb-2 px-3`}>
@@ -173,7 +176,7 @@ const SearchResult = (props: Props) => {
                         {/* Title */}
                         <Row>
                             <Col>
-                                <p className="fs-4 fs-lg-default fw-bold textOverflow">{taxonomicExpert.taxonomicExpert['schema:name']}</p>
+                                <p className="fs-4 fs-lg-default fw-bold textOverflow">{name}</p>
                             </Col>
                         </Row>
                         {/*Headline, Taxonomic Range and profile picture */}
@@ -181,14 +184,14 @@ const SearchResult = (props: Props) => {
                             <Col className=''>
                                 <Row className='mb-2'>
                                     <Col>
-                                        <p className="fs-6 fs-lg-4  textOverflow">{taxonomicExpert.taxonomicExpert['schema:headline']}</p>
+                                        <p className="fs-6 fs-lg-4  textOverflow">{headline}</p>
                                     </Col>
                                 </Row>
                                 <Row>
                                     <Col>
-                                        <p className='fst-italic'>Lepidoptera</p>
-                                        <p className='fst-italic'>Bees</p>
-                                        <p className='fst-italic'>Butterflies</p>
+                                        <p className='fst-italic fs-4'>Lepidoptera</p>
+                                        <p className='fst-italic fs-4'>Bees</p>
+                                        <p className='fst-italic fs-4'>Ants</p>
                                     </Col>
                                 </Row>
                             </Col>
@@ -207,7 +210,7 @@ const SearchResult = (props: Props) => {
                                 <p className="fs-5 fs-lg-4">{languages}</p>
                             </Col>
                             <Col className="d-flex justify-content-end">
-                                <p className="fw-bold fs-4">{taxonomicExpert.taxonomicExpert['schema:location']}</p>
+                                <p className="fw-bold fs-4">{location}</p>
                             </Col>
                         </Row>
                     </Col>

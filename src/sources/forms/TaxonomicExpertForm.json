@@ -1,38 +1,39 @@
 {
     "taxonomicExpert": {
         "title": "Personal & contact information",
+        "jsonPath": "$['schema:person']",
         "type": "object",
         "fields": [
             {
-                "jsonPath": "$['schema:name']",
+                "jsonPath": "$['schema:person']['schema:name']",
                 "title": "Full Name",
                 "type": "string",
                 "description": "The full name of the taxonomic expert.",
                 "required": true
             },
             {
-                "jsonPath": "$['schema:email']",
+                "jsonPath": "$['schema:person']['schema:email']",
                 "title": "Email",
                 "type": "string",
                 "description": "The email address of the taxonomic expert.",
                 "required": false
             },
             {
-                "jsonPath": "$['schema:identifier']",
+                "jsonPath": "$['schema:person']['schema:identifier']",
                 "title": "ORCID",
                 "description": "A unique identifier to identify the author; ORCID identifiers are valid",
                 "type": "string",
                 "required": false
             },
             {
-                "jsonPath": "$['schema:headline']",
+                "jsonPath": "$['schema:person']['schema:headline']",
                 "title": "Headline description",
                 "description": "A description of your job role or what you are an expert in. For example: Expert on Bee Taxonomy; Professor of Entomology, Citizen scientist on butterfly monitoring).",
                 "type": "text",
                 "required": false
             },
             {
-                "jsonPath": "$['schema:nationality']",
+                "jsonPath": "$['schema:person']['schema:nationality']",
                 "title": "Nationality",
                 "description": "Select your nationality. Please use the country name and ISO code (Alpha-2 code).",
                 "type": "select",
@@ -238,7 +239,7 @@
                 "required": false
             },
             {
-                "jsonPath": "$['schema:location']",
+                "jsonPath": "$['schema:person']['schema:location']",
                 "title": "Location",
                 "description": "Select your country of residence. Please use the country name and ISO code (Alpha-2 code).",
                 "type": "select",
@@ -444,7 +445,7 @@
                 "required": false
             },                               
             {
-                "jsonPath": "$['schema:language']",
+                "jsonPath": "$['schema:person']['schema:language']",
                 "title": "Supporting language",
                 "description": "The languages that you are proficient or fluent in. Please use one of the language codes from the IETF BCP 47 standard",
                 "type": "multi-select",
@@ -509,7 +510,7 @@
                 "required": false
             },
             {
-                "jsonPath": "$['schema:personal']['schema:Age']",
+                "jsonPath": "$['schema:person']['schema:birthDate']",
                 "title": "Age",
                 "description": "Select your age range.",
                 "type": "select",
@@ -524,7 +525,7 @@
                 "required": false
             },
             {
-                "jsonPath": "$['schema:personal']['schema:Gender']",
+                "jsonPath": "$['schema:person']['schema:Gender']",
                 "title": "Gender",
                 "description": "Select your gender",
                 "type": "select",
@@ -537,34 +538,27 @@
                 "required": false
             },
             {
-                "jsonPath": "$['schema:personal']['schema:Affilition']",
-                "title": "Affiliation",
-                "description": "Please provide the official English name of your institution and organisation. If you are not affiliated with an institution/organisation then write No Affiliation.",
-                "type": "string",
-                "required": false
-            },
-            {
-                "jsonPath": "$['schema:personal']['schema:affiliation']",
+                "jsonPath": "$['schema:person']['schema:affiliation']",
                 "title": "Affiliated Organisation",
                 "description": "The affiliated organisation",
                 "type": "ror",
                 "required": false
             },
             {
-                "jsonPath": "$['schema:personal']['schema:biography']",
+                "jsonPath": "$['schema:person']['schema:biography']",
                 "title": "Expertise biography",
                 "description": "A brief description of your expertise, skills and services.",
                 "type": "text",
                 "required": false
             },
             {
-                "jsonPath": "$['schema:personal']['schema:links'][0]",
+                "jsonPath": "$['schema:person']['schema:links'][0]",
                 "title": "Personal webpage links",
                 "description": "Links to your personal webpage, blog, or other online profiles.",
                 "type": "multi-string"
             },
             {
-                "jsonPath": "$['schema:personal']['schema:ProfilePicture']",
+                "jsonPath": "$['schema:person']['schema:ProfilePicture']",
                 "title": "Profile image",
                 "description": "A link to the profile image of the taxonomic expert.",
                 "type": "string",
@@ -572,25 +566,78 @@
             }
         ]
     },
-    "taxonomicScope": {
+    "Taxon": {
         "title": "Taxonomic & Research Scope",
+        "jsonPath": "$['schema:Taxon']",
         "type": "object",
         "fields": [
             {
-                "jsonPath": "$['schema:taxonomicRange']",
+                "jsonPath": "$['schema:Taxon']['schema:discipline']",
                 "title": "Taxonomic discipline",
                 "type": "string",
                 "description": "The taxonomic discipline that you are an expert in. For example: Entomology, Botany, Ichthyology, etc.",
                 "required": false
+            },
+            {
+                "jsonPath": "$['schema:Taxon']['schema:additionalType']",
+                "title": "Taxonomic sub-discipline",
+                "type": "string",
+                "description": "The taxonomic sub-discipline. For example: Coleoptera, Lepidoptera, Diptera, etc.",
+                "required": false
+            },
+            {
+                "jsonPath": "$['schema:Taxon']['schema:about']",
+                "title": "Taxonomic scope",
+                "type": "string",
+                "description": "You can list in more detail the Taxonomic, orders, Families or genus you are an expert on. Please if possible write the scientific names and english common name e.g. Hymenoptera/bees ",
+                "required": false
+            },
+            {
+                "jsonPath": "$['schema:Taxon']['schema:spatialCoverage']",
+                "title": "Geographic region",
+                "type": "string",
+                "description": "The geographic region that you are an expert in. For example: Europe, South America, Africa, etc.",
+                "required": false
+            },
+            {
+                "jsonPath": "$['schema:Taxon']['schema:temporalCoverage']",
+                "title": "Stratigraphy age",
+                "type": "string",
+                "description": "The stratigraphy age that you are an expert in. For example: Cretaceous, Jurassic, etc.",
+                "required": false
+            },
+            {
+                "jsonPath": "$['schema:Taxon']['schema:measurementTechnique']",
+                "title": "Taxonomic methodology",
+                "description": "The taxonomic methodology that you are an expert in. For example: DNA barcoding, Morphology, etc.",
+                "type": "multi-select",
+                "options": [
+                    "Morphological",
+                    "Molecular/genomica",
+                    "bioacoustic",
+                    "Integrative",
+                    "cladistics",
+                    "faunistics",
+                    "other" 
+                ],
+                "required": false
+            },
+            {
+                "jsonPath": "$['schema:Taxon']['schema:ResearchProject']",
+                "title": "Applied research",
+                "type": "multi-string",
+                "description": "Keywords that describe your expertise. For example: Taxonomy, Biodiversity, Conservation, etc.",
+                "required": false
             }
         ]
     },
-    "taxonomicEducation": {
+    "occupation": {
         "title": "Education and experience",
+        "jsonPath": "$['schema:occupation']",
         "type": "object",
         "fields": [
             {
-                "jsonPath": "$['schema:education']['schema:level']",
+                "jsonPath": "$['schema:occupation']['schema:educationalLevel']",
                 "title": "Education Level",
                 "description": "Select the highest level of education you have received. You can choose multiple options.",
                 "type": "multi-select",
@@ -606,7 +653,7 @@
                 "required": false
             },
             {
-                "jsonPath": "$['schema:education']['schema:EmploymentStatus']",
+                "jsonPath": "$['schema:occupation']['schema:employmentType']",
                 "title": "Employment Status",
                 "description": "Provide your current employment status. This information helps with statistical analysis and gives users of the marketplace insight into the professional experience of the expert. You can select up to two options.",
                 "type": "multi-select",
@@ -639,7 +686,7 @@
                 "maxSelections": 2
               },
               {
-                "jsonPath": "$['schema:education']['schema:TaxonomyExperience']",
+                "jsonPath": "$['schema:occupation']['schema:yearsInOperation']",
                 "title": "Taxonomy Experience",
                 "description": "Select your years of experience in taxonomy. This helps gauge your professional background in the field.",
                 "type": "select",
@@ -655,23 +702,75 @@
                 "required": false
               },
               {
-                "jsonPath": "$['schema:education']['schema:PublicationNumber']",
                 "title": "Publication Number",
-                "type": "string",
-                "description": "Enter the number of publications related to taxonomy. If you don’t have any publications, enter 0.",
-                "required": false
-              }
+                "jsonPath": "$['schema:occupation']['schema:publication']",
+                "description": "Enter the number of publications related to taxonomy.",
+                "type": "array",
+                "fields": [
+                    {
+                        "jsonPath": "$['schema:occupation']['schema:publication']['index']['identifier']",
+                        "title": "Identification keys",
+                        "description": "The number of identification keys",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "jsonPath": "$['schema:occupation']['schema:publication']['index']['ScholarlyArticle']",
+                        "title": "Research papers",
+                        "description": "The number of scientific papers",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "jsonPath": "$['schema:occupation']['schema:publication']['index']['Book']",
+                        "title": "Books",
+                        "description": "The number of books",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "jsonPath": "$['schema:occupation']['schema:publication']['index']['CreativeWork']",
+                        "title": "Other",
+                        "description": "The number of other publications",
+                        "type": "string",
+                        "required": false
+                    }
+                ]
+            }
         ]
     },
-    "taxonomicTraining": {
+    "course": {
         "title": "education/training provision",
+        "jsonPath": "$['schema:course']",
         "type": "object",
         "fields": [
             {
-                "jsonPath": "$['schema:training']['schema:name']",
-                "title": "Education level",
+                "jsonPath": "$['schema:course']['index']['schema:name']",
+                "title": "Training course  title",
+                "description": "The title of the training course",
                 "type": "string",
-                "description": "The full name of the taxonomic expert.",
+                "required": false
+            },
+            {
+                "jsonPath": "$['schema:course']['index']['schema:description']",
+                "title": "Training course description",
+                "description": "A brief description of the training course",
+                "type": "string",
+                "maxChars": 500,
+                "required": false
+            },
+            {
+                "jsonPath": "$['schema:course']['index']['schema:contentUrl']",
+                "title": "Content URL",
+                "description": "The URL of the training course",
+                "type": "string",
+                "required": false
+            },
+            {
+                "jsonPath": "$['schema:course']['index']['schema:EducationalOccupationalProgram']",
+                "title": "DEST URL",
+                "description": "The URL of the training course",
+                "type": "string",
                 "required": false
             }
         ]
