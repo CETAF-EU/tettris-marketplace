@@ -161,9 +161,9 @@ const SearchResult = (props: Props) => {
             navigate(`/te/${taxonomicExpert.taxonomicExpert['@id'].replace(import.meta.env.VITE_HANDLE_URL as string, '')}`);
         }
 
-        const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] || '';
-        const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] || '';
-        const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] || '';
+        const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] ?? '';
+        const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] ?? '';
+        const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] ?? '';
         const languages = (taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language'] || []).join(' / ').toUpperCase() || '';
 
         return (
