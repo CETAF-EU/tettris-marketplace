@@ -68,5 +68,26 @@ export interface TaxonomicExpert {
     "schema:location"?: string;
     [k: string]: unknown;
   };
+  /**
+   * Courses the Taxonomic Expert has created or is teaching
+   */
+  "schema:course"?: {
+    /**
+     * The title of the training course
+     */
+    "schema:name": string;
+    /**
+     * A brief description of the training course
+     */
+    "schema:description"?: string;
+    /**
+     * The URL of the training course
+     */
+    "schema:contentUrl"?: string;
+    /**
+     * The URL of the training course
+     */
+    "schema:EducationalOccupationalProgram"?: string;
+  }[];
   [k: string]: unknown;
 }

@@ -93,6 +93,50 @@
             ]
         },
         {
+            "name": "taxonomicSubGroup",
+            "alias": "schema:taxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {
+                    "label": "Mammals",
+                    "value": "mammals"
+                },
+                {
+                    "label": "Birds",
+                    "value": "birds"
+                },
+                {
+                    "label": "Reptiles",
+                    "value": "reptiles"
+                },
+                {
+                    "label": "Amphibians",
+                    "value": "amphibians"
+                },
+                {
+                    "label": "Fish",
+                    "value": "fish"
+                },
+                {
+                    "label": "Insects",
+                    "value": "insects"
+                },
+                {
+                    "label": "Arachnids",
+                    "value": "arachnids"
+                },
+                {
+                    "label": "Mollusks",
+                    "value": "mollusks"
+                },
+                {
+                    "label": "Crustaceans",
+                    "value": "crustaceans"
+                }
+            ]
+        },
+        {
             "name": "language",
             "alias": "schema:availableLanguage",
             "type": "select",

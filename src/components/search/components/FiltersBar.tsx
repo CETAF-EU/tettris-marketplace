@@ -54,11 +54,12 @@ const FiltersBar = (props: Props) => {
     /* Determine filters based on service type */
     const filters: FilterType[] = [];
     const serviceType = searchParams.get('serviceType');
-
+    let hint = "pollinator academy";
     if (!serviceType) {
         filters.push(...taxonomicServicefilters);
     } else if (serviceType === 'taxonomicExpert') {
         filters.push(...taxonomicExpertFilters);
+        hint = "John Doe";
     }
 
     /* Set initial values */
@@ -125,27 +126,29 @@ const FiltersBar = (props: Props) => {
                     <Form>
                         <Row className="align-items-end">
                             {/* Search Bar */}
-                            <Col xs={{ span: 12 }}
-                                lg={{ span: 4 }}
+                            <Col 
+                                xs={12} 
+                                lg={filters.length > 4 ? 3 : 4} 
                                 className="mb-4 mb-lg-0"
                             >
                                 <p className={`${serviceTypeClass} fs-5 fw-lightBold`}>Search query</p>
-                                <QueryBar name="query"
-                                    placeholder="Pollinator Academy"
-                                >
+                                <QueryBar name="query" placeholder={hint}>
                                     <FontAwesomeIcon icon={faMagnifyingGlass} />
                                 </QueryBar>
                             </Col>
+                    
                             {/* Filters */}
                             <Col>
                                 <Row>
                                     {filters.map((filter) => (
-                                        <Col key={filter.name}
-                                            xs={{ span: 12 }}
-                                            lg={{ span: filters.length > 4 ? 2 : 3 }}
+                                        <Col 
+                                            key={filter.name}
+                                            xs={12} 
+                                            lg={filters.length > 4 ? Math.max(3 / filters.length, 2) : 3}
                                             className="mb-2 mb-lg-0"
                                         >
-                                            <Filter filter={filter}
+                                            <Filter 
+                                                filter={filter}
                                                 currentValue={values[filter.name as keyof typeof values]}
                                                 hasDefault={!!filters.find(originalFilter => originalFilter.name === filter.name)?.default}
                                                 SetFilterValue={(value: string | number | boolean) => setFieldValue(filter.name, value)}
@@ -155,32 +158,27 @@ const FiltersBar = (props: Props) => {
                                     ))}
                                 </Row>
                             </Col>
+                    
                             {/* Search button */}
-                            <Col lg="auto"
-                                className="d-none d-lg-block"
-                            >
-                                <Button type="submit"
-                                    variant={variant}
-                                >
+                            <Col lg="auto" className="d-none d-lg-block">
+                                <Button type="submit" variant={variant}>
                                     <p>Search</p>
                                 </Button>
                             </Col>
+                    
                             {/* Deselect all filters button */}
-                            <Col lg="auto"
-                                className="ps-0 d-none d-lg-block"
-                            >
-                                <Button type="button"
+                            <Col lg="auto" className="ps-0 d-none d-lg-block">
+                                <Button 
+                                    type="button"
                                     variant="primary"
                                     className="bgc-error"
                                     OnClick={() => ResetSearchFilters()}
                                 >
-                                    <FontAwesomeIcon icon={faFilterCircleXmark}
-                                        size="lg"
-                                    />
+                                    <FontAwesomeIcon icon={faFilterCircleXmark} size="lg" />
                                 </Button>
                             </Col>
                         </Row>
-                    </Form>
+                    </Form>                
                 )
             }}
         </Formik>

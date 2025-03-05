@@ -290,6 +290,35 @@
                     "description" : "The location of the Taxonomic Expert"
                 }
             }
+        },
+        "schema:course": {
+            "type": "array",
+            "description": "Courses the Taxonomic Expert has created or is teaching",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "schema:name": {
+                        "type": "string",
+                        "description": "The title of the training course"
+                    },
+                    "schema:description": {
+                        "type": "string",
+                        "description": "A brief description of the training course"
+                    },
+                    "schema:contentUrl": {
+                        "type": "string",
+                        "description": "The URL of the training course"
+                    },
+                    "schema:EducationalOccupationalProgram": {
+                        "type": "string",
+                        "description": "The URL of the training course"
+                    }
+                },
+                "required": [
+                    "schema:name"
+                ],
+                "additionalProperties": false
+            }
         }
     },
     "required": [

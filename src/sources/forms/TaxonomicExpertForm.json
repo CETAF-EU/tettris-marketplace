@@ -740,9 +740,9 @@
         ]
     },
     "course": {
-        "title": "education/training provision",
+        "title": "Education and training provision",
         "jsonPath": "$['schema:course']",
-        "type": "object",
+        "type": "array",
         "fields": [
             {
                 "jsonPath": "$['schema:course']['index']['schema:name']",

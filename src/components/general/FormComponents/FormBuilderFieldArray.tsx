@@ -77,10 +77,8 @@ const FormBuilderFieldArray = (props: Props) => {
                             </Button>
                         </Col>
                     </Row>
-
                     {jp.value(values, section.jsonPath).map((_fields: Dict, index: number) => {
                         const key = `${section.jsonPath}-${index}`;
-
                         return (
                             <div key={key}
                                 className="mt-2 px-3 py-2 b-grey"
@@ -107,6 +105,7 @@ const FormBuilderFieldArray = (props: Props) => {
                                 <Row className="my-2">
                                     <Col>
                                         {formSections[MakeReadableString(FlattenJSONPath(section.jsonPath)).split(' ').slice(1).join(' ')].fields.map((field, localIndex) => {
+                                            
                                             let localField = cloneDeep(field);
 
                                             localField.jsonPath = field.jsonPath.replace('index', String(index));

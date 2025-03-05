@@ -16,6 +16,7 @@ import { TaxonomicExpert, TaxonomicService } from 'app/Types';
 
 /* Import Styles */
 import styles from 'components/search/search.module.scss';
+import MarkdownIt from 'markdown-it';
 
 
 /* Props Type */
@@ -61,6 +62,10 @@ const SearchResult = (props: Props) => {
             'd-none d-lg-none': !logoImage,
             'd-none d-lg-flex': logoImage
         });
+
+        const md = new MarkdownIt();
+        const description = md.render(taxonomicService.taxonomicService['schema:service']['schema:description']);
+
         return (
             <div className={`${styles.searchResult} w-100 bgc-white mt-lg-1 pt-3 pb-2 px-3`}>
                 <button type="button"
@@ -92,7 +97,7 @@ const SearchResult = (props: Props) => {
                             {/* Description */}
                             <Row className='flex-grow-1 my-2'>
                                 <Col>
-                                    <p className={`${styles.searchResultDescription} h-100 fs-4`}>{taxonomicService.taxonomicService['schema:service']['schema:description']}</p>
+                                    <p className={`${styles.searchResultDescription} h-100 fs-4`}><div dangerouslySetInnerHTML={{ __html: description }} /></p>
                                 </Col>
                             </Row>
                             {/* Service Type and Publishing Date if preview image is not present */}
@@ -195,11 +200,12 @@ const SearchResult = (props: Props) => {
                                     </Col>
                                 </Row>
                             </Col>
-                            <Col className='d-flex justify-content-end'>
-                                <div className="h-100 w-100 overflow-hidden" style={{ maxWidth: window.innerWidth < 768 ? '80px' : '100px', maxHeight: window.innerWidth < 768 ? '80px' : '100px' }}>
-                                    <img src={logoImage}
-                                        alt={logoImage}
-                                        className="h-100 w-100 object-fit-contain"
+                            <Col className="d-flex justify-content-end">
+                                <div className="h-100 w-100 overflow-hidden" style={{ maxWidth: '40%' }}>
+                                    <img 
+                                        src={logoImage} 
+                                        alt="Logo" 
+                                        className="img-fluid object-fit-contain"
                                     />
                                 </div>
                             </Col>
