@@ -67,10 +67,10 @@ function TrainingCard() {
                 </Card.Text>
                 <div className="fs-4 fw-bold d-flex justify-content-between m-3">
                     <Card.Link href="#" className="d-flex align-items-center">
-                        <i className="bi bi-link-45deg me-2"></i> Card Link
+                        <i className="bi bi-link-45deg me-2"></i> URL
                     </Card.Link>
                     <Card.Link href="#" className="d-flex align-items-center">
-                        <i className="bi bi-link-45deg me-2"></i> Another Link
+                        <i className="bi bi-link-45deg me-2"></i> Avaible though DEST
                     </Card.Link>
                 </div>
             </Card.Body>
