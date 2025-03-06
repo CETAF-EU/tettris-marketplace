@@ -70,8 +70,6 @@ const WorldMap: React.FC = () => {
         <Geographies geography={geoUrl}>
           {({ geographies }) =>
             geographies.map((geo) => {
-              // Check if the country is in Europe
-              console.log(geo);
               return (
                 <Geography
                   key={geo.rsmKey}
