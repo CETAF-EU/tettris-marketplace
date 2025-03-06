@@ -53,8 +53,7 @@ const FormBuilderFieldArray = (props: Props) => {
     const { section, title, initialFormValues, values, formSections, FlattenJSONPath, SetFieldValue, ConstructFormField } = props;
     /* Determine color */
     const color: Color = 'tc-' + getColor(window.location) as Color;
-    console.log(values, SetFieldValue);
-
+    
     return (
         <FieldArray name={section.jsonPath.replace('$', '')}>
             {({ push, remove }) => (
