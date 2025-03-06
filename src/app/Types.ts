@@ -79,6 +79,10 @@ export type Filter = {
     options?: {
         label: string,
         value: string,
+        subOptions?: {
+            label: string,
+            value: string
+        }[],
         action?: Function
     }[],
     placeholder?: string

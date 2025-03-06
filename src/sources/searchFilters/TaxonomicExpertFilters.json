@@ -6,46 +6,89 @@
             "type": "select",
             "default": "",
             "options": [
-                {
-                    "label": "United States",
-                    "value": "us"
-                },
-                {
-                    "label": "Canada",
-                    "value": "ca"
-                },
-                {
-                    "label": "United Kingdom",
-                    "value": "uk"
-                },
-                {
-                    "label": "Australia",
-                    "value": "au"
-                },
-                {
-                    "label": "Germany",
-                    "value": "de"
-                },
-                {
-                    "label": "France",
-                    "value": "fr"
-                },
-                {
-                    "label": "Italy",
-                    "value": "it"
-                },
-                {
-                    "label": "Spain",
-                    "value": "es"
-                },
-                {
-                    "label": "China",
-                    "value": "cn"
-                },
-                {
-                    "label": "Japan",
-                    "value": "jp"
-                }
+                {"label": "Afghanistan", "value": "af"},
+                {"label": "Albania", "value": "al"},
+                {"label": "Algeria", "value": "dz"},
+                {"label": "Andorra", "value": "ad"},
+                {"label": "Angola", "value": "ao"},
+                {"label": "Argentina", "value": "ar"},
+                {"label": "Armenia", "value": "am"},
+                {"label": "Australia", "value": "au"},
+                {"label": "Austria", "value": "at"},
+                {"label": "Azerbaijan", "value": "az"},
+                {"label": "Bangladesh", "value": "bd"},
+                {"label": "Belarus", "value": "by"},
+                {"label": "Belgium", "value": "be"},
+                {"label": "Bolivia", "value": "bo"},
+                {"label": "Bosnia and Herzegovina", "value": "ba"},
+                {"label": "Brazil", "value": "br"},
+                {"label": "Bulgaria", "value": "bg"},
+                {"label": "Canada", "value": "ca"},
+                {"label": "Chile", "value": "cl"},
+                {"label": "China", "value": "cn"},
+                {"label": "Colombia", "value": "co"},
+                {"label": "Croatia", "value": "hr"},
+                {"label": "Cuba", "value": "cu"},
+                {"label": "Czech Republic", "value": "cz"},
+                {"label": "Denmark", "value": "dk"},
+                {"label": "Ecuador", "value": "ec"},
+                {"label": "Egypt", "value": "eg"},
+                {"label": "Estonia", "value": "ee"},
+                {"label": "Finland", "value": "fi"},
+                {"label": "France", "value": "fr"},
+                {"label": "Georgia", "value": "ge"},
+                {"label": "Germany", "value": "de"},
+                {"label": "Greece", "value": "gr"},
+                {"label": "Hungary", "value": "hu"},
+                {"label": "Iceland", "value": "is"},
+                {"label": "India", "value": "in"},
+                {"label": "Indonesia", "value": "id"},
+                {"label": "Iran", "value": "ir"},
+                {"label": "Iraq", "value": "iq"},
+                {"label": "Ireland", "value": "ie"},
+                {"label": "Israel", "value": "il"},
+                {"label": "Italy", "value": "it"},
+                {"label": "Japan", "value": "jp"},
+                {"label": "Kazakhstan", "value": "kz"},
+                {"label": "Kenya", "value": "ke"},
+                {"label": "Latvia", "value": "lv"},
+                {"label": "Lithuania", "value": "lt"},
+                {"label": "Luxembourg", "value": "lu"},
+                {"label": "Malaysia", "value": "my"},
+                {"label": "Mexico", "value": "mx"},
+                {"label": "Mongolia", "value": "mn"},
+                {"label": "Morocco", "value": "ma"},
+                {"label": "Netherlands", "value": "nl"},
+                {"label": "New Zealand", "value": "nz"},
+                {"label": "Nigeria", "value": "ng"},
+                {"label": "Norway", "value": "no"},
+                {"label": "Pakistan", "value": "pk"},
+                {"label": "Peru", "value": "pe"},
+                {"label": "Philippines", "value": "ph"},
+                {"label": "Poland", "value": "pl"},
+                {"label": "Portugal", "value": "pt"},
+                {"label": "Romania", "value": "ro"},
+                {"label": "Russia", "value": "ru"},
+                {"label": "Saudi Arabia", "value": "sa"},
+                {"label": "Serbia", "value": "rs"},
+                {"label": "Singapore", "value": "sg"},
+                {"label": "Slovakia", "value": "sk"},
+                {"label": "Slovenia", "value": "si"},
+                {"label": "South Africa", "value": "za"},
+                {"label": "South Korea", "value": "kr"},
+                {"label": "Spain", "value": "es"},
+                {"label": "Sweden", "value": "se"},
+                {"label": "Switzerland", "value": "ch"},
+                {"label": "Thailand", "value": "th"},
+                {"label": "Turkey", "value": "tr"},
+                {"label": "Ukraine", "value": "ua"},
+                {"label": "United Arab Emirates", "value": "ae"},
+                {"label": "United Kingdom", "value": "uk"},
+                {"label": "United States", "value": "us"},
+                {"label": "Uzbekistan", "value": "uz"},
+                {"label": "Venezuela", "value": "ve"},
+                {"label": "Vietnam", "value": "vn"},
+                {"label": "Zimbabwe", "value": "zw"}
             ]
         },
         {
@@ -54,86 +97,106 @@
             "type": "select",
             "default": "",
             "options": [
-                {
-                    "label": "Mammals",
-                    "value": "mammals"
-                },
-                {
-                    "label": "Birds",
-                    "value": "birds"
-                },
-                {
-                    "label": "Reptiles",
-                    "value": "reptiles"
-                },
-                {
-                    "label": "Amphibians",
-                    "value": "amphibians"
-                },
-                {
-                    "label": "Fish",
-                    "value": "fish"
-                },
-                {
-                    "label": "Insects",
-                    "value": "insects"
-                },
-                {
-                    "label": "Arachnids",
-                    "value": "arachnids"
-                },
-                {
-                    "label": "Mollusks",
-                    "value": "mollusks"
-                },
-                {
-                    "label": "Crustaceans",
-                    "value": "crustaceans"
-                }
+                {"label": "Botany", "value": "botany"},
+                {"label": "Invertebrates Zoology", "value": "invertebrates"},
+                {"label": "Vertebrates Zoology", "value": "vertebrates"},
+                {"label": "Palaeontology", "value": "palaeontology"},
+                {"label": "Microbiology", "value": "microbiology"},
+                {"label": "ECO Environmental DNA", "value": "ecoEnvDNA"}
             ]
         },
         {
-            "name": "taxonomicSubGroup",
-            "alias": "schema:taxonomicGroup",
+            "name": "subtaxonomicGroup",
+            "alias": "schema:subtaxonomicGroup",
             "type": "select",
             "default": "",
             "options": [
-                {
-                    "label": "Mammals",
-                    "value": "mammals"
-                },
-                {
-                    "label": "Birds",
-                    "value": "birds"
-                },
-                {
-                    "label": "Reptiles",
-                    "value": "reptiles"
-                },
-                {
-                    "label": "Amphibians",
-                    "value": "amphibians"
-                },
-                {
-                    "label": "Fish",
-                    "value": "fish"
-                },
-                {
-                    "label": "Insects",
-                    "value": "insects"
-                },
-                {
-                    "label": "Arachnids",
-                    "value": "arachnids"
-                },
-                {
-                    "label": "Mollusks",
-                    "value": "mollusks"
-                },
-                {
-                    "label": "Crustaceans",
-                    "value": "crustaceans"
-                }
+                {"label": "", "value": ""}
+            ]
+        },
+        {
+            "name": "subBotanyGroup",
+            "alias": "schema:subTaxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {"label": "Algae", "value": "algae"},
+                {"label": "Macrofungi, Lichens & Myxomycetes (Mycology)", "value": "macrofungiLichensMyxomycetes"},
+                {"label": "Bryophytes", "value": "bryophytes"},
+                {"label": "Pteridophytes", "value": "pteridophytes"},
+                {"label": "Seed plants", "value": "seedPlants"},
+                {"label": "Plant Genetic Resources", "value": "plantGeneticResources"}
+            ]
+        },
+        {
+            "name": "subInvertebratesGroup",
+            "alias": "schema:subTaxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {"label": "Insects", "value": "insects"},
+                {"label": "Arachnids", "value": "arachnids"},
+                {"label": "Crustaceans & Myriapods", "value": "crustaceansMyriapods"},
+                {"label": "Mollusca (bivalves, gastropods, cephalopods)", "value": "mollusca"},
+                {"label": "Porifera (Sponges)", "value": "porifera"},
+                {"label": "Cnidaria (jellyfish, coral, anemones)", "value": "cnidaria"},
+                {"label": "Echinodermata (starfish, sea urchins, sea cucumbers)", "value": "echinodermata"},
+                {"label": "Invertebrates Genetic Resources", "value": "invertebratesGeneticResources"},
+                {"label": "Other Invertebrate Zoology", "value": "otherInvertebrateZoology"}
+            ]
+        },
+        {
+            "name": "subVertebratesGroup",
+            "alias": "schema:subTaxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {"label": "Fishes", "value": "fishes"},
+                {"label": "Amphibians", "value": "amphibians"},
+                {"label": "Reptiles", "value": "reptiles"},
+                {"label": "Birds", "value": "birds"},
+                {"label": "Mammals", "value": "mammals"},
+                {"label": "Vertebrates Genetic Resources", "value": "vertebratesGeneticResources"},
+                {"label": "Other Vertebrate Zoology", "value": "otherVertebrateZoology"}
+            ]
+        },
+        {
+            "name": "subPalaeontologyGroup",
+            "alias": "schema:subTaxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {"label": "Fossil Plants & Fungi", "value": "fossilPlantsFungi"},
+                {"label": "Fossil Invertebrates", "value": "fossilInvertebrates"},
+                {"label": "Fossil Vertebrates", "value": "fossilVertebrates"},
+                {"label": "Other Palaeontology", "value": "otherPalaeontology"}
+            ]
+        },
+        {
+            "name": "subMicrobiologyGroup",
+            "alias": "schema:subTaxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {"label": "Phages", "value": "phages"},
+                {"label": "Bacteria & Archaea", "value": "bacteriaArchaea"},
+                {"label": "Plasmids", "value": "plasmids"},
+                {"label": "Protozoa", "value": "protozoa"},
+                {"label": "Eukaryotic Microorganisms", "value": "eukaryoticMicroorganisms"},
+                {"label": "Viruses", "value": "viruses"},
+                {"label": "Microfungi (including moulds, yeasts)", "value": "microfungi"},
+                {"label": "Algae (in microbiology collection)", "value": "algaeMicrobiology"},
+                {"label": "Other Microbiology Objects (e.g. mixed or other kinds of microorganisms)", "value": "otherMicrobiologyObjects"}
+            ]
+        },
+        {
+            "name": "subEcoEnvDNAGroup",
+            "alias": "schema:subTaxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {"label": "ECO-DNA (environmental DNA)", "value": "ecoDNA"},
+                {"label": "ECO-OTH", "value": "ecoOTH"}
             ]
         },
         {
@@ -142,114 +205,77 @@
             "type": "select",
             "default": "",
             "options": [
-                {
-                    "label": "Bulgarian",
-                    "value": "bg"
-                },
-                {
-                    "label": "Croatian",
-                    "value": "hr"
-                },
-                {
-                    "label": "Czech",
-                    "value": "cs"
-                },
-                {
-                    "label": "Danish",
-                    "value": "da"
-                },
-                {
-                    "label": "Dutch",
-                    "value": "nl"
-                },
-                {
-                    "label": "Luxembourgish",
-                    "value": "lb"
-                },
-                {
-                    "label": "English",
-                    "value": "en"
-                },
-                {
-                    "label": "Estonian",
-                    "value": "es"
-                },
-                {
-                    "label": "Finnish",
-                    "value": "fi"
-                },
-                {
-                    "label": "French",
-                    "value": "fr"
-                },
-                {
-                    "label": "German",
-                    "value": "de"
-                },
-                {
-                    "label": "Greek",
-                    "value": "el"
-                },
-                {
-                    "label": "Hungarian",
-                    "value": "hu"
-                },
-                {
-                    "label": "Irish",
-                    "value": "ga"
-                },
-                {
-                    "label": "Italian",
-                    "value": "it"
-                },
-                {
-                    "label": "Latvian",
-                    "value": "lv"
-                },
-                {
-                    "label": "Lithuanian",
-                    "value": "lt"
-                },
-                {
-                    "label": "Maltese",
-                    "value": "mt"
-                },
-                {
-                    "label": "Polish",
-                    "value": "pl"
-                },
-                {
-                    "label": "Portugese",
-                    "value": "pt"
-                },
-                {
-                    "label": "Romanian",
-                    "value": "ro"
-                },
-                {
-                    "label": "Russian",
-                    "value": "ru"
-                },
-                {
-                    "label": "Slovakian",
-                    "value": "sk"
-                },
-                {
-                    "label": "Spanish",
-                    "value": "es"
-                },
-                {
-                    "label": "Swedish",
-                    "value": "sv"
-                },
-                {
-                    "label": "Turkish",
-                    "value": "tk"
-                },
-                {
-                    "label": "Ukranian",
-                    "value": "uk"
-                }
+                {"label": "Afghan Persian", "value": "fa-AF"},
+                {"label": "Afrikaans", "value": "af"},
+                {"label": "Albanian", "value": "sq"},
+                {"label": "Amharic", "value": "am"},
+                {"label": "Arabic", "value": "ar"},
+                {"label": "Armenian", "value": "hy"},
+                {"label": "Azerbaijani", "value": "az"},
+                {"label": "Bengali", "value": "bn"},
+                {"label": "Bosnian", "value": "bs"},
+                {"label": "Bulgarian", "value": "bg"},
+                {"label": "Burmese", "value": "my"},
+                {"label": "Catalan", "value": "ca"},
+                {"label": "Chinese (Simplified)", "value": "zh-CN"},
+                {"label": "Chinese (Traditional)", "value": "zh-TW"},
+                {"label": "Croatian", "value": "hr"},
+                {"label": "Czech", "value": "cs"},
+                {"label": "Danish", "value": "da"},
+                {"label": "Dutch", "value": "nl"},
+                {"label": "English", "value": "en"},
+                {"label": "Estonian", "value": "et"},
+                {"label": "Finnish", "value": "fi"},
+                {"label": "French", "value": "fr"},
+                {"label": "Georgian", "value": "ka"},
+                {"label": "German", "value": "de"},
+                {"label": "Greek", "value": "el"},
+                {"label": "Hebrew", "value": "he"},
+                {"label": "Hindi", "value": "hi"},
+                {"label": "Hungarian", "value": "hu"},
+                {"label": "Icelandic", "value": "is"},
+                {"label": "Indonesian", "value": "id"},
+                {"label": "Irish", "value": "ga"},
+                {"label": "Italian", "value": "it"},
+                {"label": "Japanese", "value": "ja"},
+                {"label": "Kazakh", "value": "kk"},
+                {"label": "Khmer", "value": "km"},
+                {"label": "Korean", "value": "ko"},
+                {"label": "Kurdish", "value": "ku"},
+                {"label": "Latvian", "value": "lv"},
+                {"label": "Lithuanian", "value": "lt"},
+                {"label": "Luxembourgish", "value": "lb"},
+                {"label": "Macedonian", "value": "mk"},
+                {"label": "Malay", "value": "ms"},
+                {"label": "Maltese", "value": "mt"},
+                {"label": "Mongolian", "value": "mn"},
+                {"label": "Nepali", "value": "ne"},
+                {"label": "Norwegian", "value": "no"},
+                {"label": "Pashto", "value": "ps"},
+                {"label": "Persian", "value": "fa"},
+                {"label": "Polish", "value": "pl"},
+                {"label": "Portuguese", "value": "pt"},
+                {"label": "Romanian", "value": "ro"},
+                {"label": "Russian", "value": "ru"},
+                {"label": "Serbian", "value": "sr"},
+                {"label": "Sinhala", "value": "si"},
+                {"label": "Slovak", "value": "sk"},
+                {"label": "Slovenian", "value": "sl"},
+                {"label": "Somali", "value": "so"},
+                {"label": "Spanish", "value": "es"},
+                {"label": "Swahili", "value": "sw"},
+                {"label": "Swedish", "value": "sv"},
+                {"label": "Tagalog", "value": "tl"},
+                {"label": "Tajik", "value": "tg"},
+                {"label": "Tamil", "value": "ta"},
+                {"label": "Thai", "value": "th"},
+                {"label": "Turkish", "value": "tr"},
+                {"label": "Turkmen", "value": "tk"},
+                {"label": "Ukrainian", "value": "uk"},
+                {"label": "Urdu", "value": "ur"},
+                {"label": "Uzbek", "value": "uz"},
+                {"label": "Vietnamese", "value": "vi"},
+                {"label": "Welsh", "value": "cy"}
             ]
         },
         {

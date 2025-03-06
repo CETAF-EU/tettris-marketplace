@@ -58,7 +58,39 @@ const FiltersBar = (props: Props) => {
     if (!serviceType) {
         filters.push(...taxonomicServicefilters);
     } else if (serviceType === 'taxonomicExpert') {
-        filters.push(...taxonomicExpertFilters);
+        let subGroup = "";
+        if (searchParams.get('taxonomicGroup'))
+            subGroup = "sub" + (searchParams.get('taxonomicGroup') as string).charAt(0).toUpperCase() + (searchParams.get('taxonomicGroup') as string).slice(1) + "Group";
+        let i = 0;
+        while (i < taxonomicExpertFilters.length) {
+            const filter = taxonomicExpertFilters[i];
+            
+            if (filter.name == "taxonomicGroup") {
+                filters.push(filter);
+                i++;
+        
+                if (searchParams.get('taxonomicGroup')) {
+                    // Process the taxonomicGroup with searchParams
+                    while (i < taxonomicExpertFilters.length && !taxonomicExpertFilters[i].name.includes(subGroup)) {
+                        i++;
+                    }
+                    filters.push(taxonomicExpertFilters[i++]);
+        
+                    while (i < taxonomicExpertFilters.length && taxonomicExpertFilters[i].name.includes('sub')) {
+                        i++;
+                    }
+                } else {
+                    // Process taxonomicGroup without searchParams
+                    filters.push(taxonomicExpertFilters[i++]);
+                    while (i < taxonomicExpertFilters.length && taxonomicExpertFilters[i].name.includes('sub')) {
+                        i++;
+                    }
+                }
+            } else {
+                filters.push(filter);
+                i++;
+            }
+        }        
         hint = "John Doe";
     }
 
@@ -128,7 +160,7 @@ const FiltersBar = (props: Props) => {
                             {/* Search Bar */}
                             <Col 
                                 xs={12} 
-                                lg={filters.length > 4 ? 3 : 4} 
+                                lg={filters.length > 4 ? 2 : 4} 
                                 className="mb-4 mb-lg-0"
                             >
                                 <p className={`${serviceTypeClass} fs-5 fw-lightBold`}>Search query</p>
