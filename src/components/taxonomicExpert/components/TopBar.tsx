@@ -29,8 +29,8 @@ const TopBar = (props: Props) => {
     return (<>
         <Row className="mt-3 pt-lg-0">
             <Col lg="8">
-                <Row className='ms-2'>
-                    <Col xs="2">
+                <Row>
+                    <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
                         <h1 className="fs-3 fs-lg-2">{name}</h1>
                     </Col>
                     <Col xs="2">
@@ -56,7 +56,7 @@ const TopBar = (props: Props) => {
         </Row>
         <Row className="mb-3 pt-lg-0">
             <Col lg="auto">
-                <img src="https://static1.purepeople.com/people/9/39/@/5118785-brad-pitt-septembre-2019-200x200-2.jpg" alt="John Doe" style={{ width: '150px', height: '150px' }} />
+                <img src="https://static1.purepeople.com/people/9/39/@/5118785-brad-pitt-septembre-2019-200x200-2.jpg" alt="John Doe" style={{ width: '12rem', height: '12rem' }} />
             </Col>
             <Col className='ms-3'>
                 <Row className='mb-3 mt-3'>

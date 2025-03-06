@@ -72,7 +72,7 @@ function displayPublicationChart() {
         <Col>
             <p className='fw-bold'>Publication Number</p>
         </Col>
-        <Col xs='8'>
+        <Col xs='auto' style={{ minWidth: '30rem', textAlign: 'center' }}>
             <Chart
                 chartType="PieChart"
                 width="100%"

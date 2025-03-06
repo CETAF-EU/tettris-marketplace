@@ -3,11 +3,58 @@ import {
   ComposableMap,
   Geographies,
   Geography,
-  Marker,
 } from 'react-simple-maps';
 
 // URL to the TopoJSON world map
 const geoUrl = "https://unpkg.com/world-atlas@2.0.2/countries-110m.json";
+
+const europeanCountries = [
+  "Albania",
+  "Andorra",
+  "Austria",
+  "Belarus",
+  "Belgium",
+  "Bosnia and Herzegovina",
+  "Bulgaria",
+  "Croatia",
+  "Cyprus",
+  "Czech Republic",
+  "Denmark",
+  "Estonia",
+  "Finland",
+  "France",
+  "Germany",
+  "Greece",
+  "Hungary",
+  "Iceland",
+  "Ireland",
+  "Italy",
+  "Kosovo",
+  "Latvia",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "Malta",
+  "Moldova",
+  "Monaco",
+  "Montenegro",
+  "Netherlands",
+  "North Macedonia",
+  "Norway",
+  "Poland",
+  "Portugal",
+  "Romania",
+  "San Marino",
+  "Serbia",
+  "Slovakia",
+  "Slovenia",
+  "Spain",
+  "Sweden",
+  "Switzerland",
+  "Ukraine",
+  "United Kingdom",
+  "Vatican City",
+];
 
 const WorldMap: React.FC = () => {
   return (
@@ -22,28 +69,20 @@ const WorldMap: React.FC = () => {
       >
         <Geographies geography={geoUrl}>
           {({ geographies }) =>
-            geographies.map((geo) => (
-              <Geography
-                key={geo.rsmKey}
-                geography={geo}
-                fill="#7ba9dc"
-                stroke="#7BC1DC"
-              />
-            ))
+            geographies.map((geo) => {
+              // Check if the country is in Europe
+              console.log(geo);
+              return (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill={europeanCountries.includes(geo.properties.name) ? "#7ba9dc" : "#EAEAEC"} // Fill Europe with blue, others with gray
+                  stroke="#D6D6DA"
+                />
+              );
+            })
           }
         </Geographies>
-
-        {/* Example Marker */}
-        <Marker coordinates={[-74.006, 40.7128]}>
-          <circle r={5} fill="#FF5533" />
-          <text
-            textAnchor="middle"
-            y={-10}
-            style={{ fontFamily: 'system-ui', fill: '#5D5A6D' }}
-          >
-            Here
-          </text>
-        </Marker>
       </ComposableMap>
     </div>
   );
