@@ -1,22 +1,38 @@
 /* Import Dependencies */
 import axios from 'axios';
 import { format } from 'date-fns';
+import { isEmpty } from 'lodash';
 
 /* Import Types */
 import { TaxonomicExpert, CordraResultArray, Dict } from 'app/Types';
+
+/* Import Sources */
 
 /**
  * Function that fetches the latest taxonomic services from the API
  * @param pageNumber The number of the current page of records
  * @returns An array of Taxonomic Service instances or an empty array
  */
-const GetTaxonomicExperts = async ({ pageNumber, pageSize }: { pageNumber: number, pageSize: number, searchFilters: { [searchFilter: string]: string } }) => {
+const GetTaxonomicExperts = async ({ pageNumber, pageSize, searchFilters }: { pageNumber: number, pageSize: number, searchFilters: { [searchFilter: string]: string } }) => {
     /* Base variables */
     let taxonomicExperts: TaxonomicExpert[] = [];
     let metadata: Dict = {};
 
     /* Filter for the object type to be a taxonomic expert */
-    const filters: string = '/taxonomicExpert/@type:TaxonomicExpert';
+    let filters: string = ''
+    filters = filters.concat('/taxonomicExpert/@type:TaxonomicExpert');
+
+    if (!isEmpty(searchFilters)) {
+        Object.entries(searchFilters).forEach(([key, value]) => {
+            
+            if (key === 'query') {
+                /* Set query to name search */
+                filters = filters.concat(` AND ` + `(` + `/taxonomicExpert/schema\\:person/schema\\:name:` + `${value}*`
+                    + `)`
+                );
+            }
+        });
+    };
 
     try {
         const result = await axios({
