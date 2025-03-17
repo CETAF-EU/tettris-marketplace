@@ -1,5 +1,6 @@
 /* Import Dependencies */
 import axios from 'axios';
+import { format } from 'date-fns';
 
 /* Import Types */
 import { TaxonomicExpert, CordraResult, Dict } from 'app/Types';
@@ -21,6 +22,7 @@ const InsertTaxonomicExpert = async ({ taxonomicExpertRecord }: { taxonomicExper
                 content: {
                     taxonomicExpert: {
                         "@type": 'TaxonomicExpert',
+                        "schema:status": 'proposed',
                         ...taxonomicExpertRecord
                     }
                 }
@@ -37,7 +39,7 @@ const InsertTaxonomicExpert = async ({ taxonomicExpertRecord }: { taxonomicExper
                 data: newTaxonomicExpert,
                 headers: {
                     'Content-type': 'application/json'
-                },
+                }, 
                 auth: {
                     username: 'TaxonomicMarketplace',
                     password: import.meta.env.VITE_CORDRA_PASSWORD
@@ -50,6 +52,10 @@ const InsertTaxonomicExpert = async ({ taxonomicExpertRecord }: { taxonomicExper
 
             /* Set Taxonomic Expert */
             taxonomicExpert = data.attributes.content as TaxonomicExpert;
+            
+            /* Set created and modified */
+            taxonomicExpert.taxonomicExpert['schema:dateCreated'] = format(new Date(data.attributes.metadata.createdOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+            taxonomicExpert.taxonomicExpert['schema:dateModified'] = format(new Date(data.attributes.metadata.modifiedOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
 
             /* Send email */
             const url = "https://marketplace.cetaf.org/cordra/#objects/" + taxonomicExpert.taxonomicExpert['@id'];

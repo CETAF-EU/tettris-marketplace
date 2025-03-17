@@ -21,6 +21,8 @@ const GetTaxonomicExperts = async ({ pageNumber, pageSize, searchFilters }: { pa
     /* Filter for the object type to be a taxonomic expert */
     let filters: string = ''
     filters = filters.concat('/taxonomicExpert/@type:TaxonomicExpert');
+    /* Filter for state to be accepted */
+    filters = filters.concat(' AND /taxonomicExpert/schema\\:status:accepted');
 
     if (!isEmpty(searchFilters)) {
         Object.entries(searchFilters).forEach(([key, value]) => {

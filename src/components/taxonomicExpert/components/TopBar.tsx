@@ -25,6 +25,8 @@ const TopBar = (props: Props) => {
     const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] as string || '';
     const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] as string || '';
     const language = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language']?.join(' / ').toUpperCase() || '';
+    const email = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:email'] as string || '';
+    const image = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:ProfilePicture'] as string || 'https://i.pinimg.com/236x/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg';
 
     return (<>
         <Row className="mt-3 pt-lg-0">
@@ -33,13 +35,13 @@ const TopBar = (props: Props) => {
                     <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
                         <h1 className="fs-3 fs-lg-2">{name}</h1>
                     </Col>
-                    <Col xs="2">
+                    <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
                         <p className="fw-lightBold bi bi-link-45deg">ORCID ID</p>
                     </Col>
-                    <Col xs="2">
+                    <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
                         <p className='fw-lightBold bi bi-geo-alt-fill'>{location}</p>
                     </Col>
-                    <Col>
+                    <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
                         <p className='fw-lightBold bi bi-globe2'> {language}</p>
                     </Col>
                 </Row>
@@ -47,7 +49,7 @@ const TopBar = (props: Props) => {
             <Col lg="2" className="d-none d-lg-block"/>
             <Col lg="auto" className="d-none d-lg-block ">
                 <Button type="submit" variant='tertiary'>
-                    <a href={`mailto:${taxonomicExpert?.taxonomicExpert['schema:email']}`} className=''>
+                    <a href={`mailto:${email}`} className=''>
                         <i className="bi bi-envelope-fill"></i> EMAIL
                     </a>
                 </Button>
@@ -56,7 +58,7 @@ const TopBar = (props: Props) => {
         </Row>
         <Row className="mb-3 pt-lg-0">
             <Col lg="auto">
-                <img src="https://static1.purepeople.com/people/9/39/@/5118785-brad-pitt-septembre-2019-200x200-2.jpg" alt="John Doe" style={{ width: '12rem', height: '12rem' }} />
+                <img src={image} alt="John Doe" style={{ width: '12rem', height: '12rem' }} />
             </Col>
             <Col className='ms-3'>
                 <Row className='mb-3 mt-3'>
