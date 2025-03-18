@@ -551,11 +551,35 @@
                     }
                 },
                 "schema:affiliation": {
-                    "type": "string",
-                    "description": "The organization the Taxonomic Expert is affiliated with",
-                    "examples": [
-                        "Naturalis Biodiversity Center"
-                    ]
+                    "schema:affiliation": {
+                        "type": "object",
+                        "properties": {
+                            "@type": {
+                                "type": "string",
+                                "description": "The type of the affiliation",
+                                "const": "schema:Organization"
+                            },
+                            "schema:identifier": {
+                                "type": "string",
+                                "description": "A unique identifier to identify the author's affiliation; ROR identifiers are valid",
+                                "examples": [
+                                    "https://ror.org/0566bfb96"
+                                ]
+                            },
+                            "schema:name": {
+                                "type": "string",
+                                "description": "Full name of the author's affiliated orgnisation",
+                                "examples": [
+                                    "Naturalis Biodiversity Center"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "@type",
+                            "schema:identifier"
+                        ],
+                        "additionalProperties": false
+                    }
                 },
                 "schema:biography": {
                     "type": "string",

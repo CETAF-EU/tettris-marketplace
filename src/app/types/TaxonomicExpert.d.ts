@@ -489,10 +489,9 @@ export interface TaxonomicExpert {
      */
     "schema:birthDate"?: string;
     "schema:gender"?: string;
-    /**
-     * The organization the Taxonomic Expert is affiliated with
-     */
-    "schema:affiliation"?: string;
+    "schema:affiliation"?: {
+      [k: string]: unknown;
+    };
     /**
      * A brief description of your expertise, skills and services.
      */

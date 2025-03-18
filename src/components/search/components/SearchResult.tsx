@@ -153,7 +153,8 @@ const SearchResult = (props: Props) => {
     }
     else if (taxonomicExpert) {
         /* Base variables */
-        const logoImage = "https://static.vecteezy.com/system/resources/thumbnails/001/840/612/small_2x/picture-profile-icon-male-icon-human-or-people-sign-and-symbol-free-vector.jpg";
+        const logoImage = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:ProfilePicture'] as string || 'https://i.pinimg.com/236x/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg';
+
         /**
          * Function for selecting a taxonomic Expert
          * @param taxonomicExpert The selected taxonomic Expert

@@ -710,46 +710,21 @@
               "description": "Gender category of the taxonomist. This data will be shown anonymously for trend analysis."
             },
             "affiliation": {
-              "type": "string",
-              "maxLength": 128,
-              "title": "Affiliation",
-              "cordra": {
-                "preview": {
-                  "showInPreview": true,
-                  "isPrimary": true
-                }
-              }
-            },
-            "ror": {
-              "type": "string",
-              "maxLength": 128,
-              "title": "ROR ID",
-              "cordra": {
-                "preview": {
-                  "showInPreview": true,
-                  "isPrimary": true
-                }
-              }
-            },
-            "rorAddress": {
-              "type": "string",
-              "maxLength": 128,
-              "title": "Affiliation address",
-              "cordra": {
-                "preview": {
-                  "showInPreview": true,
-                  "isPrimary": true
-                }
-              }
-            },
-            "rorUrl": {
-              "type": "string",
-              "maxLength": 128,
-              "title": "Affiliation URL",
-              "cordra": {
-                "preview": {
-                  "showInPreview": true,
-                  "isPrimary": true
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "description": "The type of the affiliation"
+                },
+                "schema:identifier": {
+                  "type": "string",
+                  "title": "Affiliation identifier",
+                  "description": "A unique identifier to identify the author's affiliation; ROR identifiers are valid"
+                },
+                "schema:name": {
+                  "type": "string",
+                  "title": "Affiliation name",
+                  "description": "Full name of the author's affiliated orgnisation"
                 }
               }
             },
@@ -1033,127 +1008,6 @@
                 ]
               },
               "description": "Keywords that describe your expertise. For example: Taxonomy, Biodiversity, Conservation, etc."
-            }
-          },
-          "dependencies": {
-            "discipline": {
-              "oneOf": [
-                {
-                  "properties": {
-                    "discipline": {
-                      "const": "Botany"
-                    },
-                    "subfields": {
-                      "items": {
-                        "enum": [
-                          "Algae",
-                          "Macrofungi, Lichens & Myxomycetes (Mycology)",
-                          " Bryophytes",
-                          "Pteridophytes",
-                          "Seed plants",
-                          "Plant Genetic Resources"
-                        ]
-                      }
-                    }
-                  }
-                },
-                {
-                  "properties": {
-                    "discipline": {
-                      "const": "Invertebrates Zoology"
-                    },
-                    "subfields": {
-                      "items": {
-                        "enum": [
-                          "Insects",
-                          "Arachnids",
-                          "Crustaceans & Myriapods",
-                          "Mollusca (bivalves, gastropods, cephalopods)",
-                          "Porifera (Sponges)",
-                          "Cnidaria (jellyfish, coral, anemones)",
-                          "Echinodermata (starfish, sea urchins, sea cucumbers)",
-                          "Invertebrates Genetic Resources",
-                          "Other Invertebrate zoology "
-                        ]
-                      }
-                    }
-                  }
-                },
-                {
-                  "properties": {
-                    "discipline": {
-                      "const": "Vertebrates Zoology"
-                    },
-                    "subfields": {
-                      "items": {
-                        "enum": [
-                          "Fishes",
-                          "Amphibians",
-                          "Reptiles",
-                          "Birds",
-                          "Mammals",
-                          "Vertebrates Genetic Resources",
-                          "Other Vertebrate Zoology"
-                        ]
-                      }
-                    }
-                  }
-                },
-                {
-                  "properties": {
-                    "discipline": {
-                      "const": "Palaeontology"
-                    },
-                    "subfields": {
-                      "items": {
-                        "enum": [
-                          "Fossil Plants & Fungi",
-                          "Fossil Invertebrates",
-                          "Fossil Vertebrates",
-                          "Other palaeontology"
-                        ]
-                      }
-                    }
-                  }
-                },
-                {
-                  "properties": {
-                    "discipline": {
-                      "const": "Microbiology"
-                    },
-                    "subfields": {
-                      "items": {
-                        "enum": [
-                          "Phages",
-                          "Bacteria & archea",
-                          "Plasmids",
-                          "Protozoa",
-                          "Eukaryotic microorganisms",
-                          "Viruses",
-                          "Microfungi (including moulds, yeasts)",
-                          "Algae (in microbiology collection)",
-                          "Other microbiology objects (e.g. mixed or other kinds of microorganisms)"
-                        ]
-                      }
-                    }
-                  }
-                },
-                {
-                  "properties": {
-                    "discipline": {
-                      "const": "ECO Environmental DNA"
-                    },
-                    "subfields": {
-                      "items": {
-                        "enum": [
-                          "ECO-DNA (environmental DNA)",
-                          "ECO-OTH"
-                        ]
-                      }
-                    }
-                  }
-                }
-              ]
             }
           }
         },

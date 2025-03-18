@@ -12,6 +12,11 @@ type Props = {
     taxonomicExpert: TaxonomicExpert
 };
 
+function extractRorId(url: string): string | null {
+    const match = url.match(/ror\.org\/([a-zA-Z0-9]+)/);
+    return match ? match[1] : null;
+}
+
 
 /**
  * Component that renders the Top Bar of the Taxonomic Expert page
@@ -21,13 +26,15 @@ type Props = {
 const TopBar = (props: Props) => {
     const { taxonomicExpert } = props;
     
-    const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] as string || '';
-    const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] as string || '';
-    const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] as string || '';
-    const language = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language']?.join(' / ').toUpperCase() || '';
-    const email = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:email'] as string || '';
+    const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] as string || 'Any name provided';
+    const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] as string || 'Any headline provided';
+    const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] as string || 'Any location provided';
+    const language = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language']?.join(' / ').toUpperCase() || 'Any languages provided';
+    const email = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:email'] as string || 'Any email provided';
     const image = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:ProfilePicture'] as string || 'https://i.pinimg.com/236x/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg';
-
+    const affiliationName = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:name'] as string || 'Any affiliation name provided';
+    const affiliationURL = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:identifier'] as string || null;
+    const rorId = affiliationURL ? extractRorId(affiliationURL) : null;
     return (<>
         <Row className="mt-3 pt-lg-0">
             <Col lg="8">
@@ -74,21 +81,29 @@ const TopBar = (props: Props) => {
                     <Col lg='1' />
                 </Row>
                 <Row>
-                    <Col xs="4">
-                        <p className="fw-lightBold"> Consortium of European Taxonomic Facilities</p>
+                    <Col xs="auto">
+                        <p className="fw-lightBold"> {affiliationName}</p>
                     </Col>
                     <Col xs="2">
                         <p>
-                            <a href="url" target="_blank" rel="noopener noreferrer">
-                                <i className="fw-lightBold bi bi-link-45deg"></i>URL
-                            </a>
+                            {affiliationURL ? (
+                                <a href={affiliationURL} target="_blank" rel="noopener noreferrer">
+                                    <i className="fw-lightBold bi bi-link-45deg"></i>URL
+                                </a>
+                            ) : (
+                                <i className="fw-lightBold bi bi-link-45deg">No URL provided</i>
+                            )}
                         </p>
                     </Col>
                     <Col>
                         <p>
-                            <a href="url" target="_blank" rel="noopener noreferrer">
-                                <i className="fw-lightBold bi bi-link-45deg"></i>ROR ID
-                            </a>
+                            {affiliationURL ? (
+                                <a href={affiliationURL} target="_blank" rel="noopener noreferrer">
+                                    <i className="fw-lightBold bi bi-link-45deg"></i>{rorId}
+                                </a>
+                            ) : (
+                                <i className="fw-lightBold bi bi-link-45deg">No ROR ID provided</i>
+                            )}
                         </p>
                     </Col>
                 </Row>
