@@ -67,6 +67,12 @@
             "rejected"
           ]
         },
+        "schema:comments": {
+          "type": "string",
+          "format": "textarea",
+          "title": "Comments",
+          "description": "Comments on the status of the record"
+        },
         "schema:license": {
           "type": "string",
           "title": "Licence",
