@@ -12,13 +12,6 @@ type Props = {
     taxonomicExpert: TaxonomicExpert
 };
 
-function extractRorId(url: string): string | null {
-    const regex = /ror\.org\/([a-zA-Z0-9]+)/;
-    const match = regex.exec(url);
-    return match ? match[1] : null;
-}
-
-
 /**
  * Component that renders the Top Bar of the Taxonomic Expert page
  * @param taxonomicExpert The chosen Taxonomic Service
@@ -36,7 +29,6 @@ const TopBar = (props: Props) => {
     const image = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:ProfilePicture'] as string || 'https://i.pinimg.com/236x/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg';
     const affiliationName = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:name'] as string || 'Any affiliation name provided';
     const affiliationURL = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:identifier'] as string || null;
-    const rorId = affiliationURL ? extractRorId(affiliationURL) : null;
     const affiliationURLText = affiliationURL ? taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:url'] as string : null;
     const personalLinks = Array.isArray(taxonomicExpert?.taxonomicExpert?.['schema:person']?.["schema:links"])
         ? taxonomicExpert.taxonomicExpert['schema:person']["schema:links"].flat()
@@ -119,7 +111,7 @@ const TopBar = (props: Props) => {
                         <p>
                             {affiliationURL ? (
                                 <a href={affiliationURL} target="_blank" rel="noopener noreferrer">
-                                    <i className="fw-lightBold bi bi-link-45deg"></i>{rorId}
+                                    <i className="fw-lightBold bi bi-link-45deg"> ROR ID</i>
                                 </a>
                             ) : (
                                 <i className="fw-lightBold bi bi-link-45deg">No ROR ID provided</i>
