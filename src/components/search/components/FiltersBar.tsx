@@ -48,7 +48,13 @@ const FiltersBar = (props: Props) => {
     /* Base variables */
     const FiltersType: FilterType[] = import.meta.env.VITE_DEV === 'true' ? [...DevFilters.filters] : [...Filters.filters];
     const taxonomicServicefilters: FilterType[] = [...TaxonomicServiceFilters.taxonomicServiceFilters];
-    const taxonomicExpertFilters: FilterType[] = [...TaxonimicExpertFilters.taxonomicExpertFilters];
+    const taxonomicExpertFilters: FilterType[] = TaxonimicExpertFilters.taxonomicExpertFilters.map(filter => ({
+        ...filter,
+        options: filter.options.map(option => ({
+            ...option,
+            value: option.value ?? '' // Ensure value is always a string
+        }))
+    }));
     const [initialValues, setInitialValues] = useState<Dict>({});
 
     /* Determine filters based on service type */
