@@ -21,7 +21,7 @@
             {
                 "jsonPath": "$['schema:person']['schema:identifier']",
                 "title": "ORCID",
-                "description": "A unique identifier to identify the author; ORCID identifiers are valid",
+                "description": "A unique identifier to identify the expert; ORCID identifiers are valid (0000-0002-1825-0097)",
                 "type": "string",
                 "required": false
             },

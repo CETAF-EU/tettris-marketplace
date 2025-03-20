@@ -28,10 +28,11 @@ const TopBar = (props: Props) => {
     const { taxonomicExpert } = props;
     
     const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] as string || 'Any name provided';
+    const orcidID = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:identifier'] as string || null;
     const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] as string || 'Any headline provided';
     const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] as string || 'Any location provided';
     const language = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language']?.join(' / ').toUpperCase() ?? 'Any languages provided';
-    const email = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:email'] as string || 'Any email provided';
+    const email = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:email'] as string || null;
     const image = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:ProfilePicture'] as string || 'https://i.pinimg.com/236x/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg';
     const affiliationName = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:name'] as string || 'Any affiliation name provided';
     const affiliationURL = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:identifier'] as string || null;
@@ -46,7 +47,13 @@ const TopBar = (props: Props) => {
                         <h1 className="fs-3 fs-lg-2">{name}</h1>
                     </Col>
                     <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
-                        <p className="fw-lightBold bi bi-link-45deg">ORCID ID</p>
+                        {orcidID ? (
+                            <a href={"https://orcid.org/" + orcidID} target="_blank" rel="noopener noreferrer">
+                                <p className="fw-lightBold bi bi-link-45deg">{orcidID}</p>
+                            </a>
+                        ) : (
+                            <p className="fw-lightBold bi bi-link-45deg">Any orcid ID provided</p>
+                        )}
                     </Col>
                     <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
                         <p className='fw-lightBold bi bi-geo-alt-fill'>{location}</p>
@@ -59,9 +66,13 @@ const TopBar = (props: Props) => {
             <Col lg="2" className="d-none d-lg-block"/>
             <Col lg="auto" className="d-none d-lg-block ">
                 <Button type="submit" variant='tertiary'>
-                    <a href={`mailto:${email}`} className=''>
-                        <i className="bi bi-envelope-fill"></i> EMAIL
-                    </a>
+                    {email ? (
+                        <a href={`mailto:${email}`} className=''>
+                            <i className="bi bi-envelope-fill"></i> EMAIL
+                        </a>
+                    ) : (
+                        <p>No email provided</p>
+                    )}
                 </Button>
 
             </Col>
