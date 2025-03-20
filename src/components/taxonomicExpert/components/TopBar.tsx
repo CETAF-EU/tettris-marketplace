@@ -38,8 +38,10 @@ const TopBar = (props: Props) => {
     const affiliationURL = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:identifier'] as string || null;
     const rorId = affiliationURL ? extractRorId(affiliationURL) : null;
     const affiliationURLText = affiliationURL ? taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:url'] as string : null;
-    const personalLinks = taxonomicExpert?.taxonomicExpert?.['schema:person']?.["schema:links"]  as string[] || null;
-
+    const personalLinks = Array.isArray(taxonomicExpert?.taxonomicExpert?.['schema:person']?.["schema:links"])
+        ? taxonomicExpert.taxonomicExpert['schema:person']["schema:links"].flat()
+        : null;
+    console.log(personalLinks);
     return (<>
         <Row className="mt-3 pt-lg-0">
             <Col lg="8">
@@ -87,14 +89,18 @@ const TopBar = (props: Props) => {
                     <Col>
                         <p className="fs-3 fw-bold">{headline}</p>
                     </Col>
-                    <Col className="fs-3 d-flex justify-content-end me-2">
-                        {personalLinks ? personalLinks.map((link) => (
-                            <a key={link} href={link} target="_blank" rel="noopener noreferrer">
-                                <i className="bi bi-link-45deg"></i>
-                            </a>
-                        )) : null}
+                    <Col />
+                    <Col className="fs-3 d-flex justify-content-center gap-2">
+                        {Array.isArray(personalLinks) && personalLinks.some(link => link !== null) ? (
+                            personalLinks.map((link) => (
+                                link ? (
+                                    <a key={link} href={link} target="_blank" rel="noopener noreferrer">
+                                        <i className="bi bi-globe"> </i>
+                                    </a>
+                                ) : null
+                            ))
+                        ) : null}
                     </Col>
-                    <Col lg='1' />
                 </Row>
                 <Row>
                     <Col xs="auto">
