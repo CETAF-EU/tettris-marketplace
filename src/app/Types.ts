@@ -108,5 +108,6 @@ export type FormField = {
 export type DropdownItem = {
     label: string,
     value: string,
+    url: string
     action?: Function
 };

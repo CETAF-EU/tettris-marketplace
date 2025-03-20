@@ -13,7 +13,8 @@ type Props = {
 };
 
 function extractRorId(url: string): string | null {
-    const match = url.match(/ror\.org\/([a-zA-Z0-9]+)/);
+    const regex = /ror\.org\/([a-zA-Z0-9]+)/;
+    const match = regex.exec(url);
     return match ? match[1] : null;
 }
 
@@ -29,12 +30,14 @@ const TopBar = (props: Props) => {
     const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] as string || 'Any name provided';
     const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] as string || 'Any headline provided';
     const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] as string || 'Any location provided';
-    const language = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language']?.join(' / ').toUpperCase() || 'Any languages provided';
+    const language = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language']?.join(' / ').toUpperCase() ?? 'Any languages provided';
     const email = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:email'] as string || 'Any email provided';
     const image = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:ProfilePicture'] as string || 'https://i.pinimg.com/236x/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg';
     const affiliationName = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:name'] as string || 'Any affiliation name provided';
     const affiliationURL = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:identifier'] as string || null;
     const rorId = affiliationURL ? extractRorId(affiliationURL) : null;
+    const affiliationURLText = affiliationURL ? taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:url'] as string : null;
+    
     return (<>
         <Row className="mt-3 pt-lg-0">
             <Col lg="8">
@@ -86,8 +89,8 @@ const TopBar = (props: Props) => {
                     </Col>
                     <Col xs="2">
                         <p>
-                            {affiliationURL ? (
-                                <a href={affiliationURL} target="_blank" rel="noopener noreferrer">
+                            {affiliationURLText ? (
+                                <a href={affiliationURLText} target="_blank" rel="noopener noreferrer">
                                     <i className="fw-lightBold bi bi-link-45deg"></i>URL
                                 </a>
                             ) : (

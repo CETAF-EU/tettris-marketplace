@@ -55,21 +55,24 @@ const RORField = (props: Props) => {
         /* Reset field name */
         SetFieldValue(field.jsonPath.replace('$', ''), {
             "schema:identifier": '',
-            "schema:name": ''
+            "schema:name": '',
+            "schema:url": ''
         });
 
         /* Construct dropdown items from ROR */
         const dropdownOptions: DropdownItem[] = [
             {
                 label: 'Select an organisation',
-                value: ''
+                value: '',
+                url: ''
             }
         ];
 
         rors.forEach(ror => {
             dropdownOptions.push({
                 label: ror?.names.find((nameObject: { lang: string, value: string }) => nameObject?.lang === 'en')?.value ?? ror?.names[0].value ?? '',
-                value: ror.id
+                value: ror.id,
+                url: ror?.links?.find((link: { type: string, value: string }) => link.type === 'website')?.value ?? ''
             });
         })
 
@@ -146,7 +149,8 @@ const RORField = (props: Props) => {
                             options={dropdownOptions}
                             value={fieldValue['schema:identifier'] ? {
                                 label: fieldValue['schema:name'],
-                                value: fieldValue['schema:identifier']
+                                value: fieldValue['schema:identifier'],
+                                url: fieldValue['schema:url']
                             } : undefined}
                             placeholder="Select an option"
                             className={formFieldClass}
@@ -167,7 +171,8 @@ const RORField = (props: Props) => {
                                 SetFieldValue(jsonPath, {
                                     "@type": "schema:Organization",
                                     "schema:identifier": dropdownOption?.value,
-                                    "schema:name": dropdownOption?.label
+                                    "schema:name": dropdownOption?.label,
+                                    "schema:url": dropdownOption?.url
                                 });
                             }}
                         />

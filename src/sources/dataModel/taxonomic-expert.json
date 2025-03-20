@@ -572,6 +572,14 @@
                                 "examples": [
                                     "Naturalis Biodiversity Center"
                                 ]
+                            },
+                            "schema:url": {
+                                "type": "string",
+                                "description": "The URL of the author's affiliated orgnisation",
+                                "format": "uri",
+                                "examples": [
+                                    "https://www.cetaf.org"
+                                ]
                             }
                         },
                         "required": [
