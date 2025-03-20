@@ -38,7 +38,8 @@ const TopBar = (props: Props) => {
     const affiliationURL = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:identifier'] as string || null;
     const rorId = affiliationURL ? extractRorId(affiliationURL) : null;
     const affiliationURLText = affiliationURL ? taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:url'] as string : null;
-    
+    const personalLinks = taxonomicExpert?.taxonomicExpert?.['schema:person']?.["schema:links"]  as string[] || null;
+
     return (<>
         <Row className="mt-3 pt-lg-0">
             <Col lg="8">
@@ -87,10 +88,11 @@ const TopBar = (props: Props) => {
                         <p className="fs-3 fw-bold">{headline}</p>
                     </Col>
                     <Col className="fs-3 d-flex justify-content-end me-2">
-                        <i className="bi bi-twitter mx-1"></i>
-                        <i className="bi bi-linkedin mx-1"></i>
-                        <i className="bi bi-github mx-1"></i>
-                        <i className="bi bi-facebook mx-1"></i>
+                        {personalLinks ? personalLinks.map((link) => (
+                            <a key={link} href={link} target="_blank" rel="noopener noreferrer">
+                                <i className="bi bi-link-45deg"></i>
+                            </a>
+                        )) : null}
                     </Col>
                     <Col lg='1' />
                 </Row>
