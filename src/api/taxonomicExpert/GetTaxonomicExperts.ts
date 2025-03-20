@@ -7,6 +7,7 @@ import { isEmpty } from 'lodash';
 import { TaxonomicExpert, CordraResultArray, Dict } from 'app/Types';
 
 /* Import Sources */
+// import TaxonomicExpertFilters from 'sources/searchFilters/TaxonomicExpertFilters.json';
 
 /**
  * Function that fetches the latest taxonomic services from the API
@@ -26,7 +27,8 @@ const GetTaxonomicExperts = async ({ pageNumber, pageSize, searchFilters }: { pa
 
     if (!isEmpty(searchFilters)) {
         Object.entries(searchFilters).forEach(([key, value]) => {
-            
+            // const alias: string | undefined = TaxonomicExpertFilters.taxonomicExpertFilters.find(taxonomicSearchFilter => taxonomicSearchFilter.name === key)?.alias;
+            // console.log(alias);
             if (key === 'query') {
                 /* Set query to name search */
                 filters = filters.concat(` AND ` + `(` + `/taxonomicExpert/schema\\:person/schema\\:name:` + `${value}*`
@@ -37,31 +39,18 @@ const GetTaxonomicExperts = async ({ pageNumber, pageSize, searchFilters }: { pa
                 /* Set array search for language */
                 filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:person/schema\\:language/_:` + `${value}`);
             }
-            // const alias: string | undefined = TaxonomicExpertFilters.taxonomicExpertFilters.find(taxonomicSearchFilter => taxonomicSearchFilter.name === key)?.alias;
-
-            // switch (key) {
-            //     case 'query':
-            //         /* Set query to name search */
-            //         filters = filters.concat(` AND ` + `(` + `/taxonomicExpert/schema\\:person/schema\\:name:` + `${value}*`
-            //             + `)`
-            //         );
-            //         break;
-            //     case 'taxonomicRange':
-            //         /* Set taxonomic range search */
-            //         filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:taxonomicRange/_:` + `${value}`);
-            //         break;
-            //     case 'language':
-            //         /* Set array search for language */
-            //         filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:person/schema\\:language/_:` + `${value}`);
-            //         break;
-            //     case 'ResearchProject':
-            //         /* Set array search for Research Project */
-            //         filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:ResearchProject/_:` + `${value}`);
-            //         break;
-            //     default:
-            //         /* Get field alias from taxonomic service filters source */
-            //         filters = filters.concat(` AND ` + `/taxonomicExpert/${(alias ?? key).replaceAll(':', '\\:')}:` + `${value}`);
-            // }
+            if (key === 'country') {
+                /* Set array search for country */
+                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:person/schema\\:location:` + `${value}`);
+            }
+            if (key === 'taxonomicGroup') {
+                /* Set taxonomic range search */
+                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:Taxon/schema\\:taxonomicRange/_:` + `${value}`);
+            }
+            if (key === 'appliedResearch') {
+                /* Set array search for Research Project */
+                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:Taxon/schema\\:ResearchProject/_:` + `${value}`);
+            }
         });
     };
 

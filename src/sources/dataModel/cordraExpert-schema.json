@@ -566,7 +566,7 @@
               },
               "description": "Languages the user is proficient or fluent in."
             },
-            "age": {
+            "schema:age": {
               "type": "string",
               "enum": [
                 "1900",
@@ -698,7 +698,7 @@
               ],
               "description": "Age category of the taxonomist. This data will be shown anonymously for trend analysis."
             },
-            "gender": {
+            "schema:gender": {
               "type": "string",
               "enum": [
                 "Female",
@@ -709,7 +709,7 @@
               ],
               "description": "Gender category of the taxonomist. This data will be shown anonymously for trend analysis."
             },
-            "affiliation": {
+            "schema:affiliation": {
               "type": "object",
               "properties": {
                 "@type": {
@@ -733,7 +733,7 @@
                 }
               }
             },
-            "biography": {
+            "schema:biography": {
               "type": "string",
               "maxLength": 200,
               "title": "Expertise biography",
@@ -744,7 +744,7 @@
                 }
               }
             },
-            "links": {
+            "schema:links": {
               "type": "array",
               "title": "Personal webpage links",
               "description": "Links to your personal webpage, blog, or other online profiles.",
@@ -752,7 +752,7 @@
                 "type": "string"
               }
             },
-            "ProfilePicture": {
+            "schema:ProfilePicture": {
               "type": "string",
               "format": "uri",
               "description": "URL or file path of the profile image. The image can be in PNG, JPG, or TIFF format.",
@@ -769,24 +769,24 @@
               "items": {
                 "type": "string",
                 "enum": [
-                  "Botany",
-                  "Invertebrates Zoology",
-                  "Vertebrates Zoology",
-                  "Palaeontology",
-                  "Microbiology",
-                  "ECO Environmental DNA"
+                  "botany",
+                  "invertebrates",
+                  "vertebrates",
+                  "palaeontology",
+                  "microbiology",
+                  "ecoEnvDNA"
                 ]
               },
               "description": "Taxonomic discipline."
             },
-            "subfields": {
+            "schema:subfields": {
               "type": "array",
               "items": {
                 "type": "string"
               },
               "description": "Subfields within the selected discipline."
             },
-            "scope": {
+            "schema:scope": {
               "type": "string",
               "format": "textarea",
               "maxLength": 2048,
@@ -798,7 +798,7 @@
                 }
               }
             },
-            "region": {
+            "schema:region": {
               "type": "array",
               "items": {
                 "type": "string",
@@ -833,7 +833,7 @@
               },
               "description": "Geographic region"
             },
-            "stratigraphy": {
+            "schema:stratigraphy": {
               "type": "string",
               "maxLength": 200,
               "title": "Stratigraphy age",
@@ -844,7 +844,7 @@
                 }
               }
             },
-            "methodology": {
+            "schema:methodology": {
               "type": "array",
               "items": {
                 "type": "string",
@@ -860,156 +860,155 @@
               },
               "description": "Taxonomic methodology"
             },
-            "ResearchProject": {
+            "schema:ResearchProject": {
               "title": "Applied research",
               "type": "array",
               "items": {
                 "type": "string",
                 "enum": [
-                  "100136 - environmental biotechnology",
-                  "100180 - environmental engineering",
-                  "100381 - environmental sciences",
-                  "100382 - meteorology",
-                  "100391 - natural sciences",
-                  "100408 - environmental geography",
-                  "100409 - geography",
-                  "100549 - environmental impact assessment",
-                  "101045 - environmental chemistry",
-                  "101070 - climate change",
-                  "101078 - applied environmental sciences",
-                  "101317 - environmental and public health",
-                  "101318 - biodiversity conservation",
-                  "101510 - environmentalism",
-                  "100038 - pathobiology",
-                  "100126 - biomechanics",
-                  "100343 - applied biology",
-                  "100345 - biological sciences",
-                  "100346 - biology",
-                  "100347 - ecology",
-                  "100348 - environmental biology",
-                  "100822 - cell biology",
-                  "100826 - parasitology",
-                  "100848 - aquatic biology",
-                  "100849 - freshwater biology",
-                  "100850 - population biology",
-                  "100858 - evolution",
-                  "100864 - ecosystem ecology and land use",
-                  "100865 - biometry",
-                  "100869 - bioinformatics",
-                  "100949 - biophysical science",
-                  "101210 - biomaterials",
-                  "101352 - biogeography",
-                  "101457 - community ecology",
-                  "101458 - population ecology",
-                  "100264 - anatomy",
-                  "100356 - zoology",
-                  "100522 - animal behaviour",
-                  "100880 - applied zoology",
-                  "100881 - cell zoology",
-                  "100882 - entomology",
-                  "100883 - marine zoology",
-                  "100884 - pest management",
-                  "100937 - animal physiology",
-                  "100940 - animal nutrition",
-                  "100139 - plant biotechnology",
-                  "100355 - plant sciences",
-                  "100520 - forestry and arboriculture",
-                  "100529 - horticulture",
-                  "100872 - mycology",
-                  "100873 - plant cell science",
-                  "100874 - plant pathology",
-                  "100932 - plant biochemistry",
-                  "100945 - crop protection",
-                  "100946 - crop nutrition",
-                  "100947 - crop production",
-                  "101024 - agricultural chemistry",
-                  "101025 - agricultural botany",
-                  "101348 - exotic plants and crops",
-                  "101376 - applied botany",
-                  "101460 - plant physiology",
-                  "100353 - microbiology",
-                  "100906 - applied microbiology",
-                  "100909 - bacteriology",
-                  "100910 - virology",
-                  "marineScience - Marine science",
-                  "100351 - marine biology",
-                  "100418 - marine sciences",
-                  "100421 - ocean sciences",
-                  "100544 - marine engineering",
-                  "101046 - marine chemistry",
-                  "101065 - maritime geography",
-                  "101390 - marine physics",
-                  "100137 - industrial biotechnology",
-                  "100141 - biochemical engineering",
-                  "100259 - genetics",
-                  "100344 - biochemistry",
-                  "100354 - molecular biology",
-                  "100900 - molecular genetics",
-                  "100901 - genomics",
-                  "100902 - population genetics",
-                  "100948 - biomolecular science",
-                  "100003 - ceramics",
-                  "100033 - metallurgy",
-                  "100298 - ancient history",
-                  "100299 - archaeology",
-                  "100300 - classical studies",
-                  "100302 - history",
-                  "100307 - history of science",
-                  "100309 - medieval history",
-                  "100310 - modern history",
-                  "100312 - social history",
-                  "100314 - humanities",
-                  "100350 - human biology",
-                  "100384 - archaeological sciences",
-                  "100386 - forensic biology",
-                  "100436 - anthropology",
-                  "100437 - social anthropology",
-                  "100478 - human geography",
-                  "100663 - physical and biological anthropology",
-                  "100787 - Egyptology",
-                  "100898 - human genetics",
-                  "100918 - museum studies",
-                  "101218 - forensic anthropology",
-                  "101219 - forensic archaeology",
-                  "101261 - maritime archaeology",
-                  "101437 - Stone Age",
-                  "101438 - Bronze Age",
-                  "101439 - Iron Age",
-                  "101440 - classical art and archaeology",
-                  "101455 - stone crafts",
-                  "101394 - glaciology and cryospheric systems",
-                  "101106 - engineering geology",
-                  "101105 - petroleum geology",
-                  "101104 - applied geology",
-                  "101103 - planetary science",
-                  "101102 - space science",
-                  "101093 - exploration geology",
-                  "101091 - quaternary studies",
-                  "101089 - hydrogeology",
-                  "101086 - geological oceanography",
-                  "101084 - exploration geophysics",
-                  "101083 - geochemistry",
-                  "101082 - geological hazards",
-                  "101081 - volcanology",
-                  "101079 - hydrology",
-                  "101073 - hydrography",
-                  "101067 - soil science",
-                  "101064 - geomorphology",
-                  "101044 - crystallography",
-                  "100566 - quarrying",
-                  "100550 - gemmology",
-                  "100424 - physical sciences",
-                  "100410 - physical geography",
-                  "100398 - palaeontology",
-                  "100396 - geophysics",
-                  "100395 - geology",
-                  "100394 - earth sciences",
-                  "100392 - applied science",
-                  "100380 - environmental geoscience",
-                  "100379 - climate science",
-                  "100212 - minerals processing",
-                  "100155 - minerals technology",
-                  "other subjects"
+                  "100136",
+                  "100180",
+                  "100381",
+                  "100382",
+                  "100391",
+                  "100408",
+                  "100409",
+                  "100549",
+                  "101045",
+                  "101070",
+                  "101078",
+                  "101317",
+                  "101318",
+                  "101510",
+                  "100038",
+                  "100126",
+                  "100343",
+                  "100345",
+                  "100346",
+                  "100347",
+                  "100348",
+                  "100822",
+                  "100826",
+                  "100848",
+                  "100849",
+                  "100850",
+                  "100858",
+                  "100864",
+                  "100865",
+                  "100869",
+                  "100949",
+                  "101210",
+                  "101352",
+                  "101457",
+                  "101458",
+                  "100264",
+                  "100356",
+                  "100522",
+                  "100880",
+                  "100881",
+                  "100882",
+                  "100883",
+                  "100884",
+                  "100937",
+                  "100940",
+                  "100139",
+                  "100355",
+                  "100520",
+                  "100529",
+                  "100872",
+                  "100873",
+                  "100874",
+                  "100932",
+                  "100945",
+                  "100946",
+                  "100947",
+                  "101024",
+                  "101025",
+                  "101348",
+                  "101376",
+                  "101460",
+                  "100353",
+                  "100906",
+                  "100909",
+                  "100910",
+                  "100351",
+                  "100418",
+                  "100421",
+                  "100544",
+                  "101046",
+                  "101065",
+                  "101390",
+                  "100137",
+                  "100141",
+                  "100259",
+                  "100344",
+                  "100354",
+                  "100900",
+                  "100901",
+                  "100902",
+                  "100948",
+                  "100003",
+                  "100033",
+                  "100298",
+                  "100299",
+                  "100300",
+                  "100302",
+                  "100307",
+                  "100309",
+                  "100310",
+                  "100312",
+                  "100314",
+                  "100350",
+                  "100384",
+                  "100386",
+                  "100436",
+                  "100437",
+                  "100478",
+                  "100663",
+                  "100787",
+                  "100898",
+                  "100918",
+                  "101218",
+                  "101219",
+                  "101261",
+                  "101437",
+                  "101438",
+                  "101439",
+                  "101440",
+                  "101455",
+                  "101394",
+                  "101106",
+                  "101105",
+                  "101104",
+                  "101103",
+                  "101102",
+                  "101093",
+                  "101091",
+                  "101089",
+                  "101086",
+                  "101084",
+                  "101083",
+                  "101082",
+                  "101081",
+                  "101079",
+                  "101073",
+                  "101067",
+                  "101064",
+                  "101044",
+                  "100566",
+                  "100550",
+                  "100424",
+                  "100410",
+                  "100398",
+                  "100396",
+                  "100395",
+                  "100394",
+                  "100392",
+                  "100380",
+                  "100379",
+                  "100212",
+                  "100155",
+                  "otherSubjects"
                 ]
               },
               "description": "Keywords that describe your expertise. For example: Taxonomy, Biodiversity, Conservation, etc."
@@ -1020,7 +1019,7 @@
           "type": "object",
           "title": "Education and experience",
           "properties": {
-            "educationalLevel": {
+            "schema:educationalLevel": {
               "title": "Education Level",
               "type": "array",
               "items": {
@@ -1037,7 +1036,7 @@
               },
               "description": "Select the highest level of education you have received. You can choose multiple options."
             },
-            "employmentType": {
+            "schema:employmentType": {
               "title": "Employment Status",
               "type": "array",
               "items": {
@@ -1070,21 +1069,18 @@
               },
               "description": "Provide your current employment status. This information helps with statistical analysis and gives users of the marketplace insight into the professional experience of the expert. You can select up to two options."
             },
-            "yearsInOperation": {
+            "schema:yearsInOperation": {
               "title": "Taxonomy Experience",
-              "type": "array",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "0 - 5 years",
-                  "6 - 10 years",
-                  "11 - 15 years",
-                  "16 - 20 years",
-                  "21 - 25 years",
-                  "26 - 30 years",
-                  "> 30 years"
-                ]
-              },
+              "type": "string",
+              "enum": [
+                "0 - 5 years",
+                "6 - 10 years",
+                "11 - 15 years",
+                "16 - 20 years",
+                "21 - 25 years",
+                "26 - 30 years",
+                "> 30 years"
+              ],
               "description": "Select your years of experience in taxonomy. This helps gauge your professional background in the field."
             }
           }

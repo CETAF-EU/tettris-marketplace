@@ -41,7 +41,6 @@ const TopBar = (props: Props) => {
     const personalLinks = Array.isArray(taxonomicExpert?.taxonomicExpert?.['schema:person']?.["schema:links"])
         ? taxonomicExpert.taxonomicExpert['schema:person']["schema:links"].flat()
         : null;
-    console.log(personalLinks);
     return (<>
         <Row className="mt-3 pt-lg-0">
             <Col lg="8">
@@ -84,18 +83,17 @@ const TopBar = (props: Props) => {
             <Col lg="auto">
                 <img src={image} alt="John Doe" style={{ width: '12rem', height: '12rem' }} />
             </Col>
-            <Col className='ms-3'>
+            <Col className='ms-2'>
                 <Row className='mb-3 mt-3'>
                     <Col>
                         <p className="fs-3 fw-bold">{headline}</p>
                     </Col>
-                    <Col />
-                    <Col className="fs-3 d-flex justify-content-center gap-2">
+                    <Col className="fs-3 d-flex justify-content-end gap-2" style={{ marginRight: '8rem' }}>
                         {Array.isArray(personalLinks) && personalLinks.some(link => link !== null) ? (
                             personalLinks.map((link) => (
                                 link ? (
                                     <a key={link} href={link} target="_blank" rel="noopener noreferrer">
-                                        <i className="bi bi-globe"> </i>
+                                        <i className="bi bi-globe p-1"></i>
                                     </a>
                                 ) : null
                             ))
