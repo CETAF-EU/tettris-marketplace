@@ -1,7 +1,7 @@
 {
     "taxonomicExpertFilters": [
         {
-            "name": "country",
+            "name": "location",
             "alias": "schema:countryOfOrigin",
             "type": "select",
             "default": "",
