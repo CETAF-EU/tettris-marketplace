@@ -29,6 +29,8 @@ const TaxonomicForm = () => {
     
     const formTemplate = location.pathname.includes("/te") ? TaxonomicExpertFormJSON : TaxonomicServiceFormJSON;
 
+    const client_id = import.meta.env.VITE_ORCID_CLIENT_ID;
+    const redirect_uri = import.meta.env.VITE_ORCID_REDIRECT_URI;
     /* Determine color */
     const color = "fs-2 tc-" + getColor(window.location) as Color;
 
@@ -49,6 +51,30 @@ const TaxonomicForm = () => {
                                 <BreadCrumbs />
                             </Col>
                         </Row>
+                        {location.pathname.includes("/te") && (
+                            <Row>
+                                <Col>
+                                    <Card className="w-100 px-4 py-3">
+                                        <Row>
+                                            <Col>
+                                                <h2 className="fs-4">Login with ORCID</h2>
+                                                <p className="mt-2">
+                                                    To proceed, please log in using your ORCID account. This ensures that your submission is linked to your professional profile.
+                                                </p>
+                                                <button
+                                                    className="btn btn-primary mt-3"
+                                                    onClick={() => {
+                                                        window.location.href = `https://orcid.org/oauth/authorize?client_id=${client_id}&response_type=code&scope=/authenticate&redirect_uri=${redirect_uri}`;
+                                                    }}
+                                                >
+                                                    Login with ORCID
+                                                </button>
+                                            </Col>
+                                        </Row>
+                                    </Card>
+                                </Col>
+                            </Row>
+                        )}
                         <Row className="mt-3">
                             <Col>
                                 <Card className="w-100 px-4 py-3">
