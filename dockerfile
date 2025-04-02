@@ -28,6 +28,7 @@ ARG VITE_CORDRA_PASSWORD
 ARG VITE_EMAILJS_ID
 ARG VITE_EMAILJS_TEMPLATE_ID
 ARG VITE_EMAILJS_USER_ID
+ARG VITE_DEV
 
 # Create .env file using build arguments
 RUN echo "VITE_HANDLE_URL=$VITE_HANDLE_URL" >> .env
@@ -36,7 +37,7 @@ RUN echo "VITE_CORDRA_PASSWORD=$VITE_CORDRA_PASSWORD" >> .env
 RUN echo "VITE_EMAILJS_ID=$VITE_EMAILJS_ID" >> .env
 RUN echo "VITE_EMAILJS_TEMPLATE_ID=$VITE_EMAILJS_TEMPLATE_ID" >> .env
 RUN echo "VITE_EMAILJS_USER_ID=$VITE_EMAILJS_USER_ID" >> .env
-RUN echo "VITE_DEV=false" >> .env
+RUN echo "VITE_DEV=$VITE_DEV" >> .env
 
 # Setting app to production build
 RUN npm run build
