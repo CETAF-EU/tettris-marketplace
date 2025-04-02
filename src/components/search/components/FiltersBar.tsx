@@ -2,7 +2,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { Formik, Form } from 'formik';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 
 /* Import Hooks */
@@ -56,11 +56,13 @@ const FiltersBar = (props: Props) => {
         }))
     }));
     const [initialValues, setInitialValues] = useState<Dict>({});
-
+    
     /* Determine filters based on service type */
     const filters: FilterType[] = [];
     const serviceType = searchParams.get('serviceType');
     let hint = "pollinator academy";
+
+    
     if (!serviceType) {
         filters.push(...taxonomicServicefilters);
     } else if (serviceType === 'taxonomicExpert') {
@@ -111,9 +113,15 @@ const FiltersBar = (props: Props) => {
      */
     const ResetSearchFilters = () => {
         /* Reset search params */
-        filters.filter(filter => filter.name !== 'serviceType').forEach(filter => {
-            searchParams.delete(filter.name);
-            delete initialValues[filter.name];
+        const serviceTypeValue = searchParams.get('serviceType');
+        filters.forEach(filter => {
+            if (filter.name === 'serviceType') {
+                initialValues[filter.name] = serviceTypeValue ?? filter.default ?? '';
+            }
+            else {
+                searchParams.delete(filter.name);
+                initialValues[filter.name] = filter.default ?? '';
+            }
         });
 
         setSearchParams(searchParams);

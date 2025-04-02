@@ -7,7 +7,6 @@ import { isEmpty } from 'lodash';
 import { TaxonomicExpert, CordraResultArray, Dict } from 'app/Types';
 
 /* Import Sources */
-// import TaxonomicExpertFilters from 'sources/searchFilters/TaxonomicExpertFilters.json';
 
 /**
  * Function that fetches the latest taxonomic services from the API
@@ -27,8 +26,6 @@ const GetTaxonomicExperts = async ({ pageNumber, pageSize, searchFilters }: { pa
 
     if (!isEmpty(searchFilters)) {
         Object.entries(searchFilters).forEach(([key, value]) => {
-            // const alias: string | undefined = TaxonomicExpertFilters.taxonomicExpertFilters.find(taxonomicSearchFilter => taxonomicSearchFilter.name === key)?.alias;
-            // console.log(alias);
             if (key === 'query') {
                 /* Set query to name search */
                 filters = filters.concat(` AND ` + `(` + `/taxonomicExpert/schema\\:person/schema\\:name:` + `${value}*`
@@ -45,7 +42,7 @@ const GetTaxonomicExperts = async ({ pageNumber, pageSize, searchFilters }: { pa
             }
             if (key === 'taxonomicGroup') {
                 /* Set taxonomic range search */
-                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:Taxon/schema\\:taxonomicRange/_:` + `${value}`);
+                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:Taxon/schema\\:discipline/_:` + `${value}`);
             }
             if (key === 'appliedResearch') {
                 /* Set array search for Research Project */
