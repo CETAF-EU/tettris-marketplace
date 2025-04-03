@@ -12,7 +12,7 @@ import Footer from 'components/general/footer/Footer';
 import { BreadCrumbs } from 'components/general/CustomComponents';
 import FormBuilder from 'components/general/FormComponents/FormBuilder';
 import { Color, getColor } from '../ColorPage';
-
+import { loginWithOrcid } from 'api/orcid/auth';
 
 
 /**
@@ -29,8 +29,6 @@ const TaxonomicForm = () => {
     
     const formTemplate = location.pathname.includes("/te") ? TaxonomicExpertFormJSON : TaxonomicServiceFormJSON;
 
-    const client_id = import.meta.env.VITE_ORCID_CLIENT_ID;
-    const redirect_uri = import.meta.env.VITE_ORCID_REDIRECT_URI;
     /* Determine color */
     const color = "fs-2 tc-" + getColor(window.location) as Color;
 
@@ -64,7 +62,7 @@ const TaxonomicForm = () => {
                                                 <button
                                                     className="btn btn-primary mt-3"
                                                     onClick={() => {
-                                                        window.location.href = `https://orcid.org/oauth/authorize?client_id=${client_id}&response_type=code&scope=/authenticate&redirect_uri=${redirect_uri}`;
+                                                        loginWithOrcid();
                                                     }}
                                                 >
                                                     Login with ORCID
