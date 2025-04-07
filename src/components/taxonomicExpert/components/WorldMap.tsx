@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   ComposableMap,
   Geographies,
@@ -56,7 +55,18 @@ const europeanCountries = [
   "Vatican City",
 ];
 
-const WorldMap: React.FC = () => {
+interface Props {
+  region: string;
+}
+
+/**
+ * Component that renders a details block for on the taxonomic service page
+ * @param properties An object containing all the properties to be show in the details block
+ * @returns JSX Component
+ */
+const WorldMap = (props: Props) => {
+  const { region } = props;
+
   return (
     <div className="map-container">
       <ComposableMap
@@ -74,7 +84,7 @@ const WorldMap: React.FC = () => {
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}
-                  fill={europeanCountries.includes(geo.properties.name) ? "#7ba9dc" : "#EAEAEC"} // Fill Europe with blue, others with gray
+                  fill={region && europeanCountries.includes(geo.properties.name) ? "#7ba9dc" : "#EAEAEC"} // Fill Europe with blue, others with gray
                   stroke="#D6D6DA"
                 />
               );

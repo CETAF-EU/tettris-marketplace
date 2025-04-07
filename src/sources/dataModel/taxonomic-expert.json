@@ -950,7 +950,7 @@
                     }
                 },
                 "schema:yearsInOperation": {
-                    "type": "array",
+                    "type": "string",
                     "description": "Select your years of experience in taxonomy. This helps gauge your professional background in the field.",
                     "items": {
                         "type": "string",
@@ -971,19 +971,19 @@
             "type": "object",
             "properties": {
                 "schema:identifier": {
-                    "type": "string",
+                    "type": "number",
                     "description": "The name of the publication"
                 },
                 "schema:ScholarlyArticle": {
-                    "type": "string",
+                    "type": "number",
                     "description": "The number of scientific papers"
                 },
                 "schema:Book": {
-                    "type": "string",
+                    "type": "number",
                     "description": "The number of books"
                 },
                 "schema:CreativeWork": {
-                    "type": "string",
+                    "type": "number",
                     "description": "The number of other publications"
                 }
             }    

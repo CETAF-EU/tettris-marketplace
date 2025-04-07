@@ -806,34 +806,26 @@ export interface TaxonomicExpert {
     /**
      * Select your years of experience in taxonomy. This helps gauge your professional background in the field.
      */
-    "schema:yearsInOperation"?: (
-      | "0 - 5 years"
-      | "6 - 10 years"
-      | "11 - 15 years"
-      | "16 - 20 years"
-      | "21 - 25 years"
-      | "26 - 30 years"
-      | "> 30 years"
-    )[];
+    "schema:yearsInOperation"?: string;
     [k: string]: unknown;
   };
   "schema:PublicationNumber"?: {
     /**
      * The name of the publication
      */
-    "schema:identifier"?: string;
+    "schema:identifier"?: number;
     /**
      * The number of scientific papers
      */
-    "schema:ScholarlyArticle"?: string;
+    "schema:ScholarlyArticle"?: number;
     /**
      * The number of books
      */
-    "schema:Book"?: string;
+    "schema:Book"?: number;
     /**
      * The number of other publications
      */
-    "schema:CreativeWork"?: string;
+    "schema:CreativeWork"?: number;
     [k: string]: unknown;
   };
   /**

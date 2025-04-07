@@ -2,10 +2,13 @@
 import { Row, Col, Modal } from 'react-bootstrap';
 import { useState } from 'react';
 
+/* Import Types */
+import { TaxonomicExpert } from 'app/Types';
+
 /* Props Type */
 type Props = {
-    name: string,
-    text: string,
+    name: string
+    taxonomicExpert: TaxonomicExpert
 };
 
 /**
@@ -14,8 +17,9 @@ type Props = {
  * @returns JSX Component
  */
 const BioBlock = (props: Props) => {
-    const { name, text } = props;
+    const { name, taxonomicExpert } = props;
 
+    const text = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:biography'] as string || 'Any biography provided'
     const MAX_TEXT_LENGTH = 300;
     const croppedText = text.length > MAX_TEXT_LENGTH ? text.substring(0, MAX_TEXT_LENGTH) + '...' : text;
 

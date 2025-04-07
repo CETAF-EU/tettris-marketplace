@@ -40,7 +40,6 @@ const TaxonomicExpert = () => {
     const taxonomicServiceID: string = `${params.prefix}/${params.suffix}`;
 
 
-    const text = "lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, vestibulum nunc sit amet, ultrices nunc sit lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, vestibulum nunc sit amet, ultrices nunc sit lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, vestibulum nunc sit amet, ultrices nunc sit";
     /* Fetch taxonomic service */
     fetch.Fetch({
         Method: GetTaxonomicExpert,
@@ -104,22 +103,22 @@ const TaxonomicExpert = () => {
                                     <Col>
                                         <Row className="mb-3">
                                             <Col>
-                                                <BioBlock name="Expertise bio" text={text}/>
+                                                <BioBlock name="Expertise bio" taxonomicExpert={taxonomicExpert}/>
                                             </Col>
                                         </Row>
                                         <Row className="mb-3">
                                             <Col>
-                                                <ExperienceBlock name="Experience and qualifications" />
+                                                <ExperienceBlock name="Experience and qualifications" taxonomicExpert={taxonomicExpert} />
                                             </Col>
                                         </Row>
                                         <Row className="mb-3">
                                             <Col>
-                                                <TrainingBlock name="Training Provision" />
+                                                <TrainingBlock name="Training Provision" taxonomicExpert={taxonomicExpert}/>
                                             </Col>
                                         </Row>
                                     </Col>
                                     <Col className='mb-3'>
-                                        <TaxonomicBlock name="Taxonomic and research scope" />
+                                        <TaxonomicBlock name="Taxonomic and research scope" taxonomicExpert={taxonomicExpert}/>
                                     </Col>
                                 </Row>                                
                             </>
