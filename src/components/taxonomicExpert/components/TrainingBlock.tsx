@@ -59,7 +59,6 @@ export default TrainingBlock;
 
 
 function TrainingCard({ data }: { readonly data: any }) {
-    console.log(data);
     const [expanded, setExpanded] = useState(false);
 
     const toggleText = () => {
@@ -89,10 +88,10 @@ function TrainingCard({ data }: { readonly data: any }) {
                     )}
                 </Card.Text>
                 <div className="fs-4 fw-bold d-flex justify-content-between m-3">
-                    <Card.Link href={url} className="d-flex align-items-center">
+                    <Card.Link href={url} rel="noopener noreferrer" className="d-flex align-items-center">
                         <i className="bi bi-link-45deg me-2"></i> URL
                     </Card.Link>
-                    <Card.Link href={availableThrough} className="d-flex align-items-center">
+                    <Card.Link href={availableThrough} rel="noopener noreferrer" className="d-flex align-items-center">
                         <i className="bi bi-link-45deg me-2"></i> Avaible though DEST
                     </Card.Link>
                 </div>

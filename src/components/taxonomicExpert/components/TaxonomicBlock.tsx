@@ -24,7 +24,7 @@ const TaxonomicBlock = (props: Props) => {
     const discipline = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:discipline']?.join(', ') ?? "N/A";
     const subDiscipline = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:additionalType']?.join(', ') ?? "N/A";
     const taxonomicScope = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:about'] ?? "N/A";
-    const geographicRegion = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:spatialCoverage']?.join(', ') ?? "N/A";
+    const geographicRegion = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:spatialCoverage'] ?? [];
     const methodologies = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:measurementTechnique']?.join(', ') ?? "N/A";
     const appliedResearch = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:ResearchProject']?.join(', ') ?? "N/A";
     const stratigraphicAge = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:temporalCoverage'] ?? "N/A";
@@ -95,7 +95,7 @@ function displayPublicationChart(taxonomicExpert: TaxonomicExpert) {
     </Row>;
 }
 
-function displayGeographicContent(geographicRegion: string) {
+function displayGeographicContent(geographicRegion: Array<string>) {
     return <Row>
         <Col>
             <p className='fw-bold'>Geographic region</p>
