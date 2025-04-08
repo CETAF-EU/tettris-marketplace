@@ -831,7 +831,7 @@ export interface TaxonomicExpert {
   /**
    * Courses the Taxonomic Expert has created or is teaching
    */
-  "schema:EducationAndTrainingProvision"?: {
+  "schema:educationAndTrainingProvision"?: {
     /**
      * The title of the training course
      */

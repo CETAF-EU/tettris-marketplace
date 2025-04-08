@@ -988,7 +988,7 @@
                 }
             }    
         },
-        "schema:EducationAndTrainingProvision": {
+        "schema:educationAndTrainingProvision": {
             "type": "array",
             "description": "Courses the Taxonomic Expert has created or is teaching",
             "items": {

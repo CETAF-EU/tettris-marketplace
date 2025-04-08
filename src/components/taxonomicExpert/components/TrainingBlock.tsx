@@ -19,9 +19,7 @@ type Props = {
  */
 const TrainingBlock = (props: Props) => {
     const { name, taxonomicExpert } = props;
-    const training = taxonomicExpert?.taxonomicExpert['schema:EducationAndTrainingProvision'];
-    console.log(taxonomicExpert?.taxonomicExpert['schema:EducationAndTrainingProvision'])
-    console.log(training)
+    const training = taxonomicExpert.taxonomicExpert['schema:educationAndTrainingProvision'];
     return (
         <div className="h-100 d-flex flex-column mb-3">
             {/* Name of block */}
@@ -37,9 +35,13 @@ const TrainingBlock = (props: Props) => {
                 <Col>
                     <div className="h-100 b-tertiary px-4 py-3 overflow-auto" style={{ maxHeight: '250px', overflowY: 'scroll' }}>
                         <div style={{ maxHeight: '100%', overflowY: 'auto' }}>
-                            {training?.map((item) => (
-                                <TrainingCard key={item.id} data={item} />
-                            ))}
+                            {training && (() => {
+                                const cards = [];
+                                for (const item of training) {
+                                    cards.push(<TrainingCard data={item} />);
+                                }
+                                return cards;
+                            })()}
                         </div>
                     </div>
                 </Col>
@@ -51,19 +53,20 @@ const TrainingBlock = (props: Props) => {
 export default TrainingBlock;
 
 
-function TrainingCard(data: any) {
+function TrainingCard({ data }: { readonly data: any }) {
+    console.log(data);
     const [expanded, setExpanded] = useState(false);
 
     const toggleText = () => {
         setExpanded(!expanded);
     };
 
-    const name = data['schema:name'] as string || 'Any name provided'
-    const text = data['schema:description'] as string || 'Any description provided'
+    const name = data['schema:name'] as string || 'Any name provided';
+    const text = data['schema:description'] as string || 'Any description provided';
     const MAX_TEXT_LENGTH = 300;
     const croppedText = text.length > MAX_TEXT_LENGTH ? text.substring(0, MAX_TEXT_LENGTH) + '...' : text;
-    const url = data['schema:contentUrl'] as string || undefined
-    const availableThrough = data['schema:EducationalOccupationalProgram'] as string || undefined
+    const url = data['schema:contentUrl'] as string || undefined;
+    const availableThrough = data['schema:EducationalOccupationalProgram'] as string || undefined;
 
     return (
         <Card className="mb-3 custom-card">
@@ -74,9 +77,11 @@ function TrainingCard(data: any) {
                         ? text
                         : croppedText
                     }
-                    <Button variant="link" onClick={toggleText}>
-                        {expanded ? "Read Less" : "Read More"}
-                    </Button>
+                    {text.length > MAX_TEXT_LENGTH && (
+                        <Button variant="link" onClick={toggleText}>
+                            {expanded ? "Read Less" : "Read More"}
+                        </Button>
+                    )}
                 </Card.Text>
                 <div className="fs-4 fw-bold d-flex justify-content-between m-3">
                     <Card.Link href={url} className="d-flex align-items-center">
