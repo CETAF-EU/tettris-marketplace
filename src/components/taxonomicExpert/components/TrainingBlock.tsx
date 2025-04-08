@@ -43,7 +43,7 @@ const TrainingBlock = (props: Props) => {
                                 const cards = [];
                                 for (const item of training) {
                                     if (!item['schema:name']) continue;
-                                    cards.push(<TrainingCard data={item} />);
+                                    cards.push(<TrainingCard key={String(item['@id'] || item['schema:name'])} data={item} />);
                                 }
                                 return cards;
                             })()}
@@ -88,10 +88,10 @@ function TrainingCard({ data }: { readonly data: any }) {
                     )}
                 </Card.Text>
                 <div className="fs-4 fw-bold d-flex justify-content-between m-3">
-                    <Card.Link href={url} rel="noopener noreferrer" className="d-flex align-items-center">
+                    <Card.Link href={url} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center">
                         <i className="bi bi-link-45deg me-2"></i> URL
                     </Card.Link>
-                    <Card.Link href={availableThrough} rel="noopener noreferrer" className="d-flex align-items-center">
+                    <Card.Link href={availableThrough} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center">
                         <i className="bi bi-link-45deg me-2"></i> Avaible though DEST
                     </Card.Link>
                 </div>

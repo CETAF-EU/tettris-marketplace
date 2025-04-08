@@ -237,6 +237,7 @@ const worldMarine = [
 
 const worldUnknown = ["World/NA"];
 
+// fix the type of allRegions
 const allRegions = {
   Europe: europeanCountries,
   Africa: africanCountries,
@@ -262,7 +263,6 @@ interface Props {
  */
 const WorldMap = (props: Props) => {
   const { region } = props;
-  console.log("Region: ", region);
   let selectedRegion: string[] = [];
   if (region) {
     for (const r of region) {
@@ -271,7 +271,6 @@ const WorldMap = (props: Props) => {
       }
     }
   }
-  console.log("Selected region: ", selectedRegion);
   return (
     <div className="map-container">
       <ComposableMap

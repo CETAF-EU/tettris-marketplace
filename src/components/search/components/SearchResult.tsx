@@ -171,7 +171,8 @@ const SearchResult = (props: Props) => {
         const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] ?? '';
         const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] ?? '';
         const languages = (taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language'] || []).join(' / ').toUpperCase() || '';
-
+        const discipline = taxonomicExpert?.taxonomicExpert?.['schema:Taxon']?.['schema:discipline'] || [];
+        
         return (
             <div className={`${styles.searchResult} w-100 bgc-white mt-lg-1 pt-3 pb-2 px-3`}>
                 <button type="button"
@@ -186,18 +187,18 @@ const SearchResult = (props: Props) => {
                             </Col>
                         </Row>
                         {/*Headline, Taxonomic Range and profile picture */}
-                        <Row className='mb-2 justify-content-between align-items-center'>
+                        <Row className='mb-2 justify-content-between'>
                             <Col className=''>
                                 <Row className='mb-2'>
                                     <Col>
                                         <p className="fs-6 fs-lg-4  textOverflow">{headline}</p>
                                     </Col>
                                 </Row>
-                                <Row>
+                                <Row className='h-100'>
                                     <Col>
-                                        <p className='fst-italic fs-4'>Lepidoptera</p>
-                                        <p className='fst-italic fs-4'>Bees</p>
-                                        <p className='fst-italic fs-4'>Ants</p>
+                                        <p className='fst-italic fs-4'>{discipline[0]}</p>
+                                        <p className='fst-italic fs-4'>{discipline[1]}</p>
+                                        <p className='fst-italic fs-4'>{discipline[2]}</p>
                                     </Col>
                                 </Row>
                             </Col>
