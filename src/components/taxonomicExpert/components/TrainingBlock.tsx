@@ -20,6 +20,10 @@ type Props = {
 const TrainingBlock = (props: Props) => {
     const { name, taxonomicExpert } = props;
     const training = taxonomicExpert.taxonomicExpert['schema:educationAndTrainingProvision'];
+    
+    if (training?.length === 1 && !training[0]['schema:name']) {
+        return (<></>)
+    }
     return (
         <div className="h-100 d-flex flex-column mb-3">
             {/* Name of block */}
@@ -38,6 +42,7 @@ const TrainingBlock = (props: Props) => {
                             {training && (() => {
                                 const cards = [];
                                 for (const item of training) {
+                                    if (!item['schema:name']) continue;
                                     cards.push(<TrainingCard data={item} />);
                                 }
                                 return cards;
