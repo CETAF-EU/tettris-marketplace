@@ -15,6 +15,9 @@ env:
   VITE_EMAILJS_ID: ${{ secrets.VITE_EMAILJS_ID }}
   VITE_EMAILJS_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_TEMPLATE_ID }}
   VITE_EMAILJS_USER_ID: ${{ secrets.VITE_EMAILJS_USER_ID }}
+  VITE_ORCID_CLIENT_ID: ${{ secrets.VITE_ORCID_CLIENT_ID }}
+  VITE_ORCID_CLIENT_SECRET: ${{ secrets.VITE_ORCID_CLIENT_SECRET }}
+  VITE_ORCID_REDIRECT_URI: https://sandbox.cetaf.org/te/registerYourExpertise
   VITE_DEV: true
   
 jobs:
@@ -69,6 +72,9 @@ jobs:
           --build-arg VITE_EMAILJS_ID=${{ env.VITE_EMAILJS_ID }} \
           --build-arg VITE_EMAILJS_TEMPLATE_ID=${{ env.VITE_EMAILJS_TEMPLATE_ID }} \
           --build-arg VITE_EMAILJS_USER_ID=${{ env.VITE_EMAILJS_USER_ID }} \
+          --build-arg VITE_ORCID_CLIENT_ID=${{ env.VITE_ORCID_CLIENT_ID }} \
+          --build-arg VITE_ORCID_CLIENT_SECRET=${{ env.VITE_ORCID_CLIENT_SECRET }} \
+          --build-arg VITE_ORCID_REDIRECT_URI=${{ env.VITE_ORCID_REDIRECT_URI }} \
           --build-arg VITE_DEV=true \
           -t ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }} .
 
