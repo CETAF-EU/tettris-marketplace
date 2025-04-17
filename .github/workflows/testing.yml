@@ -1,10 +1,10 @@
-name: CI Pipeline
+name: CI testing
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "develop" ]
 
 env:
   DOCKERHUB_REPOSITORY: ${{ secrets.DOCCKERHUB_REPO }}
@@ -15,7 +15,7 @@ env:
   VITE_EMAILJS_ID: ${{ secrets.VITE_EMAILJS_ID }}
   VITE_EMAILJS_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_TEMPLATE_ID }}
   VITE_EMAILJS_USER_ID: ${{ secrets.VITE_EMAILJS_USER_ID }}
-  VITE_DEV: false
+  VITE_DEV: true
   
 jobs:
   build:
@@ -38,7 +38,7 @@ jobs:
         echo "VITE_EMAILJS_ID=${{ env.VITE_EMAILJS_ID }}" >> .env
         echo "VITE_EMAILJS_TEMPLATE_ID=${{ env.VITE_EMAILJS_TEMPLATE_ID }}" >> .env
         echo "VITE_EMAILJS_USER_ID=${{ env.VITE_EMAILJS_USER_ID }}" >> .env
-        echo "VITE_DEV=false" >> .env
+        echo "VITE_DEV=true" >> .env
   
     - name: Install dependencies
       run: npm install
@@ -69,15 +69,15 @@ jobs:
           --build-arg VITE_EMAILJS_ID=${{ env.VITE_EMAILJS_ID }} \
           --build-arg VITE_EMAILJS_TEMPLATE_ID=${{ env.VITE_EMAILJS_TEMPLATE_ID }} \
           --build-arg VITE_EMAILJS_USER_ID=${{ env.VITE_EMAILJS_USER_ID }} \
-          --build-arg VITE_DEV=false \
+          --build-arg VITE_DEV=true \
           -t ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }} .
 
-    - name: Tag Docker image with 'latest'        
+    - name: Tag Docker image with 'test'        
       run: |
         docker tag ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }} \
-          ${{ env.DOCKERHUB_REPOSITORY }}:latest
+          ${{ env.DOCKERHUB_REPOSITORY }}:test
 
     - name: Push Docker images to Docker Hub
       run: |
         docker push ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }}
-        docker push ${{ env.DOCKERHUB_REPOSITORY }}:latest
+        docker push ${{ env.DOCKERHUB_REPOSITORY }}:test
