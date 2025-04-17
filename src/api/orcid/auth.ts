@@ -53,9 +53,13 @@ export function useOrcidCallback() {
                     Accept: 'application/json',
                 },
             });
-
+    
+            if (tokenResponse.status !== 200) {
+                throw new Error('Failed to retrieve access token');
+            }
+    
             const { access_token, orcid } = tokenResponse.data;
-
+    
             // Step 3: Retrieve user data using the ORCID ID and access token
             const userResponse = await axios.get(`${ORCID_USER_INFO_URL}${orcid}/person`, {
                 headers: {
@@ -63,19 +67,27 @@ export function useOrcidCallback() {
                     Accept: 'application/json',
                 },
             });
-
+    
+            if (userResponse.status !== 200) {
+                throw new Error('Failed to retrieve user data');
+            }
+    
             const userData = userResponse.data;
             console.log('User Data:', userData);
+    
             return {
                 orcid,
                 name: `${userData.name['given-names'].value} ${userData.name['family-name'].value}`,
                 email: userData.emails?.email?.[0]?.email, // Optional, if email is available
             };
         } catch (error) {
-            console.error('Error during ORCID login:', error);
+            if (axios.isAxiosError(error)) {
+                console.error('API request failed:', error.response?.data || error.message);
+            } else {
+                console.error('Error during ORCID login:', error);
+            }
             throw new Error('Failed to login with ORCID');
         }
     }
-
     return { userData, error };
 }
