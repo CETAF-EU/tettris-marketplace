@@ -1,12 +1,15 @@
 /* Import Dependencies */
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Modal } from 'react-bootstrap';
+import { useState } from 'react';
+
+/* Import Types */
+import { TaxonomicExpert } from 'app/Types';
 
 /* Props Type */
 type Props = {
-    name: string,
-    text: string,
+    name: string
+    taxonomicExpert: TaxonomicExpert
 };
-
 
 /**
  * Component that renders a details block for on the taxonomic service page
@@ -14,10 +17,21 @@ type Props = {
  * @returns JSX Component
  */
 const BioBlock = (props: Props) => {
-    const { name, text } = props;
+    const { name, taxonomicExpert } = props;
 
+    const text = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:biography'] as string || 'Any biography provided'
     const MAX_TEXT_LENGTH = 300;
     const croppedText = text.length > MAX_TEXT_LENGTH ? text.substring(0, MAX_TEXT_LENGTH) + '...' : text;
+
+    // State to control modal visibility
+    const [showModal, setShowModal] = useState(false);
+
+    // Function to handle opening the modal
+    const handleShowModal = () => setShowModal(true);
+
+    // Function to handle closing the modal
+    const handleCloseModal = () => setShowModal(false);
+
     return (
         <div className="h-100 d-flex flex-column">
             {/* Name of block */}
@@ -35,12 +49,25 @@ const BioBlock = (props: Props) => {
                         <p className='fs-4 m-1'>{croppedText}</p>
                         {text.length > MAX_TEXT_LENGTH && (
                             <div className="d-flex justify-content-end">
-                                <button className="btn btn-link p-0" onClick={() => alert(text)}>Read More</button>
+                                <button className="btn btn-link p-0" onClick={handleShowModal}>Read More</button>
                             </div>
                         )}
                     </div>
                 </Col>
             </Row>
+
+            {/* Modal to show full description */}
+            <Modal show={showModal} onHide={handleCloseModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title className="tc-tertiary">{name}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>{text}</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button className="btn btn-secondary" onClick={handleCloseModal}>Close</button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };

@@ -68,7 +68,7 @@ const TaxonomicService = () => {
     const detailBlocksClass = classNames({
         'pt-4': !taxonomicService?.taxonomicService['schema:AssociatedMedia']
     });
-
+    
     return (
         <div className="h-100 d-flex flex-column">
             {/* Render Header */}
@@ -170,7 +170,11 @@ const TaxonomicService = () => {
                                                 </Col>
                                             }
                                             {/* Show funding details if funding object is present in taxonomic service */}
-                                            {taxonomicService.taxonomicService['schema:fundingScheme'] &&
+                                            {(taxonomicService.taxonomicService['schema:fundingScheme'] &&
+                                                 (taxonomicService.taxonomicService['schema:fundingScheme']['schema:award'] ||
+                                                 taxonomicService.taxonomicService['schema:fundingScheme']['schema:funding']?.['schema:identifier'] ||
+                                                 taxonomicService.taxonomicService['schema:fundingScheme']['schema:funding']?.['schema:description'] ||
+                                                 taxonomicService.taxonomicService['schema:fundingScheme']['schema:funder'])) &&
                                                 <Col xs={{ span: 12 }}
                                                     lg={{ span: 4 }}
                                                     className="mt-4 mt-lg-0 mb-lg-3"

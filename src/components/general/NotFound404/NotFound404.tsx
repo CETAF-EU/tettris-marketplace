@@ -33,7 +33,7 @@ const NotFound404 = () => {
 
             {/* Render footer */}
             <Footer />
-        </div>
+        </div> 
     );
 };
 

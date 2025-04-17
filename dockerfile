@@ -37,6 +37,7 @@ RUN echo "VITE_CORDRA_PASSWORD=$VITE_CORDRA_PASSWORD" >> .env
 RUN echo "VITE_EMAILJS_ID=$VITE_EMAILJS_ID" >> .env
 RUN echo "VITE_EMAILJS_TEMPLATE_ID=$VITE_EMAILJS_TEMPLATE_ID" >> .env
 RUN echo "VITE_EMAILJS_USER_ID=$VITE_EMAILJS_USER_ID" >> .env
+RUN echo "VITE_PROXY=false" >> .env
 RUN echo "VITE_DEV=$VITE_DEV" >> .env
 
 # Setting app to production build

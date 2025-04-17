@@ -1,51 +1,94 @@
 {
     "taxonomicExpertFilters": [
         {
-            "name": "country",
+            "name": "location",
             "alias": "schema:countryOfOrigin",
             "type": "select",
             "default": "",
             "options": [
-                {
-                    "label": "United States",
-                    "value": "us"
-                },
-                {
-                    "label": "Canada",
-                    "value": "ca"
-                },
-                {
-                    "label": "United Kingdom",
-                    "value": "uk"
-                },
-                {
-                    "label": "Australia",
-                    "value": "au"
-                },
-                {
-                    "label": "Germany",
-                    "value": "de"
-                },
-                {
-                    "label": "France",
-                    "value": "fr"
-                },
-                {
-                    "label": "Italy",
-                    "value": "it"
-                },
-                {
-                    "label": "Spain",
-                    "value": "es"
-                },
-                {
-                    "label": "China",
-                    "value": "cn"
-                },
-                {
-                    "label": "Japan",
-                    "value": "jp"
-                }
+                {"label": "Afghanistan", "value": "af"},
+                {"label": "Albania", "value": "al"},
+                {"label": "Algeria", "value": "dz"},
+                {"label": "Andorra", "value": "ad"},
+                {"label": "Angola", "value": "ao"},
+                {"label": "Argentina", "value": "ar"},
+                {"label": "Armenia", "value": "am"},
+                {"label": "Australia", "value": "au"},
+                {"label": "Austria", "value": "at"},
+                {"label": "Azerbaijan", "value": "az"},
+                {"label": "Bangladesh", "value": "bd"},
+                {"label": "Belarus", "value": "by"},
+                {"label": "Belgium", "value": "be"},
+                {"label": "Bolivia", "value": "bo"},
+                {"label": "Bosnia and Herzegovina", "value": "ba"},
+                {"label": "Brazil", "value": "br"},
+                {"label": "Bulgaria", "value": "bg"},
+                {"label": "Canada", "value": "ca"},
+                {"label": "Chile", "value": "cl"},
+                {"label": "China", "value": "cn"},
+                {"label": "Colombia", "value": "co"},
+                {"label": "Croatia", "value": "hr"},
+                {"label": "Cuba", "value": "cu"},
+                {"label": "Czech Republic", "value": "cz"},
+                {"label": "Denmark", "value": "dk"},
+                {"label": "Ecuador", "value": "ec"},
+                {"label": "Egypt", "value": "eg"},
+                {"label": "Estonia", "value": "ee"},
+                {"label": "Finland", "value": "fi"},
+                {"label": "France", "value": "fr"},
+                {"label": "Georgia", "value": "ge"},
+                {"label": "Germany", "value": "de"},
+                {"label": "Greece", "value": "gr"},
+                {"label": "Hungary", "value": "hu"},
+                {"label": "Iceland", "value": "is"},
+                {"label": "India", "value": "in"},
+                {"label": "Indonesia", "value": "id"},
+                {"label": "Iran", "value": "ir"},
+                {"label": "Iraq", "value": "iq"},
+                {"label": "Ireland", "value": "ie"},
+                {"label": "Israel", "value": "il"},
+                {"label": "Italy", "value": "it"},
+                {"label": "Japan", "value": "jp"},
+                {"label": "Kazakhstan", "value": "kz"},
+                {"label": "Kenya", "value": "ke"},
+                {"label": "Latvia", "value": "lv"},
+                {"label": "Lithuania", "value": "lt"},
+                {"label": "Luxembourg", "value": "lu"},
+                {"label": "Malaysia", "value": "my"},
+                {"label": "Mexico", "value": "mx"},
+                {"label": "Mongolia", "value": "mn"},
+                {"label": "Morocco", "value": "ma"},
+                {"label": "Netherlands", "value": "nl"},
+                {"label": "New Zealand", "value": "nz"},
+                {"label": "Nigeria", "value": "ng"},
+                {"label": "Norway", "value": "no"},
+                {"label": "Pakistan", "value": "pk"},
+                {"label": "Peru", "value": "pe"},
+                {"label": "Philippines", "value": "ph"},
+                {"label": "Poland", "value": "pl"},
+                {"label": "Portugal", "value": "pt"},
+                {"label": "Romania", "value": "ro"},
+                {"label": "Russia", "value": "ru"},
+                {"label": "Saudi Arabia", "value": "sa"},
+                {"label": "Serbia", "value": "rs"},
+                {"label": "Singapore", "value": "sg"},
+                {"label": "Slovakia", "value": "sk"},
+                {"label": "Slovenia", "value": "si"},
+                {"label": "South Africa", "value": "za"},
+                {"label": "South Korea", "value": "kr"},
+                {"label": "Spain", "value": "es"},
+                {"label": "Sweden", "value": "se"},
+                {"label": "Switzerland", "value": "ch"},
+                {"label": "Thailand", "value": "th"},
+                {"label": "Turkey", "value": "tr"},
+                {"label": "Ukraine", "value": "ua"},
+                {"label": "United Arab Emirates", "value": "ae"},
+                {"label": "United Kingdom", "value": "uk"},
+                {"label": "United States", "value": "us"},
+                {"label": "Uzbekistan", "value": "uz"},
+                {"label": "Venezuela", "value": "ve"},
+                {"label": "Vietnam", "value": "vn"},
+                {"label": "Zimbabwe", "value": "zw"}
             ]
         },
         {
@@ -54,42 +97,106 @@
             "type": "select",
             "default": "",
             "options": [
-                {
-                    "label": "Mammals",
-                    "value": "mammals"
-                },
-                {
-                    "label": "Birds",
-                    "value": "birds"
-                },
-                {
-                    "label": "Reptiles",
-                    "value": "reptiles"
-                },
-                {
-                    "label": "Amphibians",
-                    "value": "amphibians"
-                },
-                {
-                    "label": "Fish",
-                    "value": "fish"
-                },
-                {
-                    "label": "Insects",
-                    "value": "insects"
-                },
-                {
-                    "label": "Arachnids",
-                    "value": "arachnids"
-                },
-                {
-                    "label": "Mollusks",
-                    "value": "mollusks"
-                },
-                {
-                    "label": "Crustaceans",
-                    "value": "crustaceans"
-                }
+                {"label": "Botany", "value": "botany"},
+                {"label": "Invertebrates Zoology", "value": "invertebrates"},
+                {"label": "Vertebrates Zoology", "value": "vertebrates"},
+                {"label": "Palaeontology", "value": "palaeontology"},
+                {"label": "Microbiology", "value": "microbiology"},
+                {"label": "ECO Environmental DNA", "value": "ecoEnvDNA"}
+            ]
+        },
+        {
+            "name": "subTaxonomicGroup",
+            "alias": "schema:subTaxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {"label": "", "value": ""}
+            ]
+        },
+        {
+            "name": "subBotanyGroup",
+            "alias": "schema:subTaxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {"label": "Algae", "value": "algae"},
+                {"label": "Macrofungi, Lichens & Myxomycetes (Mycology)", "value": "macrofungiLichensMyxomycetes"},
+                {"label": "Bryophytes", "value": "bryophytes"},
+                {"label": "Pteridophytes", "value": "pteridophytes"},
+                {"label": "Seed plants", "value": "seedPlants"},
+                {"label": "Plant Genetic Resources", "value": "plantGeneticResources"}
+            ]
+        },
+        {
+            "name": "subInvertebratesGroup",
+            "alias": "schema:subTaxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {"label": "Insects", "value": "insects"},
+                {"label": "Arachnids", "value": "arachnids"},
+                {"label": "Crustaceans & Myriapods", "value": "crustaceansMyriapods"},
+                {"label": "Mollusca (bivalves, gastropods, cephalopods)", "value": "mollusca"},
+                {"label": "Porifera (Sponges)", "value": "porifera"},
+                {"label": "Cnidaria (jellyfish, coral, anemones)", "value": "cnidaria"},
+                {"label": "Echinodermata (starfish, sea urchins, sea cucumbers)", "value": "echinodermata"},
+                {"label": "Invertebrates Genetic Resources", "value": "invertebratesGeneticResources"},
+                {"label": "Other Invertebrate Zoology", "value": "otherInvertebrateZoology"}
+            ]
+        },
+        {
+            "name": "subVertebratesGroup",
+            "alias": "schema:subTaxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {"label": "Fishes", "value": "fishes"},
+                {"label": "Amphibians", "value": "amphibians"},
+                {"label": "Reptiles", "value": "reptiles"},
+                {"label": "Birds", "value": "birds"},
+                {"label": "Mammals", "value": "mammals"},
+                {"label": "Vertebrates Genetic Resources", "value": "vertebratesGeneticResources"},
+                {"label": "Other Vertebrate Zoology", "value": "otherVertebrateZoology"}
+            ]
+        },
+        {
+            "name": "subPalaeontologyGroup",
+            "alias": "schema:subTaxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {"label": "Fossil Plants & Fungi", "value": "fossilPlantsFungi"},
+                {"label": "Fossil Invertebrates", "value": "fossilInvertebrates"},
+                {"label": "Fossil Vertebrates", "value": "fossilVertebrates"},
+                {"label": "Other Palaeontology", "value": "otherPalaeontology"}
+            ]
+        },
+        {
+            "name": "subMicrobiologyGroup",
+            "alias": "schema:subTaxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {"label": "Phages", "value": "phages"},
+                {"label": "Bacteria & Archaea", "value": "bacteriaArchaea"},
+                {"label": "Plasmids", "value": "plasmids"},
+                {"label": "Protozoa", "value": "protozoa"},
+                {"label": "Eukaryotic Microorganisms", "value": "eukaryoticMicroorganisms"},
+                {"label": "Viruses", "value": "viruses"},
+                {"label": "Microfungi (including moulds, yeasts)", "value": "microfungi"},
+                {"label": "Algae (in microbiology collection)", "value": "algaeMicrobiology"},
+                {"label": "Other Microbiology Objects (e.g. mixed or other kinds of microorganisms)", "value": "otherMicrobiologyObjects"}
+            ]
+        },
+        {
+            "name": "subEcoEnvDNAGroup",
+            "alias": "schema:subTaxonomicGroup",
+            "type": "select",
+            "default": "",
+            "options": [
+                {"label": "ECO-DNA (environmental DNA)", "value": "ecoDNA"},
+                {"label": "ECO-OTH", "value": "ecoOTH"}
             ]
         },
         {
@@ -98,114 +205,77 @@
             "type": "select",
             "default": "",
             "options": [
-                {
-                    "label": "Bulgarian",
-                    "value": "bg"
-                },
-                {
-                    "label": "Croatian",
-                    "value": "hr"
-                },
-                {
-                    "label": "Czech",
-                    "value": "cs"
-                },
-                {
-                    "label": "Danish",
-                    "value": "da"
-                },
-                {
-                    "label": "Dutch",
-                    "value": "nl"
-                },
-                {
-                    "label": "Luxembourgish",
-                    "value": "lb"
-                },
-                {
-                    "label": "English",
-                    "value": "en"
-                },
-                {
-                    "label": "Estonian",
-                    "value": "es"
-                },
-                {
-                    "label": "Finnish",
-                    "value": "fi"
-                },
-                {
-                    "label": "French",
-                    "value": "fr"
-                },
-                {
-                    "label": "German",
-                    "value": "de"
-                },
-                {
-                    "label": "Greek",
-                    "value": "el"
-                },
-                {
-                    "label": "Hungarian",
-                    "value": "hu"
-                },
-                {
-                    "label": "Irish",
-                    "value": "ga"
-                },
-                {
-                    "label": "Italian",
-                    "value": "it"
-                },
-                {
-                    "label": "Latvian",
-                    "value": "lv"
-                },
-                {
-                    "label": "Lithuanian",
-                    "value": "lt"
-                },
-                {
-                    "label": "Maltese",
-                    "value": "mt"
-                },
-                {
-                    "label": "Polish",
-                    "value": "pl"
-                },
-                {
-                    "label": "Portugese",
-                    "value": "pt"
-                },
-                {
-                    "label": "Romanian",
-                    "value": "ro"
-                },
-                {
-                    "label": "Russian",
-                    "value": "ru"
-                },
-                {
-                    "label": "Slovakian",
-                    "value": "sk"
-                },
-                {
-                    "label": "Spanish",
-                    "value": "es"
-                },
-                {
-                    "label": "Swedish",
-                    "value": "sv"
-                },
-                {
-                    "label": "Turkish",
-                    "value": "tk"
-                },
-                {
-                    "label": "Ukranian",
-                    "value": "uk"
-                }
+                {"label": "Afghan Persian", "value": "fa-AF"},
+                {"label": "Afrikaans", "value": "af"},
+                {"label": "Albanian", "value": "sq"},
+                {"label": "Amharic", "value": "am"},
+                {"label": "Arabic", "value": "ar"},
+                {"label": "Armenian", "value": "hy"},
+                {"label": "Azerbaijani", "value": "az"},
+                {"label": "Bengali", "value": "bn"},
+                {"label": "Bosnian", "value": "bs"},
+                {"label": "Bulgarian", "value": "bg"},
+                {"label": "Burmese", "value": "my"},
+                {"label": "Catalan", "value": "ca"},
+                {"label": "Chinese (Simplified)", "value": "zh-CN"},
+                {"label": "Chinese (Traditional)", "value": "zh-TW"},
+                {"label": "Croatian", "value": "hr"},
+                {"label": "Czech", "value": "cs"},
+                {"label": "Danish", "value": "da"},
+                {"label": "Dutch", "value": "nl"},
+                {"label": "English", "value": "en"},
+                {"label": "Estonian", "value": "et"},
+                {"label": "Finnish", "value": "fi"},
+                {"label": "French", "value": "fr"},
+                {"label": "Georgian", "value": "ka"},
+                {"label": "German", "value": "de"},
+                {"label": "Greek", "value": "el"},
+                {"label": "Hebrew", "value": "he"},
+                {"label": "Hindi", "value": "hi"},
+                {"label": "Hungarian", "value": "hu"},
+                {"label": "Icelandic", "value": "is"},
+                {"label": "Indonesian", "value": "id"},
+                {"label": "Irish", "value": "ga"},
+                {"label": "Italian", "value": "it"},
+                {"label": "Japanese", "value": "ja"},
+                {"label": "Kazakh", "value": "kk"},
+                {"label": "Khmer", "value": "km"},
+                {"label": "Korean", "value": "ko"},
+                {"label": "Kurdish", "value": "ku"},
+                {"label": "Latvian", "value": "lv"},
+                {"label": "Lithuanian", "value": "lt"},
+                {"label": "Luxembourgish", "value": "lb"},
+                {"label": "Macedonian", "value": "mk"},
+                {"label": "Malay", "value": "ms"},
+                {"label": "Maltese", "value": "mt"},
+                {"label": "Mongolian", "value": "mn"},
+                {"label": "Nepali", "value": "ne"},
+                {"label": "Norwegian", "value": "no"},
+                {"label": "Pashto", "value": "ps"},
+                {"label": "Persian", "value": "fa"},
+                {"label": "Polish", "value": "pl"},
+                {"label": "Portuguese", "value": "pt"},
+                {"label": "Romanian", "value": "ro"},
+                {"label": "Russian", "value": "ru"},
+                {"label": "Serbian", "value": "sr"},
+                {"label": "Sinhala", "value": "si"},
+                {"label": "Slovak", "value": "sk"},
+                {"label": "Slovenian", "value": "sl"},
+                {"label": "Somali", "value": "so"},
+                {"label": "Spanish", "value": "es"},
+                {"label": "Swahili", "value": "sw"},
+                {"label": "Swedish", "value": "sv"},
+                {"label": "Tagalog", "value": "tl"},
+                {"label": "Tajik", "value": "tg"},
+                {"label": "Tamil", "value": "ta"},
+                {"label": "Thai", "value": "th"},
+                {"label": "Turkish", "value": "tr"},
+                {"label": "Turkmen", "value": "tk"},
+                {"label": "Ukrainian", "value": "uk"},
+                {"label": "Urdu", "value": "ur"},
+                {"label": "Uzbek", "value": "uz"},
+                {"label": "Vietnamese", "value": "vi"},
+                {"label": "Welsh", "value": "cy"}
             ]
         },
         {
@@ -214,14 +284,150 @@
             "type": "select",
             "default": "",
             "options": [
-                {
-                    "label": "Yes",
-                    "value": "yes"
-                },
-                {
-                    "label": "No",
-                    "value": "no"
-                }
+                {"label": "100136 - environmental biotechnology", "value": "100136"},
+                {"label": "100180 - environmental engineering", "value": "100180"},
+                {"label": "100381 - environmental sciences", "value": "100381"},
+                {"label": "100382 - meteorology", "value": "100382"},
+                {"label": "100391 - natural sciences", "value": "100391"},
+                {"label": "100408 - environmental geography", "value": "100408"},
+                {"label": "100409 - geography", "value": "100409"},
+                {"label": "100549 - environmental impact assessment", "value": "100549"},
+                {"label": "101045 - environmental chemistry", "value": "101045"},
+                {"label": "101070 - climate change", "value": "101070"},
+                {"label": "101078 - applied environmental sciences", "value": "101078"},
+                {"label": "101317 - environmental and public health", "value": "101317"},
+                {"label": "101318 - biodiversity conservation", "value": "101318"},
+                {"label": "101510 - environmentalism"},
+                {"label": "100038 - pathobiology", "value": "100038"},
+                {"label": "100126 - biomechanics", "value": "100126"},
+                {"label": "100343 - applied biology", "value": "100343"},
+                {"label": "100345 - biological sciences", "value": "100345"},
+                {"label": "100346 - biology", "value": "100346"},
+                {"label": "100347 - ecology", "value": "100347"},
+                {"label": "100348 - environmental biology", "value": "100348"},
+                {"label": "100822 - cell biology", "value": "100822"},
+                {"label": "100826 - parasitology", "value": "100826"},
+                {"label": "100848 - aquatic biology", "value": "100848"},
+                {"label": "100849 - freshwater biology", "value": "100849"},
+                {"label": "100850 - population biology", "value": "100850"},
+                {"label": "100858 - evolution", "value": "100858"},
+                {"label": "100864 - ecosystem ecology and land use", "value": "100864"},
+                {"label": "100865 - biometry", "value": "100865"},
+                {"label": "100869 - bioinformatics", "value": "100869"},
+                {"label": "100949 - biophysical science", "value": "100949"},
+                {"label": "101210 - biomaterials", "value": "101210"},
+                {"label": "101352 - biogeography", "value": "101352"},
+                {"label": "101457 - community ecology", "value": "101457"},
+                {"label": "101458 - population ecology", "value": "101458"},
+                {"label": "100264 - anatomy", "value": "100264"},
+                {"label": "100356 - zoology", "value": "100356"},
+                {"label": "100522 - animal behaviour", "value": "100522"},
+                {"label": "100880 - applied zoology", "value": "100880"},
+                {"label": "100881 - cell zoology", "value": "100881"},
+                {"label": "100882 - entomology", "value": "100882"},
+                {"label": "100883 - marine zoology", "value": "100883"},
+                {"label": "100884 - pest management", "value": "100884"},
+                {"label": "100937 - animal physiology", "value": "100937"},
+                {"label": "100940 - animal nutrition", "value": "100940"},
+                {"label": "100139 - plant biotechnology", "value": "100139"},
+                {"label": "100355 - plant sciences", "value": "100355"},
+                {"label": "100520 - forestry and arboriculture", "value": "100520"},
+                {"label": "100529 - horticulture", "value": "100529"},
+                {"label": "100872 - mycology", "value": "100872"},
+                {"label": "100873 - plant cell science", "value": "100873"},
+                {"label": "100874 - plant pathology", "value": "100874"},
+                {"label": "100932 - plant biochemistry", "value": "100932"},
+                {"label": "100945 - crop protection", "value": "100945"},
+                {"label": "100946 - crop nutrition", "value": "100946"},
+                {"label": "100947 - crop production", "value": "100947"},
+                {"label": "101024 - agricultural chemistry", "value": "101024"},
+                {"label": "101025 - agricultural botany", "value": "101025"},
+                {"label": "101348 - exotic plants and crops", "value": "101348"},
+                {"label": "101376 - applied botany", "value": "101376"},
+                {"label": "101460 - plant physiology", "value": "101460"},
+                {"label": "100353 - microbiology", "value": "100353"},
+                {"label": "100906 - applied microbiology", "value": "100906"},
+                {"label": "100909 - bacteriology", "value": "100909"},
+                {"label": "100910 - virology", "value": "100910"},
+                {"label": "Marine science", "value": "marineScience"},
+                {"label": "100351 - marine biology", "value": "100351"},
+                {"label": "100418 - marine sciences", "value": "100418"},
+                {"label": "100421 - ocean sciences", "value": "100421"},
+                {"label": "100544 - marine engineering", "value": "100544"},
+                {"label": "101046 - marine chemistry", "value": "101046"},
+                {"label": "101065 - maritime geography", "value": "101065"},
+                {"label": "101390 - marine physics", "value": "101390"},
+                {"label": "100137 - industrial biotechnology", "value": "100137"},
+                {"label": "100141 - biochemical engineering", "value": "100141"},
+                {"label": "100259 - genetics", "value": "100259"},
+                {"label": "100344 - biochemistry", "value": "100344"},
+                {"label": "100354 - molecular biology", "value": "100354"},
+                {"label": "100900 - molecular genetics", "value": "100900"},
+                {"label": "100901 - genomics", "value": "100901"},
+                {"label": "100902 - population genetics", "value": "100902"},
+                {"label": "100948 - biomolecular science", "value": "100948"},
+                {"label": "100003 - ceramics", "value": "100003"},
+                {"label": "100033 - metallurgy", "value": "100033"},
+                {"label": "100298 - ancient history", "value": "100298"},
+                {"label": "100299 - archaeology", "value": "100299"},
+                {"label": "100300 - classical studies", "value": "100300"},
+                {"label": "100302 - history", "value": "100302"},
+                {"label": "100307 - history of science", "value": "100307"},
+                {"label": "100309 - medieval history", "value": "100309"},
+                {"label": "100310 - modern history", "value": "100310"},
+                {"label": "100312 - social history", "value": "100312"},
+                {"label": "100314 - humanities", "value": "100314"},
+                {"label": "100350 - human biology", "value": "100350"},
+                {"label": "100384 - archaeological sciences", "value": "100384"},
+                {"label": "100386 - forensic biology", "value": "100386"},
+                {"label": "100436 - anthropology", "value": "100436"},
+                {"label": "100437 - social anthropology", "value": "100437"},
+                {"label": "100478 - human geography", "value": "100478"},
+                {"label": "100663 - physical and biological anthropology", "value": "100663"},
+                {"label": "100787 - Egyptology", "value": "100787"},
+                {"label": "100898 - human genetics", "value": "100898"},
+                {"label": "100918 - museum studies", "value": "100918"},
+                {"label": "101218 - forensic anthropology", "value": "101218"},
+                {"label": "101219 - forensic archaeology", "value": "101219"},
+                {"label": "101261 - maritime archaeology", "value": "101261"},
+                {"label": "101437 - Stone Age", "value": "101437"},
+                {"label": "101438 - Bronze Age", "value": "101438"},
+                {"label": "101439 - Iron Age", "value": "101439"},
+                {"label": "101440 - classical art and archaeology", "value": "101440"},
+                {"label": "101455 - stone crafts", "value": "101455"},
+                {"label": "101394 - glaciology and cryospheric systems", "value": "101394"},
+                {"label": "101106 - engineering geology", "value": "101106"},
+                {"label": "101105 - petroleum geology", "value": "101105"},
+                {"label": "101104 - applied geology", "value": "101104"},
+                {"label": "101103 - planetary science", "value": "101103"},
+                {"label": "101102 - space science", "value": "101102"},
+                {"label": "101093 - exploration geology", "value": "101093"},
+                {"label": "101091 - quaternary studies", "value": "101091"},
+                {"label": "101089 - hydrogeology", "value": "101089"},
+                {"label": "101086 - geological oceanography", "value": "101086"},
+                {"label": "101084 - exploration geophysics", "value": "101084"},
+                {"label": "101083 - geochemistry", "value": "101083"},
+                {"label": "101082 - geological hazards", "value": "101082"},
+                {"label": "101081 - volcanology", "value": "101081"},
+                {"label": "101079 - hydrology", "value": "101079"},
+                {"label": "101073 - hydrography", "value": "101073"},
+                {"label": "101067 - soil science", "value": "101067"},
+                {"label": "101064 - geomorphology", "value": "101064"},
+                {"label": "101044 - crystallography", "value": "101044"},
+                {"label": "100566 - quarrying", "value": "100566"},
+                {"label": "100550 - gemmology", "value": "100550"},
+                {"label": "100424 - physical sciences", "value": "100424"},
+                {"label": "100410 - physical geography", "value": "100410"},
+                {"label": "100398 - palaeontology", "value": "100398"},
+                {"label": "100396 - geophysics", "value": "100396"},
+                {"label": "100395 - geology", "value": "100395"},
+                {"label": "100394 - earth sciences", "value": "100394"},
+                {"label": "100392 - applied science", "value": "100392"},
+                {"label": "100380 - environmental geoscience", "value": "100380"},
+                {"label": "100379 - climate science", "value": "100379"},
+                {"label": "100212 - minerals processing", "value": "100212"},
+                {"label": "100155 - minerals technology", "value": "100155"},
+                {"label": "other subjects", "value": "otherSubjects"}
             ]
         }
     ]

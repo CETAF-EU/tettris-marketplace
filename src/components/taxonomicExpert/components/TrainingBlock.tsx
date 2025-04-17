@@ -2,9 +2,13 @@
 import { useState } from 'react';
 import { Row, Col, Card, Button } from 'react-bootstrap';
 
+/* Import Types */
+import { TaxonomicExpert } from 'app/Types';
+
 /* Props Type */
 type Props = {
-    name: string,
+    name: string
+    taxonomicExpert: TaxonomicExpert
 };
 
 
@@ -14,8 +18,12 @@ type Props = {
  * @returns JSX Component
  */
 const TrainingBlock = (props: Props) => {
-    const { name } = props;
-
+    const { name, taxonomicExpert } = props;
+    const training = taxonomicExpert.taxonomicExpert['schema:educationAndTrainingProvision'];
+    
+    if (training?.length === 1 && !training[0]['schema:name']) {
+        return (<></>)
+    }
     return (
         <div className="h-100 d-flex flex-column mb-3">
             {/* Name of block */}
@@ -31,9 +39,14 @@ const TrainingBlock = (props: Props) => {
                 <Col>
                     <div className="h-100 b-tertiary px-4 py-3 overflow-auto" style={{ maxHeight: '250px', overflowY: 'scroll' }}>
                         <div style={{ maxHeight: '100%', overflowY: 'auto' }}>
-                            {TrainingCard()}
-                            {TrainingCard()}
-                            {TrainingCard()}
+                            {training && (() => {
+                                const cards = [];
+                                for (const item of training) {
+                                    if (!item['schema:name']) continue;
+                                    cards.push(<TrainingCard key={String(item['@id'] || item['schema:name'])} data={item} />);
+                                }
+                                return cards;
+                            })()}
                         </div>
                     </div>
                 </Col>
@@ -45,32 +58,41 @@ const TrainingBlock = (props: Props) => {
 export default TrainingBlock;
 
 
-function TrainingCard() {
+function TrainingCard({ data }: { readonly data: any }) {
     const [expanded, setExpanded] = useState(false);
 
     const toggleText = () => {
         setExpanded(!expanded);
     };
 
+    const name = data['schema:name'] as string || 'Any name provided';
+    const text = data['schema:description'] as string || 'Any description provided';
+    const MAX_TEXT_LENGTH = 300;
+    const croppedText = text.length > MAX_TEXT_LENGTH ? text.substring(0, MAX_TEXT_LENGTH) + '...' : text;
+    const url = data['schema:contentUrl'] as string || undefined;
+    const availableThrough = data['schema:EducationalOccupationalProgram'] as string || undefined;
+
     return (
         <Card className="mb-3 custom-card">
             <Card.Body>
-                <Card.Title className='fs-3 fw-bold'>Card Title</Card.Title>
+                <Card.Title className='fs-3 fw-bold'>{name}</Card.Title>
                 <Card.Text>
                     {expanded
-                        ? "Some quick example text to build on the card title and make up the bulk of the card's content, and even more content to show how the expansion works!"
-                        : "Some quick example text to build on the card title and make up the bulk of the card's content."
+                        ? text
+                        : croppedText
                     }
-                    <Button variant="link" onClick={toggleText}>
-                        {expanded ? "Read Less" : "Read More"}
-                    </Button>
+                    {text.length > MAX_TEXT_LENGTH && (
+                        <Button variant="link" onClick={toggleText}>
+                            {expanded ? "Read Less" : "Read More"}
+                        </Button>
+                    )}
                 </Card.Text>
                 <div className="fs-4 fw-bold d-flex justify-content-between m-3">
-                    <Card.Link href="#" className="d-flex align-items-center">
-                        <i className="bi bi-link-45deg me-2"></i> Card Link
+                    <Card.Link href={url} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center">
+                        <i className="bi bi-link-45deg me-2"></i> URL
                     </Card.Link>
-                    <Card.Link href="#" className="d-flex align-items-center">
-                        <i className="bi bi-link-45deg me-2"></i> Another Link
+                    <Card.Link href={availableThrough} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center">
+                        <i className="bi bi-link-45deg me-2"></i> Avaible though DEST
                     </Card.Link>
                 </div>
             </Card.Body>

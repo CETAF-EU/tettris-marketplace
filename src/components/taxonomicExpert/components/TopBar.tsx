@@ -7,12 +7,10 @@ import { TaxonomicExpert } from 'app/Types';
 /* Import Components */
 import { Button } from 'components/general/CustomComponents';
 
-
 /* Props Type */
 type Props = {
     taxonomicExpert: TaxonomicExpert
 };
-
 
 /**
  * Component that renders the Top Bar of the Taxonomic Expert page
@@ -21,68 +19,103 @@ type Props = {
  */
 const TopBar = (props: Props) => {
     const { taxonomicExpert } = props;
-
+    
+    const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] as string || 'Any name provided';
+    const orcidID = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:identifier'] as string || null;
+    const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] as string || 'Any headline provided';
+    const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] as string || 'Any location provided';
+    const language = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language']?.join(' / ').toUpperCase() ?? 'Any languages provided';
+    const email = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:email'] as string || null;
+    const image = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:ProfilePicture'] as string || 'https://i.pinimg.com/236x/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg';
+    const affiliationName = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:name'] as string || 'Any affiliation name provided';
+    const affiliationURL = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:identifier'] as string || null;
+    const affiliationURLText = affiliationURL ? taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:affiliation']?.['schema:url'] as string : null;
+    const personalLinks = Array.isArray(taxonomicExpert?.taxonomicExpert?.['schema:person']?.["schema:links"])
+        ? taxonomicExpert.taxonomicExpert['schema:person']["schema:links"].flat()
+        : null;
     return (<>
         <Row className="mt-3 pt-lg-0">
             <Col lg="8">
-                <Row className='ms-2'>
-                    <Col xs="2">
-                        <h1 className="fs-3 fs-lg-2">{taxonomicExpert?.taxonomicExpert['schema:name']}</h1>
+                <Row>
+                    <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
+                        <h1 className="fs-3 fs-lg-2">{name}</h1>
                     </Col>
-                    <Col xs="2">
-                        <p className="fw-lightBold bi bi-link-45deg">ORCID ID</p>
+                    <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
+                        {orcidID ? (
+                            <a href={"https://orcid.org/" + orcidID} target="_blank" rel="noopener noreferrer">
+                                <p className="fw-lightBold bi bi-link-45deg">{orcidID}</p>
+                            </a>
+                        ) : (
+                            <p className="fw-lightBold bi bi-link-45deg">Any orcid ID provided</p>
+                        )}
                     </Col>
-                    <Col xs="2">
-                        <p className='fw-lightBold bi bi-geo-alt-fill'>{taxonomicExpert?.taxonomicExpert['schema:location']}</p>
+                    <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
+                        <p className='fw-lightBold bi bi-geo-alt-fill'>{location}</p>
                     </Col>
-                    <Col>
-                        <p className='fw-lightBold bi bi-globe2'> {taxonomicExpert?.taxonomicExpert['schema:language']?.join(' / ').toUpperCase()}</p>
+                    <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
+                        <p className='fw-lightBold bi bi-globe2'> {language}</p>
                     </Col>
                 </Row>
             </Col>
             <Col lg="2" className="d-none d-lg-block"/>
             <Col lg="auto" className="d-none d-lg-block ">
                 <Button type="submit" variant='tertiary'>
-                    <a href={`mailto:${taxonomicExpert?.taxonomicExpert['schema:email']}`} className=''>
-                        <i className="bi bi-envelope-fill"></i> EMAIL
-                    </a>
+                    {email ? (
+                        <a href={`mailto:${email}`} className=''>
+                            <i className="bi bi-envelope-fill"></i> EMAIL
+                        </a>
+                    ) : (
+                        <p>No email provided</p>
+                    )}
                 </Button>
 
             </Col>
         </Row>
         <Row className="mb-3 pt-lg-0">
             <Col lg="auto">
-                <img src="https://static1.purepeople.com/people/9/39/@/5118785-brad-pitt-septembre-2019-200x200-2.jpg" alt="John Doe" style={{ width: '150px', height: '150px' }} />
+                <img src={image} alt="John Doe" style={{ width: '12rem', height: '12rem' }} />
             </Col>
-            <Col className='ms-3'>
+            <Col className='ms-2'>
                 <Row className='mb-3 mt-3'>
                     <Col>
-                        <p className="fs-3 fw-bold">{taxonomicExpert.taxonomicExpert['schema:headline']}</p>
+                        <p className="fs-3 fw-bold">{headline}</p>
                     </Col>
-                    <Col className="fs-3 d-flex justify-content-end me-2">
-                        <i className="bi bi-twitter mx-1"></i>
-                        <i className="bi bi-linkedin mx-1"></i>
-                        <i className="bi bi-github mx-1"></i>
-                        <i className="bi bi-facebook mx-1"></i>
+                    <Col className="fs-3 d-flex justify-content-end gap-2" style={{ marginRight: '8rem' }}>
+                        {Array.isArray(personalLinks) && personalLinks.some(link => link !== null) ? (
+                            personalLinks.map((link) => (
+                                link ? (
+                                    <a key={link} href={link} target="_blank" rel="noopener noreferrer">
+                                        <i className="bi bi-globe p-1"></i>
+                                    </a>
+                                ) : null
+                            ))
+                        ) : null}
                     </Col>
-                    <Col lg='1' />
                 </Row>
                 <Row>
-                    <Col xs="4">
-                        <p className="fw-lightBold"> Consortium of European Taxonomic Facilities</p>
+                    <Col xs="auto">
+                        <p className="fw-lightBold"> {affiliationName}</p>
                     </Col>
                     <Col xs="2">
                         <p>
-                            <a href="url" target="_blank" rel="noopener noreferrer">
-                                <i className="fw-lightBold bi bi-link-45deg"></i>URL
-                            </a>
+                            {affiliationURLText ? (
+                                <a href={affiliationURLText} target="_blank" rel="noopener noreferrer">
+                                    <i className="fw-lightBold bi bi-link-45deg"></i>URL
+                                </a>
+                            ) : (
+                                <i className="fw-lightBold bi bi-link-45deg">No URL provided</i>
+                            )}
                         </p>
                     </Col>
                     <Col>
                         <p>
-                            <a href="url" target="_blank" rel="noopener noreferrer">
-                                <i className="fw-lightBold bi bi-link-45deg"></i>ROR ID
-                            </a>
+                            {affiliationURL ? (
+                                <a href={affiliationURL} target="_blank" rel="noopener noreferrer">
+                                    <i className="fw-lightBold bi bi-link-45deg"> ROR ID</i>
+                                </a>
+                            ) : (
+                                <i className="fw-lightBold bi bi-link-45deg">No ROR ID provided</i>
+                            )}
                         </p>
                     </Col>
                 </Row>
