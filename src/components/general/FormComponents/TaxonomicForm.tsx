@@ -1,5 +1,4 @@
-/* Import Dependencies */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 
 /* Import Sources */
@@ -12,8 +11,7 @@ import Footer from 'components/general/footer/Footer';
 import { BreadCrumbs } from 'components/general/CustomComponents';
 import FormBuilder from 'components/general/FormComponents/FormBuilder';
 import { Color, getColor } from '../ColorPage';
-import { loginWithOrcid } from 'api/orcid/auth';
-
+import { useOrcidCallback } from 'api/orcid/auth';
 
 /**
  * Component that renders the taxonomic service form
@@ -22,6 +20,7 @@ import { loginWithOrcid } from 'api/orcid/auth';
 const TaxonomicForm = () => {
     /* Base variables */
     const [completed, setCompleted] = useState<boolean>(false);
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
     const title = location.pathname.includes("/te") ? 'Register as a new taxonomic expert' : 'Suggest a new taxonomic e-service';
     const description = location.pathname.includes("/te") ? 'Use this form to register as a new expert that should be listed in the CETAF Marketplace.\nPlease fill in the required fields and add as much additional information as you can.\nThe CETAF secretariat will review and curate your submission before adding it to the marketplace\nTo be accepted it needs to be a taxonomic tool or service and it needs to be of sufficient quality.\nPlease propose only services that are in production and maintained.' : 'Use this form to suggest new taxonomic e-services or tools that should be listed in the CETAF Marketplace.\nPlease fill in the required fields and add as much additional information as you can.\nThe CETAF secretariat will review and curate your submission before adding it to the marketplace.\nTo be accepted it needs to be a taxonomic tool or service and it needs to be of sufficient quality\nPlease propose only services that are in production and maintained.';
@@ -31,6 +30,22 @@ const TaxonomicForm = () => {
 
     /* Determine color */
     const color = "fs-2 tc-" + getColor(window.location) as Color;
+
+    // Use the ORCID callback hook
+    const { userData } = useOrcidCallback();
+    
+    // Handle ORCID login success
+    useEffect(() => {
+        if (userData) {
+            setIsLoggedIn(true);
+        }
+    }, [userData]);
+
+    // Function to redirect to ORCID login
+    const redirectToOrcidAuth = () => {
+        const authorizationUrl = `https://orcid.org/oauth/authorize?client_id=${import.meta.env.VITE_ORCID_CLIENT_ID}&response_type=code&scope=/authenticate&redirect_uri=${import.meta.env.VITE_ORCID_REDIRECT_URI}`;
+        window.location.href = authorizationUrl;
+    };
 
     return (
         <div className="h-100 d-flex flex-column">
@@ -49,7 +64,7 @@ const TaxonomicForm = () => {
                                 <BreadCrumbs />
                             </Col>
                         </Row>
-                        {location.pathname.includes("/te") && (
+                        {location.pathname.includes("/te") && !isLoggedIn && (
                             <Row>
                                 <Col>
                                     <Card className="w-100 px-4 py-3">
@@ -61,9 +76,7 @@ const TaxonomicForm = () => {
                                                 </p>
                                                 <button
                                                     className="btn btn-primary mt-3"
-                                                    onClick={() => {
-                                                        loginWithOrcid();
-                                                    }}
+                                                    onClick={redirectToOrcidAuth}
                                                 >
                                                     Login with ORCID
                                                 </button>
