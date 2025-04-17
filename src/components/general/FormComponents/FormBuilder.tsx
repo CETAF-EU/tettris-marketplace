@@ -85,8 +85,9 @@ const FormBuilder = (props: Props) => {
             applicableToServiceTypes?: string[]
         }
     } = {};
+
     const initialFormValues: Dict = {};
-    
+
     /**
      * Function to flatten a JSON path
      * @returns flattened JSON path string
@@ -121,7 +122,6 @@ const FormBuilder = (props: Props) => {
     /* Construct initial form values */
     if (isEmpty(initialFormValues)) {
         Object.entries(formTemplate).forEach(([_key, formSection]) => {
-            /* If is array, push to initial form values */
             if (formSection.type === 'array') {
                 jp.value(initialFormValues, formSection.jsonPath ?? '', []);
             }
@@ -133,11 +133,11 @@ const FormBuilder = (props: Props) => {
                     let pathSuffix: string = FlattenJSONPath(field.jsonPath).split('_').at(-1) as string;
 
                     jsonPath = jsonPath.concat(`${formSection.jsonPath ?? ''}[0]['${pathSuffix}']`);
-
-                    /* Add to initial form values array zero index */
                     jp.value(initialFormValues, jsonPath, DetermineInitialFormValue(field.type, field.const));
+                // } else if (field.jsonPath === "$['schema:person']['schema:name']" ) {
+                //     // Here we check if it's the 'Full Name' field and prefill it
+                //     jp.value(initialFormValues, field.jsonPath, "John Doe");
                 } else {
-                    /* Add to initial form values */
                     jp.value(initialFormValues, field.jsonPath, DetermineInitialFormValue(field.type, field.const));
                 }
             });
