@@ -72,7 +72,7 @@ const RORField = (props: Props) => {
             dropdownOptions.push({
                 label: ror?.names.find((nameObject: { lang: string, value: string }) => nameObject?.lang === 'en')?.value ?? ror?.names[0].value ?? '',
                 value: ror.id,
-                url: ror?.links?.find((link: { type: string, value: string }) => link.type === 'website')?.value ?? ''
+                url: ror?.links?.find((link: { type: string, value: string }) => link.type === 'website')?.value ?? 'N/A'
             });
         })
 
@@ -146,7 +146,7 @@ const RORField = (props: Props) => {
                 <Row className="mt-2">
                     <Col>
                         <Select
-                            options={dropdownOptions}
+                            options={dropdownOptions as { label: any; value: any; url: any; }[]}
                             value={fieldValue['schema:identifier'] ? {
                                 label: fieldValue['schema:name'],
                                 value: fieldValue['schema:identifier'],
