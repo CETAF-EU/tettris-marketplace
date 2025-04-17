@@ -49,7 +49,7 @@ export async function loginWithOrcid(): Promise<OrcidUserData> {
         });
 
         const userData = userResponse.data;
-
+        console.log('User data:', userData);
         return {
             orcid,
             name: `${userData.name['given-names'].value} ${userData.name['family-name'].value}`,

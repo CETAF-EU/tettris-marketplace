@@ -37,6 +37,7 @@ RUN echo "VITE_EMAILJS_ID=$VITE_EMAILJS_ID" >> .env
 RUN echo "VITE_EMAILJS_TEMPLATE_ID=$VITE_EMAILJS_TEMPLATE_ID" >> .env
 RUN echo "VITE_EMAILJS_USER_ID=$VITE_EMAILJS_USER_ID" >> .env
 RUN echo "VITE_DEV=false" >> .env
+RUN echo "VITE_PROXY=false" >> .env
 
 # Setting app to production build
 RUN npm run build
