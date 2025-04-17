@@ -41,6 +41,9 @@ jobs:
         echo "VITE_EMAILJS_ID=${{ env.VITE_EMAILJS_ID }}" >> .env
         echo "VITE_EMAILJS_TEMPLATE_ID=${{ env.VITE_EMAILJS_TEMPLATE_ID }}" >> .env
         echo "VITE_EMAILJS_USER_ID=${{ env.VITE_EMAILJS_USER_ID }}" >> .env
+        echo "VITE_ORCID_CLIENT_ID=${{ env.VITE_ORCID_CLIENT_ID }}" >> .env
+        echo "VITE_ORCID_CLIENT_SECRET=${{ env.VITE_ORCID_CLIENT_SECRET }}" >> .env
+        echo "VITE_ORCID_REDIRECT_URI=${{ env.VITE_ORCID_REDIRECT_URI }}" >> .env
         echo "VITE_DEV=true" >> .env
   
     - name: Install dependencies
