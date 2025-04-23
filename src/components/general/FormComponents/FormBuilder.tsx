@@ -40,6 +40,11 @@ type Props = {
             applicableToServiceTypes?: string[]
         }
     },
+    OrcidData: {
+        orcid?: string;
+        name?: string;
+        email?: string;
+    },
     SetCompleted: Function
 };
 
@@ -50,7 +55,7 @@ type Props = {
  * @returns JSX Component
  */
 const FormBuilder = (props: Props) => {
-    const { formTemplate, SetCompleted } = props;
+    const { formTemplate,OrcidData, SetCompleted } = props;
 
     /* Hooks */
     const captchaHook = useCaptchaHook({
@@ -134,9 +139,13 @@ const FormBuilder = (props: Props) => {
 
                     jsonPath = jsonPath.concat(`${formSection.jsonPath ?? ''}[0]['${pathSuffix}']`);
                     jp.value(initialFormValues, jsonPath, DetermineInitialFormValue(field.type, field.const));
-                // } else if (field.jsonPath === "$['schema:person']['schema:name']" ) {
-                //     // Here we check if it's the 'Full Name' field and prefill it
-                //     jp.value(initialFormValues, field.jsonPath, "John Doe");
+                } else if (field.jsonPath === "$['schema:person']['schema:name']" &&  OrcidData?.name) {
+                    jp.value(initialFormValues, field.jsonPath, OrcidData.name);
+                }
+                else if (field.jsonPath === "$['schema:person']['schema:email']" &&  OrcidData?.email) {
+                    jp.value(initialFormValues, field.jsonPath, OrcidData.email);
+                } else if (field.jsonPath === "$['schema:person']['schema:identifier']" &&  OrcidData?.orcid) {
+                    jp.value(initialFormValues, field.jsonPath, OrcidData.orcid);
                 } else {
                     jp.value(initialFormValues, field.jsonPath, DetermineInitialFormValue(field.type, field.const));
                 }

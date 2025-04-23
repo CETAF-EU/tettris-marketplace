@@ -31,7 +31,7 @@ export function useOrcidCallback() {
             return response.data;
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                console.error('Backend error:', error.response?.data || error.message);
+                console.error('Backend error:', error.response?.data ?? error.message);
             } else {
                 console.error('Unknown error:', error);
             }

@@ -96,17 +96,12 @@ const TaxonomicForm = () => {
                                                 <p className="mt-3 fs-4" style={{ whiteSpace: 'pre-line' }}>
                                                     {!completed ? description : sended}
                                                 </p>
-                                                {userData && (
-                                                    <p className="text-muted small">
-                                                        Logged in as <strong>{userData.name}</strong> ({userData.orcid})
-                                                    </p>
-                                                )}
                                             </Col>
                                         </Row>
                                         {!completed && (
                                             <Row>
                                                 <Col>
-                                                    <FormBuilder formTemplate={formTemplate} SetCompleted={() => setCompleted(true)} />
+                                                    <FormBuilder formTemplate={formTemplate} OrcidData={userData ?? {}} SetCompleted={() => setCompleted(true)} />
                                                 </Col>
                                             </Row>
                                         )}
