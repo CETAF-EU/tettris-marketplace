@@ -7,6 +7,38 @@ import { TaxonomicExpert } from 'app/Types';
 /* Import Components */
 import { Button } from 'components/general/CustomComponents';
 
+const getIconClass = (link: string) => {
+    const iconMap: { [key: string]: string } = {
+        'github.com': "bi bi-github p-1",
+        'linkedin.com': "bi bi-linkedin p-1",
+        'twitter.com': "bi bi-twitter p-1",
+        'facebook.com': "bi bi-facebook p-1",
+        'instagram.com': "bi bi-instagram p-1",
+        'youtube.com': "bi bi-youtube p-1",
+        'tiktok.com': "bi bi-tiktok p-1",
+        'pinterest.com': "bi bi-pinterest p-1",
+        'reddit.com': "bi bi-reddit p-1",
+        'medium.com': "bi bi-medium p-1",
+        'snapchat.com': "bi bi-snapchat p-1",
+        'tumblr.com': "bi bi-tumblr p-1",
+        'whatsapp.com': "bi bi-whatsapp p-1",
+        'telegram.org': "bi bi-telegram p-1",
+        'discord.com': "bi bi-discord p-1",
+        'slack.com': "bi bi-slack p-1",
+        'dribbble.com': "bi bi-dribbble p-1",
+        'behance.net': "bi bi-behance p-1",
+        'flickr.com': "bi bi-flickr p-1",
+        'quora.com': "bi bi-quora p-1",
+    };
+
+    for (const domain in iconMap) {
+        if (link.includes(domain)) {
+            return iconMap[domain];
+        }
+    }
+    return "bi bi-globe p-1";
+};
+
 /* Props Type */
 type Props = {
     taxonomicExpert: TaxonomicExpert
@@ -80,12 +112,12 @@ const TopBar = (props: Props) => {
                     <Col>
                         <p className="fs-3 fw-bold">{headline}</p>
                     </Col>
-                    <Col className="fs-3 d-flex justify-content-end gap-2" style={{ marginRight: '8rem' }}>
+                    <Col className="fs-3 d-flex justify-content-end gap-2" style={{ marginRight: '7rem' }}>
                         {Array.isArray(personalLinks) && personalLinks.some(link => link !== null) ? (
                             personalLinks.map((link) => (
                                 link ? (
                                     <a key={link} href={link} target="_blank" rel="noopener noreferrer">
-                                        <i className="bi bi-globe p-1"></i>
+                                        <i className={getIconClass(link)}></i>
                                     </a>
                                 ) : null
                             ))
