@@ -22,7 +22,7 @@ export function useOrcidCallback() {
 
     async function loginWithOrcid(code: string): Promise<OrcidUserData> {
         try {
-            const response = await axios.post('/orcid/api/orcid/token', { code });
+            const response = await axios.post('https://sandbox.cetaf.org/orcid/api/orcid/token', { code });
 
             if (response.status !== 200) {
                 throw new Error('Failed to login with ORCID');
