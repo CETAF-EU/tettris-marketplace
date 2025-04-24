@@ -48,8 +48,8 @@ const ExperienceBlock = (props: Props) => {
     ];
       
     const options = {
-        width: "25rem",
-        height: "6.25rem",
+        width: 400,
+        height: 100,
         chartArea: { width: "80%", height: "20%" },
         bar: { groupWidth: "100%"},
         backgroundColor: "transparent",
@@ -57,7 +57,7 @@ const ExperienceBlock = (props: Props) => {
         isStacked: true,
         hAxis: {
             title: "Yrs",
-            textStyle: { fontSize: "0.625rem" },
+            textStyle: { fontSize: 10 },
             ticks: [0, 1, 2, 3, 4, 5, 6], // Numeric positions for the ticks
             format: '0', // Ensure numeric format
             gridlines: { count: 7 },
