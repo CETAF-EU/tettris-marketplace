@@ -71,6 +71,13 @@ const Support = () => {
                                             <p>Thank you for using the Taxonomic Marketplace!</p>
                                         </Col>
                                     </Row>
+                                    <Row className="mt-2">
+                                        <Col>
+                                            <p>
+                                                Visit our <Link to="/helpdesk" className="tc-tertiary">Helpdesk</Link> for more assistance.
+                                            </p>
+                                        </Col>
+                                    </Row>
                                 </Col>
                             </Row >
                         }
