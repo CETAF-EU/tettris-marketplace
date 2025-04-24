@@ -203,11 +203,11 @@ const SearchResult = (props: Props) => {
                                 </Row>
                             </Col>
                             <Col className="d-flex justify-content-end">
-                                <div className="h-100 w-100 overflow-hidden" style={{ maxWidth: '45%' }}>
+                                <div className="h-100 w-100 overflow-hidden" style={{ maxWidth: '6rem', aspectRatio: '1 / 1' }}>
                                     <img 
                                         src={logoImage} 
                                         alt="Logo" 
-                                        style={{ width: '6rem', height: '6rem' }}
+                                        className="h-100 w-100 object-fit-contain"
                                     />
                                 </div>
                             </Col>

@@ -48,8 +48,8 @@ const ExperienceBlock = (props: Props) => {
     ];
       
     const options = {
-        width: 400,
-        height: 100,
+        width: "25rem",
+        height: "6.25rem",
         chartArea: { width: "80%", height: "20%" },
         bar: { groupWidth: "100%"},
         backgroundColor: "transparent",
@@ -57,7 +57,7 @@ const ExperienceBlock = (props: Props) => {
         isStacked: true,
         hAxis: {
             title: "Yrs",
-            textStyle: { fontSize: 10 },
+            textStyle: { fontSize: "0.625rem" },
             ticks: [0, 1, 2, 3, 4, 5, 6], // Numeric positions for the ticks
             format: '0', // Ensure numeric format
             gridlines: { count: 7 },
@@ -120,7 +120,7 @@ const ExperienceBlock = (props: Props) => {
                             <Col className="d-flex align-items-center">
                                 <p className='fw-bold mb-0'>Years of experience</p>
                             </Col>
-                            <Col className="d-flex align-items-center">
+                            <Col className="d-flex align-items-center overflow-hidden">
                                 <Chart
                                     chartType="BarChart"
                                     width="100%"

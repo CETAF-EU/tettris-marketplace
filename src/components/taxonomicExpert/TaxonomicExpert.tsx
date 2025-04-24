@@ -70,7 +70,7 @@ const TaxonomicExpert = () => {
             <Header />
 
             {/* Home page Body */}
-            <Container fluid className="flex-grow-1 overflow-hidden">
+            <Container fluid className="flex-grow-1 overflow-auto">
                 <Row className="h-100">
                     <Col lg={{ span: 10, offset: 1 }}
                         className="h-100 d-flex flex-column pt-3 pt-lg-5 px-4 px-lg-3"
@@ -99,7 +99,7 @@ const TaxonomicExpert = () => {
                                 <Row className='m-1'>
                                     <TopBar taxonomicExpert={taxonomicExpert} />
                                 </Row>
-                                <Row className="flex-grow-1 overflow-auto">
+                                <Row className="flex-grow-1">
                                     <Col>
                                         <Row className="mb-3">
                                             <Col>

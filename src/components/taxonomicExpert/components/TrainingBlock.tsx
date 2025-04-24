@@ -25,7 +25,7 @@ const TrainingBlock = (props: Props) => {
         return (<></>)
     }
     return (
-        <div className="h-100 d-flex flex-column mb-3">
+        <div className="h-100 d-flex flex-column mb-1">
             {/* Name of block */}
             <Row>
                 <Col className="col-md-auto">
@@ -37,13 +37,13 @@ const TrainingBlock = (props: Props) => {
             {/* Properties content */}
             <Row className="h-100">
                 <Col>
-                    <div className="h-100 b-tertiary px-4 py-3 overflow-auto" style={{ maxHeight: '250px', overflowY: 'scroll' }}>
+                    <div className="h-100 b-tertiary px-3 py-2 overflow-auto" style={{ maxHeight: '15.625rem', overflowY: 'scroll' }}>
                         <div style={{ maxHeight: '100%', overflowY: 'auto' }}>
                             {training && (() => {
                                 const cards = [];
                                 for (const item of training) {
                                     if (!item['schema:name']) continue;
-                                    cards.push(<TrainingCard key={String(item['@id'] || item['schema:name'])} data={item} />);
+                                    cards.push(<TrainingCard key={String(item['@id'] ?? item['schema:name'])} data={item} />);
                                 }
                                 return cards;
                             })()}

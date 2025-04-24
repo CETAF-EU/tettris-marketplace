@@ -66,7 +66,7 @@ const TopBar = (props: Props) => {
         ? taxonomicExpert.taxonomicExpert['schema:person']["schema:links"].flat()
         : null;
     return (<>
-        <Col lg='2' className="mb-3">
+        <Col lg='auto' className="mb-3">
             <Row className="text-center">
                 <h1 className="fs-2">{name}</h1>
             </Row>
@@ -74,7 +74,7 @@ const TopBar = (props: Props) => {
                 <img src={image} alt="John Doe" style={{ width: '10rem', height: '10rem' }} />
             </Row>
         </Col>
-        <Col lg="5" className='mt-1'>
+        <Col lg="6" className='mt-1'>
             <Row className="justify-content-center text-center text-md-start">
                 <Col xs={12} md="auto"> 
                     {orcidID ? (
@@ -125,7 +125,7 @@ const TopBar = (props: Props) => {
             </Row>
         </Col>
         <Col lg="2" className="d-none d-lg-block"></Col>
-        <Col lg="3" className="mt-1">
+        <Col lg="2" className="mt-1">
             <Row className="justify-content-center text-center">
                 <Col xs="auto">
                     {email ? (

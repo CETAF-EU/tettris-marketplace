@@ -42,7 +42,7 @@ const TaxonomicBlock = (props: Props) => {
             {/* Properties content */}
             <Row className="flex-grow-1">
                 <Col>
-                    <div className="h-100 b-tertiary px-4 py-3">
+                    <div className="h-100 b-tertiary px-4 py-3 overflow-hidden">
                         {DisplayRowData("Discipline", discipline)}
                         {DisplayRowData("Sub discipline", subDiscipline)}
                         {DisplayRowData("Taxonomic Scope", taxonomicScope)}
