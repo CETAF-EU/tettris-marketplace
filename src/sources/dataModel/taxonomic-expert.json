@@ -967,22 +967,22 @@
                 }
             }
         },
-        "schema:PublicationNumber" : {
+        "schema:publicationNumber" : {
             "type": "object",
             "properties": {
                 "schema:identifier": {
                     "type": "number",
                     "description": "The name of the publication"
                 },
-                "schema:ScholarlyArticle": {
+                "schema:scholarlyArticle": {
                     "type": "number",
                     "description": "The number of scientific papers"
                 },
-                "schema:Book": {
+                "schema:book": {
                     "type": "number",
                     "description": "The number of books"
                 },
-                "schema:CreativeWork": {
+                "schema:creativeWork": {
                     "type": "number",
                     "description": "The number of other publications"
                 }

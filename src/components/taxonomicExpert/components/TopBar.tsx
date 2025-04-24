@@ -66,93 +66,93 @@ const TopBar = (props: Props) => {
         ? taxonomicExpert.taxonomicExpert['schema:person']["schema:links"].flat()
         : null;
     return (<>
-        <Row className="mt-3 pt-lg-0">
-            <Col lg="8">
-                <Row>
-                    <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
-                        <h1 className="fs-3 fs-lg-2">{name}</h1>
-                    </Col>
-                    <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
-                        {orcidID ? (
-                            <a href={"https://orcid.org/" + orcidID} target="_blank" rel="noopener noreferrer">
-                                <p className="fw-lightBold bi bi-link-45deg">{orcidID}</p>
-                            </a>
-                        ) : (
-                            <p className="fw-lightBold bi bi-link-45deg">Any orcid ID provided</p>
-                        )}
-                    </Col>
-                    <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
-                        <p className='fw-lightBold bi bi-geo-alt-fill'>{location}</p>
-                    </Col>
-                    <Col xs="auto" style={{ minWidth: '13rem', textAlign: 'center' }}>
-                        <p className='fw-lightBold bi bi-globe2'> {language}</p>
+        <Col lg='2' className="mb-3">
+            <Row className="text-center">
+                <h1 className="fs-2">{name}</h1>
+            </Row>
+            <Row className='justify-content-center mt-3'>
+                <img src={image} alt="John Doe" style={{ width: '10rem', height: '10rem' }} />
+            </Row>
+        </Col>
+        <Col lg="5" className='mt-1'>
+            <Row className="justify-content-center text-center text-md-start">
+                <Col xs={12} md="auto"> 
+                    {orcidID ? (
+                    <a href={"https://orcid.org/" + orcidID} target="_blank" rel="noopener noreferrer">
+                        <p className="fw-lightBold bi bi-link-45deg">{orcidID}</p>
+                    </a>
+                    ) : (
+                    <p className="fw-lightBold bi bi-link-45deg">Any orcid ID provided</p>
+                    )}
+                </Col>
+                <Col xs={12} md="auto">
+                    <p className="fw-lightBold bi bi-geo-alt-fill">{location}</p>
+                </Col>
+                <Col xs={12} md="auto">
+                    <p className="fw-lightBold bi bi-globe2">{language}</p>
+                </Col>
+            </Row>
+            <Row className="justify-content-center text-center text-md-start">
+                <Row className='mt-5 d-none d-md-flex'></Row>
+                <Row className='mt-1 mb-3'>
+                    <Col xs={12} md="auto">
+                        <p className="fs-3 fw-bold">{headline}</p>
                     </Col>
                 </Row>
-            </Col>
-            <Col lg="2" className="d-none d-lg-block"/>
-            <Col lg="auto" className="d-none d-lg-block ">
-                <Button type="submit" variant='tertiary'>
+                <Row>
+                    <Col xs={12} md="auto">
+                        <p className="fw-lightBold">{affiliationName}</p>
+                    </Col>
+                    <Col xs={12} md="auto">
+                        {affiliationURLText ? (
+                            <a href={affiliationURLText} target="_blank" rel="noopener noreferrer">
+                                <i className="fw-lightBold bi bi-link-45deg"></i> URL
+                            </a>
+                        ) : (
+                            <i className="fw-lightBold bi bi-link-45deg">No URL provided</i>
+                        )}
+                    </Col>
+                    <Col xs={12} md="auto">
+                        {affiliationURL ? (
+                            <a href={affiliationURL} target="_blank" rel="noopener noreferrer">
+                                <i className="fw-lightBold bi bi-link-45deg"> ROR ID</i>
+                            </a>
+                        ) : (
+                            <i className="fw-lightBold bi bi-link-45deg">No ROR ID provided</i>
+                        )}
+                    </Col>
+                </Row>
+            </Row>
+        </Col>
+        <Col lg="2" className="d-none d-lg-block"></Col>
+        <Col lg="3" className="mt-1">
+            <Row className="justify-content-center text-center">
+                <Col xs="auto">
                     {email ? (
-                        <a href={`mailto:${email}`} className=''>
-                            <i className="bi bi-envelope-fill"></i> EMAIL
-                        </a>
+                        <Button type="submit" variant='tertiary'>
+                            <a href={`mailto:${email}`} className=''>
+                                <i className="bi bi-envelope-fill"></i> EMAIL
+                            </a>
+                        </Button>
                     ) : (
                         <p>No email provided</p>
                     )}
-                </Button>
-
-            </Col>
-        </Row>
-        <Row className="mb-3 pt-lg-0">
-            <Col lg="auto">
-                <img src={image} alt="John Doe" style={{ width: '12rem', height: '12rem' }} />
-            </Col>
-            <Col className='ms-2'>
-                <Row className='mb-3 mt-3'>
-                    <Col>
-                        <p className="fs-3 fw-bold">{headline}</p>
-                    </Col>
-                    <Col className="fs-3 d-flex justify-content-end gap-2" style={{ marginRight: '7rem' }}>
-                        {Array.isArray(personalLinks) && personalLinks.some(link => link !== null) ? (
-                            personalLinks.map((link) => (
-                                link ? (
-                                    <a key={link} href={link} target="_blank" rel="noopener noreferrer">
-                                        <i className={getIconClass(link)}></i>
-                                    </a>
-                                ) : null
-                            ))
-                        ) : null}
-                    </Col>
-                </Row>
-                <Row>
-                    <Col xs="auto">
-                        <p className="fw-lightBold"> {affiliationName}</p>
-                    </Col>
-                    <Col xs="2">
-                        <p>
-                            {affiliationURLText ? (
-                                <a href={affiliationURLText} target="_blank" rel="noopener noreferrer">
-                                    <i className="fw-lightBold bi bi-link-45deg"></i>URL
+                </Col>
+            </Row>
+            <Row className="justify-content-center text-center mt-3 mb-3">
+                <Col xs="auto" className="d-flex justify-content-center gap-2">
+                    {Array.isArray(personalLinks) && personalLinks.some(link => link !== null) ? (
+                        personalLinks.map((link) => (
+                            link ? (
+                                <a key={link} href={link} target="_blank" rel="noopener noreferrer">
+                                    <i className={getIconClass(link)}></i>
                                 </a>
-                            ) : (
-                                <i className="fw-lightBold bi bi-link-45deg">No URL provided</i>
-                            )}
-                        </p>
-                    </Col>
-                    <Col>
-                        <p>
-                            {affiliationURL ? (
-                                <a href={affiliationURL} target="_blank" rel="noopener noreferrer">
-                                    <i className="fw-lightBold bi bi-link-45deg"> ROR ID</i>
-                                </a>
-                            ) : (
-                                <i className="fw-lightBold bi bi-link-45deg">No ROR ID provided</i>
-                            )}
-                        </p>
-                    </Col>
-                </Row>
-            </Col>
-        </Row>
+                            ) : null
+                        ))
+                    ) : null}
+                </Col>
+            </Row>
+        </Col>
     </>);
 }
 

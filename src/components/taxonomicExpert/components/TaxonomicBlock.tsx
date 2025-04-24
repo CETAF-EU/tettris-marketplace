@@ -63,12 +63,11 @@ export default TaxonomicBlock;
 function displayPublicationChart(taxonomicExpert: TaxonomicExpert) {
     const data = [
         ["Type", "Number"],
-        ["Identification Keys", taxonomicExpert.taxonomicExpert?.['schema:PublicationNumber']?.['schema:identifier'] ?? 0],
-        ["Papers", taxonomicExpert.taxonomicExpert?.['schema:PublicationNumber']?.['schema:ScholarlyArticle'] ?? 0],
-        ["Books", taxonomicExpert.taxonomicExpert?.['schema:PublicationNumber']?.['schema:Book'] ?? 0],
-        ["Other", taxonomicExpert.taxonomicExpert?.['schema:PublicationNumber']?.['schema:CreativeWork'] ?? 0],
+        ["Identification Keys", taxonomicExpert.taxonomicExpert?.['schema:publicationNumber']?.['schema:identifier'] ?? 0],
+        ["Papers", taxonomicExpert.taxonomicExpert?.['schema:publicationNumber']?.['schema:scholarlyArticle'] ?? 0],
+        ["Books", taxonomicExpert.taxonomicExpert?.['schema:publicationNumber']?.['schema:book'] ?? 0],
+        ["Other", taxonomicExpert.taxonomicExpert?.['schema:publicationNumber']?.['schema:creativeWork'] ?? 0],
     ];
-
     const options = {
         width: 400,
         height: 100,

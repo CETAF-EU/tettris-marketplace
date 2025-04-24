@@ -1067,21 +1067,21 @@
                 "required": false
             },
             {
-                "jsonPath": "$['schema:publicationNumber']['ScholarlyArticle']",
+                "jsonPath": "$['schema:publicationNumber']['scholarlyArticle']",
                 "title": "Research papers",
                 "description": "The number of scientific papers",
                 "type": "string",
                 "required": false
             },
             {
-                "jsonPath": "$['schema:publicationNumber']['Book']",
+                "jsonPath": "$['schema:publicationNumber']['book']",
                 "title": "Books",
                 "description": "The number of books",
                 "type": "string",
                 "required": false
             },
             {
-                "jsonPath": "$['schema:publicationNumber']['CreativeWork']",
+                "jsonPath": "$['schema:publicationNumber']['creativeWork']",
                 "title": "Other",
                 "description": "The number of other publications",
                 "type": "string",

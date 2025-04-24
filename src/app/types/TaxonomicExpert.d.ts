@@ -809,7 +809,7 @@ export interface TaxonomicExpert {
     "schema:yearsInOperation"?: string;
     [k: string]: unknown;
   };
-  "schema:PublicationNumber"?: {
+  "schema:publicationNumber"?: {
     /**
      * The name of the publication
      */
@@ -817,15 +817,15 @@ export interface TaxonomicExpert {
     /**
      * The number of scientific papers
      */
-    "schema:ScholarlyArticle"?: number;
+    "schema:scholarlyArticle"?: number;
     /**
      * The number of books
      */
-    "schema:Book"?: number;
+    "schema:book"?: number;
     /**
      * The number of other publications
      */
-    "schema:CreativeWork"?: number;
+    "schema:creativeWork"?: number;
     [k: string]: unknown;
   };
   /**
