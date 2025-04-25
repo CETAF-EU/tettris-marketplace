@@ -70,7 +70,7 @@ const TopBar = (props: Props) => {
             <Row className="text-center">
                 <h1 className="fs-2">{name}</h1>
             </Row>
-            <Row className='justify-content-center mt-3'>
+            <Row className='justify-content-center'>
                 <img className="h-100 w-100 object-fit-contain" src={image} alt={name} style={{ maxWidth: '10rem', aspectRatio: '1 / 1'}} />
             </Row>
         </Col>
