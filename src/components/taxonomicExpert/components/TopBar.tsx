@@ -71,7 +71,7 @@ const TopBar = (props: Props) => {
                 <h1 className="fs-2">{name}</h1>
             </Row>
             <Row className='justify-content-center mt-3'>
-                <img src={image} alt="John Doe" style={{ width: '10rem', height: '10rem' }} />
+                <img className="h-100 w-100 object-fit-contain" src={image} alt={name} style={{ maxWidth: '10rem', aspectRatio: '1 / 1'}} />
             </Row>
         </Col>
         <Col lg="6" className='mt-1'>
@@ -79,17 +79,17 @@ const TopBar = (props: Props) => {
                 <Col xs={12} md="auto"> 
                     {orcidID ? (
                     <a href={"https://orcid.org/" + orcidID} target="_blank" rel="noopener noreferrer">
-                        <p className="fw-lightBold bi bi-link-45deg">{orcidID}</p>
+                        <p className="fw-lightBold bi bi-link-45deg"> {orcidID}</p>
                     </a>
                     ) : (
-                    <p className="fw-lightBold bi bi-link-45deg">Any orcid ID provided</p>
+                    <p className="fw-lightBold bi bi-link-45deg"> Any orcid ID provided</p>
                     )}
                 </Col>
                 <Col xs={12} md="auto">
-                    <p className="fw-lightBold bi bi-geo-alt-fill">{location}</p>
+                    <p className="fw-lightBold bi bi-geo-alt-fill"> {location}</p>
                 </Col>
                 <Col xs={12} md="auto">
-                    <p className="fw-lightBold bi bi-globe2">{language}</p>
+                    <p className="fw-lightBold bi bi-globe2"> {language}</p>
                 </Col>
             </Row>
             <Row className="justify-content-center text-center text-md-start">

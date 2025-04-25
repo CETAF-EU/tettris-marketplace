@@ -20,8 +20,8 @@ type Props = {
 const ExperienceBlock = (props: Props) => {
     const { name, taxonomicExpert } = props;
 
-    const educationLevel = taxonomicExpert?.taxonomicExpert?.['schema:occupation']?.['schema:educationalLevel']?.join(', ') as string || 'Any education level provided';
-    const employmentType = taxonomicExpert?.taxonomicExpert?.['schema:occupation']?.['schema:employmentType']?.join(', ') as string || 'Any employment status provided';
+    const educationLevel = taxonomicExpert?.taxonomicExpert?.['schema:occupation']?.['schema:educationalLevel'] || ['Any education level provided'];
+    const employmentType = taxonomicExpert?.taxonomicExpert?.['schema:occupation']?.['schema:employmentType'] || ['Any employment status provided'];
     const yearsOfExperience = taxonomicExpert?.taxonomicExpert?.['schema:occupation']?.['schema:yearsInOperation'] as string || 'Any years of experience provided';
     
     let bar = ["", 0, 0, 0, 0, 0, 0, 0]
@@ -102,25 +102,35 @@ const ExperienceBlock = (props: Props) => {
             <Row className="flex-grow-1">
                 <Col>
                     <div className="h-100 b-tertiary px-4 py-3">
-                    <Row className="d-flex align-items-center">
+                        <Row className="d-flex align-items-center mb-3">
                             <Col className="d-flex align-items-center">
                                 <p className='fw-bold'>Education level</p>
                             </Col>
-                            <Col className="d-flex align-items-center">
-                                <p>{educationLevel}</p>            
+                            <Col lg='auto' className="d-flex align-items-center justify-content-center">
+                                <Row className="text-end">
+                                    {educationLevel.map((level) => (
+                                        <p key={level}>{level}</p>
+                                    ))}
+                                </Row>
                             </Col>
-                            <Col lg='auto' className='d-flex align-items-center'>
+                        </Row>
+                        <Row className="d-flex align-items-center">
+                            <Col lg='4' className='d-flex align-items-center'>
                                 <p className='fw-bold'>Employment status</p>
                             </Col>
-                            <Col className='d-flex align-items-center'>
-                                <p>{employmentType}</p>
+                            <Col lg='8' className='d-flex align-items-center justify-content-center'>
+                                <Row className="text-end">
+                                    {employmentType.map((employment) => (
+                                        <p key={employment}>{employment}</p>
+                                    ))}
+                                </Row>
                             </Col>
                         </Row>
                         <Row className="d-flex align-items-center">
                             <Col className="d-flex align-items-center">
-                                <p className='fw-bold mb-0'>Years of experience</p>
+                                <p className='fw-bold'>Years of experience</p>
                             </Col>
-                            <Col className="d-flex align-items-center overflow-hidden">
+                            <Col lg='auto' className="d-flex align-items-center overflow-hidden">
                                 <Chart
                                     chartType="BarChart"
                                     width="100%"
