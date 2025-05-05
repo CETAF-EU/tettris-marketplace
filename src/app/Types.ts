@@ -1,6 +1,7 @@
 /* Import Types */
 import { TaxonomicService as TaxonomicServiceType } from "./types/TaxonomicService";
 import { TaxonomicExpert as TaxonomicExpertType } from "./types/TaxonomicExpert";
+import { DashboardData as DashboardDataType } from "./types/DashboardData";
 
 /* General type for a dictionary */
 export type Dict = {
@@ -39,6 +40,11 @@ export type TaxonomicService = {
 /* Type for a Taxonomic Expert */
 export type TaxonomicExpert = {
     taxonomicExpert: TaxonomicExpertType
+}
+
+/* Type for a Dashboard Data */
+export type DashboardData = {
+    DashboardData: DashboardDataType
 }
 
 /* Type for an Author */

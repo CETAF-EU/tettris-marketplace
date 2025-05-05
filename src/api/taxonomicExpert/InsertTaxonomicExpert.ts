@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 /* Import Types */
 import { TaxonomicExpert, CordraResult, Dict } from 'app/Types';
 import SendEmail from 'api/email/SendEmail';
+import InsertDashboardData from 'api/dashboardData/InsertDashboardData';
 
 /**
  * Function that sends a POST request to the API in order to insert a new taxonomic expert
@@ -57,9 +58,19 @@ const InsertTaxonomicExpert = async ({ taxonomicExpertRecord }: { taxonomicExper
             taxonomicExpert.taxonomicExpert['schema:dateCreated'] = format(new Date(data.attributes.metadata.createdOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
             taxonomicExpert.taxonomicExpert['schema:dateModified'] = format(new Date(data.attributes.metadata.modifiedOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
 
+            /* Dashboard Data */                           
+            InsertDashboardData({
+                DashboardDataRecord: {
+                    "@type": 'DashboardData',
+                    "schema:person:schema:identifier": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:identifier'],
+                    "schema:person:schema:gender": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:gender'],
+                    "schema:person:schema:birthDate": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:birthDate'],
+                }
+            });
+
             /* Send email */
             const url = "https://marketplace.cetaf.org/cordra/#objects/" + taxonomicExpert.taxonomicExpert['@id'];
-            const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] ? taxonomicExpert.taxonomicExpert['schema:person']['schema:name'] : "Taxonomic Expert";
+            const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] ?? "Taxonomic Expert";
             SendEmail(name, url);
 
         } catch (error) {

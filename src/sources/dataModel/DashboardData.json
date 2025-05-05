@@ -1,0 +1,86 @@
+{
+    "$id": "https://schemas.dissco.tech/schemas/fdo-type/tettris-service/0.1.0/tettris-service.json",
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "$comment": "Dashboard Data Version 0.1.0",
+    "title": "Dashboard Data",
+    "type": "object",
+    "description": "The Dashboard Data object is a JSON-LD representation of the data used in the dashboard. It contains information about the dashboard, including its ID, type, and various properties related to the dashboard's content.",
+    "context": {
+        "schema": "http://schema.org"
+    },
+    "properties": {
+        "@id": {
+            "type": "string",
+            "description": "The unique identifier of the Dashboard Data object",
+            "pattern": "20.500.14547\/(.){20}",
+            "examples": [
+                "20.500.14547/47bcc386b52ecbae623a"
+            ]
+        },
+        "@type": {
+            "type": "string",
+            "description": "The type of the object, in this case DashboardData",
+            "const": "DashboardData"
+        },
+        "schema:dateCreated": {
+            "type": "string",
+            "description": "The date on which the Taxonomic Expert was created or the item was added to a DataFeed, following the ISO Date Time Format yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+            "format": "date-time",
+            "examples": [
+                "2023-07-10T12:02:00.000Z"
+            ]
+        },
+        "schema:dateModified": {
+            "type": "string",
+            "description": "The date on which the Expert was most recently modified or when the item's entry was modified within a DataFeed, following the ISO Date Time Format yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+            "format": "date-time",
+            "examples": [
+                "2023-07-10T12:02:00.000Z"
+            ]
+        },
+        "schema:datePublished": {
+            "type": "string",
+            "description": "Date of the expert was published, following the ISO Date Time Format yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+            "format": "date-time",
+            "examples": [
+                "2023-07-10T12:02:00.000Z"
+            ]
+        },
+        "schema:person": {
+            "type": "object",
+            "properties": {
+                "schema:identifier": {
+                    "type": "string",
+                    "description": "A unique identifier to identify the author; ORCID identifiers are valid",
+                    "examples": [
+                        "0000-0001-5000-0007"
+                    ]
+                },
+                "schema:birthDate": {
+                    "type": "string",
+                    "description": "The birth date of the Taxonomic Expert",
+                    "format": "date",
+                    "examples": [
+                        "1980"
+                    ]
+                },
+                "schema:gender": {
+                    "type": "string",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "Female",
+                            "Male",
+                            "non-binary",
+                            "other",
+                            "prefer not to say"	
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "required": [
+        "@id"
+    ]
+}
