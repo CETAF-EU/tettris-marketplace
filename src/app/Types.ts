@@ -16,6 +16,7 @@ export type CordraResult = {
         content: {
             taxonomicService?: TaxonomicServiceType,
             taxonomicExpert?: TaxonomicExpertType,
+            DashboardData?: DashboardDataType,
             [property: string]: any
         },
         metadata: {

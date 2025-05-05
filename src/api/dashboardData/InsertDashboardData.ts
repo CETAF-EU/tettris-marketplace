@@ -12,7 +12,7 @@ import { DashboardData, CordraResult, Dict } from 'app/Types';
  */
 const InsertDashboardData = async ({ DashboardDataRecord }: { DashboardDataRecord?: Dict }) => {
     let DashboardData: DashboardData | undefined;
-
+    console.log('DashboardDataRecord', DashboardDataRecord);
     if (DashboardDataRecord) {
         /* Craft taxonomic expert object */
         const newDashboardData = {

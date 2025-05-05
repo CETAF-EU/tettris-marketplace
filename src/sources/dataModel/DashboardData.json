@@ -46,37 +46,32 @@
                 "2023-07-10T12:02:00.000Z"
             ]
         },
-        "schema:person": {
-            "type": "object",
-            "properties": {
-                "schema:identifier": {
-                    "type": "string",
-                    "description": "A unique identifier to identify the author; ORCID identifiers are valid",
-                    "examples": [
-                        "0000-0001-5000-0007"
-                    ]
-                },
-                "schema:birthDate": {
-                    "type": "string",
-                    "description": "The birth date of the Taxonomic Expert",
-                    "format": "date",
-                    "examples": [
-                        "1980"
-                    ]
-                },
-                "schema:gender": {
-                    "type": "string",
-                    "items": {
-                        "type": "string",
-                        "enum": [
-                            "Female",
-                            "Male",
-                            "non-binary",
-                            "other",
-                            "prefer not to say"	
-                        ]
-                    }
-                }
+        "schema:identifier": {
+            "type": "string",
+            "description": "A unique identifier to identify the author; ORCID identifiers are valid",
+            "examples": [
+                "0000-0001-5000-0007"
+            ]
+        },
+        "schema:birthDate": {
+            "type": "string",
+            "description": "The birth date of the Taxonomic Expert",
+            "format": "date",
+            "examples": [
+                "1980"
+            ]
+        },
+        "schema:gender": {
+            "type": "string",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "Female",
+                    "Male",
+                    "non-binary",
+                    "other",
+                    "prefer not to say"	
+                ]
             }
         }
     },

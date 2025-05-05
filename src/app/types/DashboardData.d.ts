@@ -29,17 +29,14 @@ export interface DashboardData {
    * Date of the expert was published, following the ISO Date Time Format yyyy-MM-dd'T'HH:mm:ss.SSSXXX
    */
   "schema:datePublished"?: string;
-  "schema:person"?: {
-    /**
-     * A unique identifier to identify the author; ORCID identifiers are valid
-     */
-    "schema:identifier"?: string;
-    /**
-     * The birth date of the Taxonomic Expert
-     */
-    "schema:birthDate"?: string;
-    "schema:gender"?: string;
-    [k: string]: unknown;
-  };
+  /**
+   * A unique identifier to identify the author; ORCID identifiers are valid
+   */
+  "schema:identifier"?: string;
+  /**
+   * The birth date of the Taxonomic Expert
+   */
+  "schema:birthDate"?: string;
+  "schema:gender"?: string;
   [k: string]: unknown;
 }

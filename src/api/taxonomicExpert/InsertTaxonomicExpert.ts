@@ -62,16 +62,16 @@ const InsertTaxonomicExpert = async ({ taxonomicExpertRecord }: { taxonomicExper
             InsertDashboardData({
                 DashboardDataRecord: {
                     "@type": 'DashboardData',
-                    "schema:person:schema:identifier": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:identifier'],
-                    "schema:person:schema:gender": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:gender'],
-                    "schema:person:schema:birthDate": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:birthDate'],
+                    "schema:identifier": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:identifier'],
+                    "schema:gender": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:gender'],
+                    "schema:age": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:birthDate'],
                 }
             });
 
             /* Send email */
-            const url = "https://marketplace.cetaf.org/cordra/#objects/" + taxonomicExpert.taxonomicExpert['@id'];
-            const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] ?? "Taxonomic Expert";
-            SendEmail(name, url);
+            // const url = "https://marketplace.cetaf.org/cordra/#objects/" + taxonomicExpert.taxonomicExpert['@id'];
+            // const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] ?? "Taxonomic Expert";
+            // SendEmail(name, url);
 
         } catch (error) {
             console.error(error);
