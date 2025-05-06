@@ -397,7 +397,7 @@
                 "required": false
             },
             {
-                "jsonPath": "$['schema:person']['schema:Gender']",
+                "jsonPath": "$['schema:person']['schema:gender']",
                 "title": "Gender",
                 "description": "Select your gender",
                 "type": "select",

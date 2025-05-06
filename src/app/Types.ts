@@ -16,7 +16,7 @@ export type CordraResult = {
         content: {
             taxonomicService?: TaxonomicServiceType,
             taxonomicExpert?: TaxonomicExpertType,
-            DashboardData?: DashboardDataType,
+            dashboardData?: DashboardDataType,
             [property: string]: any
         },
         metadata: {
@@ -45,7 +45,7 @@ export type TaxonomicExpert = {
 
 /* Type for a Dashboard Data */
 export type DashboardData = {
-    DashboardData: DashboardDataType
+    dashboardData: DashboardDataType
 }
 
 /* Type for an Author */
