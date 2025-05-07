@@ -52,16 +52,9 @@
             }
           }
         },
-        "schema:orcid": {
+        "schema:reference": {
           "type": "string",
-          "maxLength": 128,
-          "title": "Orcid ID",
-          "cordra": {
-            "preview": {
-              "showInPreview": true,
-              "isPrimary": true
-            }
-          }
+          "title": "Reference"
         },
         "schema:age": {
           "type": "string",

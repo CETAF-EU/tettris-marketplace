@@ -63,7 +63,7 @@ const InsertTaxonomicExpert = async ({ taxonomicExpertRecord }: { taxonomicExper
                     content: {
                         dashboardData: {
                             "@type": 'DashboardData',
-                            "schema:identifier": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:identifier'],
+                            "schema:reference": taxonomicExpert.taxonomicExpert['@id'],
                             "schema:gender": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:gender'],
                             "schema:age": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:birthDate'],
                         }

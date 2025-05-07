@@ -30,9 +30,9 @@ export interface DashboardData {
    */
   "schema:datePublished"?: string;
   /**
-   * A unique identifier to identify the author; ORCID identifiers are valid
+   * A unique identifier to identify the author;
    */
-  "schema:identifier"?: string;
+  "schema:reference"?: string;
   /**
    * The birth date of the Taxonomic Expert
    */
