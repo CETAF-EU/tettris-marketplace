@@ -39,8 +39,9 @@ const HomeCategory = (props: Props) => {
 
     /* ClassNames */
     const hoverDivClass = classNames({
-        [`${styles.homeCategoryBar} bgc-${color} py-3 tr-smooth z-1 position-absolute d-none d-lg-block`]: true,
-        'h-100': active
+        [`${styles.homeCategoryBar} bgc-${color} tr-smooth z-1 position-absolute`]: true,
+        'h-100': active,
+        [`py-${window.innerWidth < 990 ? 1 : 3}`]: !active
     });
 
     const textClass = classNames({

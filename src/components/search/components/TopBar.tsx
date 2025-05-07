@@ -44,15 +44,16 @@ const TopBar = () => {
 
     /* variable */
     let textButton = "Suggest a new service"
-    let path = "/ts/suggestNewTaxonomicService"
+    let path = "/ts/suggestNewTaxonomicService" 
     if (searchParams.get('serviceType') === 'referenceCollection') {
-        textButton = "Suggest a new reference collection"
+        textButton = "Suggest a new reference collection"        
     }
     else if (searchParams.get('serviceType') === 'taxonomicExpert') {
         textButton = "Register your expertise"
         path = "/te/registerYourExpertise"
     }
     const variant: Color = getColor(window.location) as Color;
+
 
     return (
         <div className="position-relative">
@@ -64,11 +65,11 @@ const TopBar = () => {
                 </Col>
                 {/* Display filters menu, if device is mobile */}
                 <Col xs
-                    className="d-block d-lg-none mt-3"
+                    className="d-block d-lg-none"
                 >
                     <Button type="button"
                         variant={variant}
-                        className="fs-5"
+                        className="fs-5 mt-3"
                         OnClick={() => setFiltersToggle(!filtersToggle)}
                     >
                         <>
@@ -77,9 +78,9 @@ const TopBar = () => {
                         </>
                     </Button>
                     <Button type="button"
-                        variant={variant}
-                        className="fs-5 ms-2"
-                        OnClick={() => setSearchParams()}
+                        variant="primary"
+                        className="bgc-error fs-5 ms-2 mt-3"
+                        OnClick={() => setSearchParams(searchParams.get('serviceType') === 'referenceCollection' ? { serviceType: 'referenceCollection' } : searchParams.get('serviceType') === 'taxonomicExpert' ? { serviceType: 'taxonomicExpert' } : {})}
                     >
                         <FontAwesomeIcon icon={faFilterCircleXmark} />
                     </Button>

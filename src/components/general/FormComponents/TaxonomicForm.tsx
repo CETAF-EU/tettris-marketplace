@@ -84,7 +84,9 @@ const TaxonomicForm = () => {
                             </Row>
                         )}
 
-                        {(!isExpertForm || isLoggedIn) && (
+                        {
+                        (!isExpertForm || isLoggedIn) &&
+                         (
                             <Row className="mt-3">
                                 <Col>
                                     <Card className="w-100 px-4 py-3">
