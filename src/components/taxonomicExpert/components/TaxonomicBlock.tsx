@@ -96,8 +96,19 @@ function displayPublicationChart(taxonomicExpert: TaxonomicExpert) {
 
 function displayGeographicContent(geographicRegion: Array<string>) {
     return <Row>
-        <Col>
+        <Col lg='3'>
             <p className='fw-bold'>Geographic region</p>
+        </Col>
+        <Col lg='3'>
+            {geographicRegion.length > 0 ? (
+                <p>
+                    {geographicRegion.map((region) => (
+                        region
+                    ))}
+                </p>
+            ) : (
+                <p>N/A</p>
+            )}
         </Col>
         <Col>
             <WorldMap region={geographicRegion} />
