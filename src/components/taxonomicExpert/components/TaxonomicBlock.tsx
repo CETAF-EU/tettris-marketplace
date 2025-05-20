@@ -3,9 +3,13 @@ import { Row, Col } from 'react-bootstrap';
 import { Chart } from "react-google-charts";
 import WorldMap from './WorldMap';
 
+/* Import Types */
+import { TaxonomicExpert } from 'app/Types';
+
 /* Props Type */
 type Props = {
-    name: string,
+    name: string
+    taxonomicExpert: TaxonomicExpert
 };
 
 
@@ -15,7 +19,15 @@ type Props = {
  * @returns JSX Component
  */
 const TaxonomicBlock = (props: Props) => {
-    const { name } = props;
+    const { name, taxonomicExpert } = props;
+
+    const discipline = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:discipline']?.join(', ') ?? "N/A";
+    const subDiscipline = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:additionalType']?.join(', ') ?? "N/A";
+    const taxonomicScope = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:about'] ?? "N/A";
+    const geographicRegion = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:spatialCoverage'] ?? [];
+    const methodologies = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:measurementTechnique']?.join(', ') ?? "N/A";
+    const appliedResearch = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:ResearchProject']?.join(', ') ?? "N/A";
+    const stratigraphicAge = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:temporalCoverage'] ?? "N/A";
 
     return (
         <div className=" d-flex flex-column">
@@ -30,15 +42,15 @@ const TaxonomicBlock = (props: Props) => {
             {/* Properties content */}
             <Row className="flex-grow-1">
                 <Col>
-                    <div className="h-100 b-tertiary px-4 py-3">
-                        {DisplayRowData("Discipline", "Biology")}
-                        {DisplayRowData("Sub discipline", "Insects")}
-                        {DisplayRowData("Taxonomic Scope", "Bees")}
-                        {displayGeographicContent()}
-                        {DisplayRowData("Methodologies", "Morphological")}
-                        {DisplayRowData("Applied Research", "Anatomy, biomechanics")}
-                        {displayPublicationChart()}
-                        {DisplayRowData("Stratigraphic age", "Present")}
+                    <div className="h-100 b-tertiary px-4 py-3 overflow-hidden">
+                        {DisplayRowData("Discipline", discipline)}
+                        {DisplayRowData("Sub discipline", subDiscipline)}
+                        {DisplayRowData("Taxonomic Scope", taxonomicScope)}
+                        {displayGeographicContent(geographicRegion)}
+                        {DisplayRowData("Methodologies", methodologies)}
+                        {DisplayRowData("Applied Research", appliedResearch)}
+                        {displayPublicationChart(taxonomicExpert)}
+                        {DisplayRowData("Stratigraphic age", stratigraphicAge)}
                     </div>
                 </Col>
             </Row>
@@ -48,15 +60,14 @@ const TaxonomicBlock = (props: Props) => {
 
 export default TaxonomicBlock;
 
-function displayPublicationChart() {
+function displayPublicationChart(taxonomicExpert: TaxonomicExpert) {
     const data = [
         ["Type", "Number"],
-        ["Identification Keys", 11],
-        ["Papers", 2],
-        ["Books", 2],
-        ["Other", 2],
+        ["Identification Keys", taxonomicExpert.taxonomicExpert?.['schema:publicationNumber']?.['schema:identifier'] ?? 0],
+        ["Papers", taxonomicExpert.taxonomicExpert?.['schema:publicationNumber']?.['schema:scholarlyArticle'] ?? 0],
+        ["Books", taxonomicExpert.taxonomicExpert?.['schema:publicationNumber']?.['schema:book'] ?? 0],
+        ["Other", taxonomicExpert.taxonomicExpert?.['schema:publicationNumber']?.['schema:creativeWork'] ?? 0],
     ];
-
     const options = {
         width: 400,
         height: 100,
@@ -72,7 +83,7 @@ function displayPublicationChart() {
         <Col>
             <p className='fw-bold'>Publication Number</p>
         </Col>
-        <Col xs='8'>
+        <Col xs='auto' style={{ minWidth: '30rem', textAlign: 'center' }}>
             <Chart
                 chartType="PieChart"
                 width="100%"
@@ -83,13 +94,24 @@ function displayPublicationChart() {
     </Row>;
 }
 
-function displayGeographicContent() {
+function displayGeographicContent(geographicRegion: Array<string>) {
     return <Row>
-        <Col>
+        <Col lg='3'>
             <p className='fw-bold'>Geographic region</p>
         </Col>
+        <Col lg='3'>
+            {geographicRegion.length > 0 ? (
+                <p>
+                    {geographicRegion.map((region) => (
+                        region
+                    ))}
+                </p>
+            ) : (
+                <p>N/A</p>
+            )}
+        </Col>
         <Col>
-            <WorldMap />
+            <WorldMap region={geographicRegion} />
         </Col>
     </Row>;
 }

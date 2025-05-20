@@ -35,7 +35,7 @@ export default defineConfig({
       provider: "v8"
     }
   },
-  server:  (process.env.VITE_DEV ?? 'true') === 'true' ? {
+  server:  (process.env.VITE_PROXY ?? 'true') === 'true' ? {
     proxy: {
       '/cordra/doip': {
         target: 'https://marketplace.cetaf.org',

@@ -141,12 +141,6 @@ const Home = () => {
                                 <Col lg={{ span: 10 }}
                                     className="mt-5 mt-lg-0"
                                 >
-                                    {/* Block title on mobile */}
-                                    <Row className="d-flex d-lg-none">
-                                        <Col>
-                                            <p className="fw-lightBold">Currently providing:</p>
-                                        </Col>
-                                    </Row>
                                     {/* Home category blocks */}
                                     <Row>
                                         <Col xs={{ span: 4 }}
@@ -165,7 +159,7 @@ const Home = () => {
                                             <HomeCategory title="Reference Collections"
                                                 subTitle="Go explore"
                                                 count={counts.referenceCollections}
-                                                link= {import.meta.env.VITE_DEV === 'true' ? "/search?serviceType=referenceCollection" : "ReferenceCollection"}
+                                                link={import.meta.env.VITE_DEV === 'true' ? "/search?serviceType=referenceCollection" : "/referenceCollection"}
                                                 color="secondary"
                                             />
                                         </Col>

@@ -27,6 +27,8 @@ import StringArrayField from "./StringArrayField";
 import TextField from "./TextField";
 import { Button, Spinner } from "components/general/CustomComponents";
 import { Color, getColor } from "components/general/ColorPage";
+import ORCIDField from "./ORCIDField";
+import ImageField from "./ImageField";
 
 
 /* Props Type */
@@ -40,6 +42,11 @@ type Props = {
             applicableToServiceTypes?: string[]
         }
     },
+    OrcidData: {
+        orcid?: string;
+        name?: string;
+        email?: string;
+    },
     SetCompleted: Function
 };
 
@@ -50,7 +57,7 @@ type Props = {
  * @returns JSX Component
  */
 const FormBuilder = (props: Props) => {
-    const { formTemplate, SetCompleted } = props;
+    const { formTemplate,OrcidData, SetCompleted } = props;
 
     /* Hooks */
     const captchaHook = useCaptchaHook({
@@ -85,8 +92,9 @@ const FormBuilder = (props: Props) => {
             applicableToServiceTypes?: string[]
         }
     } = {};
+
     const initialFormValues: Dict = {};
-    
+
     /**
      * Function to flatten a JSON path
      * @returns flattened JSON path string
@@ -121,7 +129,6 @@ const FormBuilder = (props: Props) => {
     /* Construct initial form values */
     if (isEmpty(initialFormValues)) {
         Object.entries(formTemplate).forEach(([_key, formSection]) => {
-            /* If is array, push to initial form values */
             if (formSection.type === 'array') {
                 jp.value(initialFormValues, formSection.jsonPath ?? '', []);
             }
@@ -133,11 +140,15 @@ const FormBuilder = (props: Props) => {
                     let pathSuffix: string = FlattenJSONPath(field.jsonPath).split('_').at(-1) as string;
 
                     jsonPath = jsonPath.concat(`${formSection.jsonPath ?? ''}[0]['${pathSuffix}']`);
-
-                    /* Add to initial form values array zero index */
                     jp.value(initialFormValues, jsonPath, DetermineInitialFormValue(field.type, field.const));
+                } else if (field.jsonPath === "$['schema:person']['schema:name']" &&  OrcidData?.name) {
+                    jp.value(initialFormValues, field.jsonPath, OrcidData.name);
+                }
+                else if (field.jsonPath === "$['schema:person']['schema:email']" &&  OrcidData?.email) {
+                    jp.value(initialFormValues, field.jsonPath, OrcidData.email);
+                } else if (field.jsonPath === "$['schema:person']['schema:identifier']" &&  OrcidData?.orcid) {
+                    jp.value(initialFormValues, field.jsonPath, OrcidData.orcid);
                 } else {
-                    /* Add to initial form values */
                     jp.value(initialFormValues, field.jsonPath, DetermineInitialFormValue(field.type, field.const));
                 }
             });
@@ -420,6 +431,13 @@ function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValu
                 values={values}
                 SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
                 SetServiceTypes={field.title === 'Service Type' ? (serviceTypes: string[]) => setServiceTypes(serviceTypes) : undefined} />;
+        } case 'orcid': {
+            return <ORCIDField field={field}
+                fieldValue={fieldValues as Dict}
+                values={values}
+                SetFieldValue={(fieldName: string, value: Dict) => {
+                    SetFieldValue?.(fieldName, value);
+                } } />;
         } case 'ror': {
             return <RORField field={field}
                 fieldValue={fieldValues as Dict}
@@ -434,6 +452,9 @@ function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValu
             return <TextField field={field}
                 values={values}
                 SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)} />;
+        } case 'image': {
+            return <ImageField field={field}
+                values={values} />
         } default: {
             return <StringField field={field}
                 values={values} />;

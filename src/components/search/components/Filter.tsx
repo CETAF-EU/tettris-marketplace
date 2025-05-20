@@ -48,14 +48,14 @@ const Filter = (props: Props) => {
     switch (filter.type) {
         case 'select':
             if (filter.options) {
-                const selectedOption: DropdownItem | undefined = filter.options.find((option) => option.value === currentValue);
+                const selectedOption: DropdownItem | undefined = filter.options.find((option) => option.value === currentValue) as DropdownItem;
 
                 return <>
                     <p className={`${serviceTypeClass} fs-5 fw-lightBold`}>{MakeReadableString(filter.name)}</p>
                     <Dropdown items={filter.options}
                         selectedItem={currentValue ? {
                             label: MakeReadableString(selectedOption?.label ?? `${currentValue}`),
-                            value: `${currentValue}`
+                            value: `${currentValue}`,
                         } : undefined}
                         placeholder={MakeReadableString(filter.name)}
                         hasDefault={hasDefault}

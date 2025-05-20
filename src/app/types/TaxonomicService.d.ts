@@ -174,7 +174,7 @@ export interface TaxonomicService {
     | "Unclassified"
   )[];
   /**
-   * The taxonomic grouping of the organism, e.g. 'No specific range' or 'Agromyzidae, Braconidae'
+   * The taxonomic grouping of the organism, e.g. 'No specific taxonomic range' or 'Agromyzidae, Braconidae'
    */
   "schema:taxonomicRange"?: string[];
   /**
@@ -401,7 +401,8 @@ export interface TaxonomicService {
        */
       "schema:name"?: string;
     }[];
-  };
+    [k: string]: unknown;
+  }[];
   /**
    * Object representing the service's software source code
    */

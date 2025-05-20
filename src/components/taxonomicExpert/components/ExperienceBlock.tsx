@@ -2,9 +2,13 @@
 import { Row, Col } from 'react-bootstrap';
 import { Chart } from "react-google-charts";
 
+/* Import Types */
+import { TaxonomicExpert } from 'app/Types';
+
 /* Props Type */
 type Props = {
-    name: string,
+    name: string
+    taxonomicExpert: TaxonomicExpert
 };
 
 
@@ -14,13 +18,34 @@ type Props = {
  * @returns JSX Component
  */
 const ExperienceBlock = (props: Props) => {
-    const { name } = props;
+    const { name, taxonomicExpert } = props;
 
+    const educationLevel = taxonomicExpert?.taxonomicExpert?.['schema:occupation']?.['schema:educationalLevel'] || ['Any education level provided'];
+    const employmentType = taxonomicExpert?.taxonomicExpert?.['schema:occupation']?.['schema:employmentType'] || ['Any employment status provided'];
+    const yearsOfExperience = taxonomicExpert?.taxonomicExpert?.['schema:occupation']?.['schema:yearsInOperation'] as string || 'Any years of experience provided';
+    
+    let bar = ["", 0, 0, 0, 0, 0, 0, 0]
+
+    const experienceRanges = [
+        "0 - 5 years",
+        "6 - 10 years",
+        "11 - 15 years",
+        "16 - 20 years",
+        "21 - 25 years",
+        "26 - 30 years",
+        ">30 years"
+    ]
+
+    const index = experienceRanges.indexOf(yearsOfExperience)
+
+    if (index !== -1) {
+        bar = ["", ...Array(7).fill(0).map((_, i) => i <= index ? 1 : 0)]
+    }
 
     const data = [
         ["Years", "0-5", "6-10", "11-15", "16-20", "21-25", "26-30", ">30"],
-        ["", 1, 1, 1, 0, 0, 0, 0], // 1 = filled, 0 = empty
-      ];
+        bar,
+    ];
       
     const options = {
         width: 400,
@@ -77,25 +102,35 @@ const ExperienceBlock = (props: Props) => {
             <Row className="flex-grow-1">
                 <Col>
                     <div className="h-100 b-tertiary px-4 py-3">
-                    <Row className="d-flex align-items-center">
+                        <Row className="d-flex align-items-center mb-3">
                             <Col className="d-flex align-items-center">
                                 <p className='fw-bold'>Education level</p>
                             </Col>
-                            <Col className="d-flex align-items-center">
-                                <p>PhD</p>            
+                            <Col lg='auto' className="d-flex align-items-center justify-content-center">
+                                <Row className="text-end">
+                                    {educationLevel.map((level) => (
+                                        <p key={level}>{level}</p>
+                                    ))}
+                                </Row>
                             </Col>
-                            <Col lg='auto' className='d-flex align-items-center'>
+                        </Row>
+                        <Row className="d-flex align-items-center">
+                            <Col lg='4' className='d-flex align-items-center'>
                                 <p className='fw-bold'>Employment status</p>
                             </Col>
-                            <Col className='d-flex align-items-center'>
-                                <p>Full Time scientist</p>
+                            <Col lg='8' className='d-flex align-items-center justify-content-center'>
+                                <Row className="text-end">
+                                    {employmentType.map((employment) => (
+                                        <p key={employment}>{employment}</p>
+                                    ))}
+                                </Row>
                             </Col>
                         </Row>
                         <Row className="d-flex align-items-center">
                             <Col className="d-flex align-items-center">
-                                <p className='fw-bold mb-0'>Years of experience</p>
+                                <p className='fw-bold'>Years of experience</p>
                             </Col>
-                            <Col className="d-flex align-items-center">
+                            <Col lg='auto' className="d-flex align-items-center overflow-hidden">
                                 <Chart
                                     chartType="BarChart"
                                     width="100%"

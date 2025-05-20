@@ -42,6 +42,10 @@ const Footer = () => {
                                             <Row>
                                                 <Col>
                                                     <div className="h-100 fs-5 tc-white fw-lightBold text-end">
+                                                        <a href="/support">
+                                                            Support
+                                                        </a>
+                                                        <span className="px-2">|</span>
                                                         <a href="https://marketplace.cetaf.org/cordra/#urls/openapi/index.html">
                                                             API Docs
                                                         </a>
@@ -70,6 +74,12 @@ const Footer = () => {
                         </Col>
                         <Col className="col-lg-auto">
                             <div className="h-100 d-flex align-items-center fs-5 tc-white fw-lightBold">
+                                <span>
+                                    <a href="/support">
+                                        Support
+                                    </a>
+                                </span>
+                                <span className="px-2">|</span>
                                 <span>
                                     <a href="https://marketplace.cetaf.org/cordra/#urls/openapi/index.html">
                                         API Docs

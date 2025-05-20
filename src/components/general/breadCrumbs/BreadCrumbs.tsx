@@ -80,7 +80,7 @@ const BreadCrumbs = () => {
                     });
                 } else {
                     breadCrumbs.push({
-                        crumb: `${taxonomicExpert?.taxonomicExpert['schema:name']}`
+                        crumb: `${taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] ?? ''}`
                     });
                 }
             }

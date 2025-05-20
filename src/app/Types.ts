@@ -1,6 +1,7 @@
 /* Import Types */
 import { TaxonomicService as TaxonomicServiceType } from "./types/TaxonomicService";
 import { TaxonomicExpert as TaxonomicExpertType } from "./types/TaxonomicExpert";
+import { DashboardData as DashboardDataType } from "./types/DashboardData";
 
 /* General type for a dictionary */
 export type Dict = {
@@ -15,6 +16,7 @@ export type CordraResult = {
         content: {
             taxonomicService?: TaxonomicServiceType,
             taxonomicExpert?: TaxonomicExpertType,
+            dashboardData?: DashboardDataType,
             [property: string]: any
         },
         metadata: {
@@ -39,6 +41,11 @@ export type TaxonomicService = {
 /* Type for a Taxonomic Expert */
 export type TaxonomicExpert = {
     taxonomicExpert: TaxonomicExpertType
+}
+
+/* Type for a Dashboard Data */
+export type DashboardData = {
+    dashboardData: DashboardDataType
 }
 
 /* Type for an Author */
@@ -104,5 +111,6 @@ export type FormField = {
 export type DropdownItem = {
     label: string,
     value: string,
+    url?: string
     action?: Function
 };

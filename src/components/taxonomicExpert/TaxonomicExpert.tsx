@@ -40,7 +40,6 @@ const TaxonomicExpert = () => {
     const taxonomicServiceID: string = `${params.prefix}/${params.suffix}`;
 
 
-    const text = "lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, vestibulum nunc sit amet, ultrices nunc sit lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, vestibulum nunc sit amet, ultrices nunc sit lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, vestibulum nunc sit amet, ultrices nunc sit";
     /* Fetch taxonomic service */
     fetch.Fetch({
         Method: GetTaxonomicExpert,
@@ -71,7 +70,7 @@ const TaxonomicExpert = () => {
             <Header />
 
             {/* Home page Body */}
-            <Container fluid className="flex-grow-1 overflow-hidden">
+            <Container fluid className="flex-grow-1 overflow-auto">
                 <Row className="h-100">
                     <Col lg={{ span: 10, offset: 1 }}
                         className="h-100 d-flex flex-column pt-3 pt-lg-5 px-4 px-lg-3"
@@ -100,26 +99,26 @@ const TaxonomicExpert = () => {
                                 <Row className='m-1'>
                                     <TopBar taxonomicExpert={taxonomicExpert} />
                                 </Row>
-                                <Row className="flex-grow-1 overflow-auto">
+                                <Row className="flex-grow-1">
                                     <Col>
                                         <Row className="mb-3">
                                             <Col>
-                                                <BioBlock name="Expertise bio" text={text}/>
+                                                <BioBlock name="Expertise bio" taxonomicExpert={taxonomicExpert}/>
                                             </Col>
                                         </Row>
                                         <Row className="mb-3">
                                             <Col>
-                                                <ExperienceBlock name="Experience and qualifications" />
+                                                <ExperienceBlock name="Experience and qualifications" taxonomicExpert={taxonomicExpert} />
                                             </Col>
                                         </Row>
                                         <Row className="mb-3">
                                             <Col>
-                                                <TrainingBlock name="Training Provision" />
+                                                <TrainingBlock name="Training Provision" taxonomicExpert={taxonomicExpert}/>
                                             </Col>
                                         </Row>
                                     </Col>
                                     <Col className='mb-3'>
-                                        <TaxonomicBlock name="Taxonomic and research scope" />
+                                        <TaxonomicBlock name="Taxonomic and research scope" taxonomicExpert={taxonomicExpert}/>
                                     </Col>
                                 </Row>                                
                             </>
