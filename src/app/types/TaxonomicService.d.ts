@@ -366,7 +366,43 @@ export interface TaxonomicService {
   /**
    * A FundingScheme combines organizational, project and policy aspects of grant-based funding that sets guidelines, principles and mechanisms to support other kinds of projects and activities.
    */
-  "schema:fundingScheme"?: unknown[];
+  "schema:fundingScheme"?: {
+    /**
+     * An award won by or for this service
+     */
+    "schema:award"?: string;
+    /**
+     * A Grant that directly or indirectly provide funding or sponsorship for this service
+     */
+    "schema:funding"?: {
+      /**
+       * A unique identifier to identify the grant
+       */
+      "schema:identifier"?: string;
+      /**
+       * A description of the service's grant
+       */
+      "schema:description"?: string;
+    };
+    /**
+     * An organization that supports (sponsors) something through some kind of financial contribution.
+     */
+    "schema:funder"?: {
+      /**
+       * The type of funder
+       */
+      "@type": "schema:Organization";
+      /**
+       * A unique identifier to identify the funder organisation; ROR identifiers are valid
+       */
+      "schema:identifier": string;
+      /**
+       * The name of the funder (funding program)
+       */
+      "schema:name"?: string;
+    }[];
+    [k: string]: unknown;
+  }[];
   /**
    * Object representing the service's software source code
    */

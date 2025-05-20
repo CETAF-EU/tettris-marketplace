@@ -60,7 +60,7 @@
         "schema:status": {
           "type": "string",
           "title": "Status",
-          "description": "he status of the record",
+          "description": "the status of the record",
           "enum": [
             "proposed",
             "accepted",
@@ -496,54 +496,57 @@
         "schema:fundingScheme": {
           "type": "array",
           "description": "A FundingScheme combines organizational, project and policy aspects of grant-based funding that sets guidelines, principles and mechanisms to support other kinds of projects and activities.",
-          "properties": {
-            "schema:award": {
-              "type": "string",
-              "title": "Award",
-              "description": "An award won by or for this service"
-            },
-            "schema:funding": {
-              "type": "object",
-              "description": "A Grant that directly or indirectly provide funding or sponsorship for this service",
-              "properties": {
-                "schema:identifier": {
-                  "type": "string",
-                  "title": "Grant identifier",
-                  "description": "A unique identifier to identify the grant"
-                },
-                "schema:description": {
-                  "type": "string",
-                  "title": "Funding grant",
-                  "description": "A description of the service's grant"
-                }
-              }
-            },
-            "schema:funder": {
-              "type": "array",
-              "description": "An organization that supports (sponsors) something through some kind of financial contribution.",
-              "items": {
+          "items": {
+            "type": "object",
+            "properties": {
+              "schema:award": {
+                "type": "string",
+                "title": "Award",
+                "description": "An award won by or for this service"
+              },
+              "schema:funding": {
                 "type": "object",
+                "description": "A Grant that directly or indirectly provide funding or sponsorship for this service",
                 "properties": {
-                  "@type": {
-                    "type": "string",
-                    "title": "Funder type",
-                    "description": "The type of funder"
-                  },
                   "schema:identifier": {
                     "type": "string",
-                    "title": "Funder identifier",
-                    "description": "A unique identifier to identify the funder organisation; ROR identifiers are valid"
+                    "title": "Grant identifier",
+                    "description": "A unique identifier to identify the grant"
                   },
-                  "schema:name": {
+                  "schema:description": {
                     "type": "string",
-                    "title": "Funder name",
-                    "description": "The name of the funder (funding program)"
+                    "title": "Funding grant",
+                    "description": "A description of the service's grant"
                   }
-                },
-                "required": [
-                  "@type",
-                  "schema:identifier"
-                ]
+                }
+              },
+              "schema:funder": {
+                "type": "array",
+                "description": "An organization that supports (sponsors) something through some kind of financial contribution.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "@type": {
+                      "type": "string",
+                      "title": "Funder type",
+                      "description": "The type of funder"
+                    },
+                    "schema:identifier": {
+                      "type": "string",
+                      "title": "Funder identifier",
+                      "description": "A unique identifier to identify the funder organisation; ROR identifiers are valid"
+                    },
+                    "schema:name": {
+                      "type": "string",
+                      "title": "Funder name",
+                      "description": "The name of the funder (funding program)"
+                    }
+                  },
+                  "required": [
+                    "@type",
+                    "schema:identifier"
+                  ]
+                }
               }
             }
           }
