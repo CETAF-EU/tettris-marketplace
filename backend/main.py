@@ -1,12 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 import httpx
 import os
 from dotenv import load_dotenv
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
-
-
+from urllib.parse import quote_plus
 
 load_dotenv()
 
@@ -27,6 +26,43 @@ ORCID_REDIRECT_URI = os.getenv("VITE_ORCID_REDIRECT_URI")
 
 class ORCIDCode(BaseModel):
     code: str
+
+@app.get("/api/orcid/search")
+async def search_orcid(q: str = Query(..., min_length=1)):
+    safe_query = quote_plus(q)
+    url = f"https://pub.orcid.org/v3.0/expanded-search/?q={safe_query}"
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, headers={"Accept": "application/json"})
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail="Failed to fetch ORCID data")
+
+        data = response.json()
+        results = data.get("expanded-result", [])[:50]
+
+        output = []
+        for record in results:
+            given = record.get("given-names", "")
+            family = record.get("family-names", "")
+            orcid_id = record.get("orcid-id", "")
+
+            institutions = record.get("institution-name", [])
+            if isinstance(institutions, str):
+                institutions = [institutions]  # Ensure it's a list
+
+            full_name = f"{given} {family}".strip()
+            inst_string = ", ".join(institutions)
+            display_name = f"{full_name} — {inst_string}" if inst_string else full_name
+
+            if full_name and orcid_id:
+                output.append({
+                    "identifier": orcid_id,
+                    "name": display_name
+                })
+
+        return output
+
 
 
 @app.post("/api/orcid/token")

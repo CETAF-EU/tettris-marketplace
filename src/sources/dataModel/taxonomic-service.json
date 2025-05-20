@@ -584,68 +584,71 @@
             }
         },
         "schema:fundingScheme": {
-            "type": "object",
+            "type": "array",
             "description": "A FundingScheme combines organizational, project and policy aspects of grant-based funding that sets guidelines, principles and mechanisms to support other kinds of projects and activities.",
-            "properties": {
-                "schema:award": {
-                    "type": "string",
-                    "description": "An award won by or for this service",
-                    "examples": [
-                        "National Award 2024"
-                    ]
-                },
-                "schema:funding": {
-                    "type": "object",
-                    "description": "A Grant that directly or indirectly provide funding or sponsorship for this service",
-                    "properties": {
-                        "schema:identifier": {
-                            "type": "string",
-                            "description": "A unique identifier to identify the grant",
-                            "examples": [
-                                "https://ror.org/0566bfb96"
-                            ]
-                        },
-                        "schema:description": {
-                            "type": "string",
-                            "description": "A description of the service's grant",
-                            "examples": [
-                                "This grant was given for exceptional performance"
-                            ]
-                        }
+            "items": {
+                "type": "object",
+                "properties": {
+                    "schema:award": {
+                        "type": "string",
+                        "description": "An award won by or for this service",
+                        "examples": [
+                            "National Award 2024"
+                        ]
                     },
-                    "additionalProperties": false
-                },
-                "schema:funder": {
-                    "type": "array",
-                    "description": "An organization that supports (sponsors) something through some kind of financial contribution.",
-                    "items": {
+                    "schema:funding": {
                         "type": "object",
+                        "description": "A Grant that directly or indirectly provide funding or sponsorship for this service",
                         "properties": {
-                            "@type": {
-                                "type": "string",
-                                "description": "The type of funder",
-                                "const": "schema:Organization"
-                            },
                             "schema:identifier": {
                                 "type": "string",
-                                "description": "A unique identifier to identify the funder organisation; ROR identifiers are valid",
+                                "description": "A unique identifier to identify the grant",
                                 "examples": [
                                     "https://ror.org/0566bfb96"
                                 ]
                             },
-                            "schema:name": {
+                            "schema:description": {
                                 "type": "string",
-                                "description": "The name of the funder (funding program)",
+                                "description": "A description of the service's grant",
                                 "examples": [
-                                    "Horizon 2020"
+                                    "This grant was given for exceptional performance"
                                 ]
                             }
                         },
-                        "required": [
-                            "@type",
-                            "schema:identifier"
-                        ],
                         "additionalProperties": false
+                    },
+                    "schema:funder": {
+                        "type": "array",
+                        "description": "An organization that supports (sponsors) something through some kind of financial contribution.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "@type": {
+                                    "type": "string",
+                                    "description": "The type of funder",
+                                    "const": "schema:Organization"
+                                },
+                                "schema:identifier": {
+                                    "type": "string",
+                                    "description": "A unique identifier to identify the funder organisation; ROR identifiers are valid",
+                                    "examples": [
+                                        "https://ror.org/0566bfb96"
+                                    ]
+                                },
+                                "schema:name": {
+                                    "type": "string",
+                                    "description": "The name of the funder (funding program)",
+                                    "examples": [
+                                        "Horizon 2020"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "@type",
+                                "schema:identifier"
+                            ],
+                            "additionalProperties": false
+                        }
                     }
                 }
             },

@@ -170,25 +170,38 @@ const TaxonomicService = () => {
                                                 </Col>
                                             }
                                             {/* Show funding details if funding object is present in taxonomic service */}
-                                            {(taxonomicService.taxonomicService['schema:fundingScheme'] &&
-                                                 (taxonomicService.taxonomicService['schema:fundingScheme']['schema:award'] ||
-                                                 taxonomicService.taxonomicService['schema:fundingScheme']['schema:funding']?.['schema:identifier'] ||
-                                                 taxonomicService.taxonomicService['schema:fundingScheme']['schema:funding']?.['schema:description'] ||
-                                                 taxonomicService.taxonomicService['schema:fundingScheme']['schema:funder'])) &&
-                                                <Col xs={{ span: 12 }}
-                                                    lg={{ span: 4 }}
-                                                    className="mt-4 mt-lg-0 mb-lg-3"
-                                                >
-                                                    <DetailsBlock name="Funding"
-                                                        properties={{
-                                                            award: taxonomicService.taxonomicService['schema:fundingScheme']['schema:award'],
-                                                            fundingId: taxonomicService.taxonomicService['schema:fundingScheme']['schema:funding']?.['schema:identifier'],
-                                                            fundingDescription: taxonomicService.taxonomicService['schema:fundingScheme']['schema:funding']?.['schema:description'],
-                                                            funders: taxonomicService.taxonomicService['schema:fundingScheme']['schema:funder'] as Dict[] as Funder[]
-                                                        }}
-                                                    />
-                                                </Col>
-                                            }
+                                     {Array.isArray(taxonomicService.taxonomicService['schema:fundingScheme']) &&
+                                        taxonomicService.taxonomicService['schema:fundingScheme']
+                                            .map((scheme, index) => {
+                                                const hasFundingInfo =
+                                                    scheme['schema:award'] ??
+                                                    scheme['schema:funding']?.['schema:identifier'] ??
+                                                    scheme['schema:funding']?.['schema:description'] ??
+                                                    scheme['schema:funder'];
+                                                
+                                                const numberedName = (taxonomicService.taxonomicService['schema:fundingScheme']?.length ?? 0) > 1 ? `Funding ${index + 1}` : "Funding";
+
+                                                return hasFundingInfo ? (
+                                                    <Col
+                                                        key={`funding-block-${scheme['@id'] ?? scheme['schema:award'] ?? index}`}
+                                                        xs={{ span: 12 }}
+                                                        lg={{ span: 4 }}
+                                                        className="mt-4 mt-lg-0 mb-lg-3"
+                                                    >
+                                                        <DetailsBlock
+                                                            name={numberedName}
+                                                            properties={{
+                                                                award: scheme['schema:award'],
+                                                                fundingId: scheme['schema:funding']?.['schema:identifier'],
+                                                                fundingDescription: scheme['schema:funding']?.['schema:description'],
+                                                                funders: scheme['schema:funder'] as Dict[] as Funder[],
+                                                            }}
+                                                        />
+                                                    </Col>
+                                                ) : null;
+                                            })}
+
+
                                             {/* Show multimedia block, if multimedia is present */}
                                             {taxonomicService.taxonomicService['schema:associatedMedia'] &&
                                                 <Col xs={{ span: 12 }} lg

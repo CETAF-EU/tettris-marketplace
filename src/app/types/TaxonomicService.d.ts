@@ -401,7 +401,8 @@ export interface TaxonomicService {
        */
       "schema:name"?: string;
     }[];
-  };
+    [k: string]: unknown;
+  }[];
   /**
    * Object representing the service's software source code
    */

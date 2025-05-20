@@ -27,6 +27,8 @@ import StringArrayField from "./StringArrayField";
 import TextField from "./TextField";
 import { Button, Spinner } from "components/general/CustomComponents";
 import { Color, getColor } from "components/general/ColorPage";
+import ORCIDField from "./ORCIDField";
+import ImageField from "./ImageField";
 
 
 /* Props Type */
@@ -429,6 +431,13 @@ function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValu
                 values={values}
                 SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
                 SetServiceTypes={field.title === 'Service Type' ? (serviceTypes: string[]) => setServiceTypes(serviceTypes) : undefined} />;
+        } case 'orcid': {
+            return <ORCIDField field={field}
+                fieldValue={fieldValues as Dict}
+                values={values}
+                SetFieldValue={(fieldName: string, value: Dict) => {
+                    SetFieldValue?.(fieldName, value);
+                } } />;
         } case 'ror': {
             return <RORField field={field}
                 fieldValue={fieldValues as Dict}
@@ -443,6 +452,9 @@ function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValu
             return <TextField field={field}
                 values={values}
                 SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)} />;
+        } case 'image': {
+            return <ImageField field={field}
+                values={values} />
         } default: {
             return <StringField field={field}
                 values={values} />;
