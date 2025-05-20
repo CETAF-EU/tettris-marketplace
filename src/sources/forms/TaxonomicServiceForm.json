@@ -349,7 +349,7 @@
                 "jsonPath": "$['schema:author']['index']['schema:identifier']",
                 "title": "ORCID",
                 "description": "A unique identifier to identify the author; ORCID identifiers are valid",
-                "type": "string",
+                "type": "orcid",
                 "required": false
             },
             {
@@ -357,7 +357,7 @@
                 "title": "Affiliated Organisation",
                 "description": "The affiliated organisation",
                 "type": "ror",
-                "required": false
+                "required": true
             }
         ],
         "applicableToServiceTypes": [
