@@ -350,7 +350,7 @@
                 "title": "ORCID",
                 "description": "A unique identifier to identify the author; ORCID identifiers are valid",
                 "type": "orcid",
-                "required": false
+                "required": true
             },
             {
                 "jsonPath": "$['schema:author']['index']['schema:affiliation']",
@@ -410,31 +410,31 @@
             "Identification tool"
         ]
     },
-    "funding": {
-        "title": "Funding",
+    "fundingScheme": {
+        "title": "Funding Scheme",
         "jsonPath": "$['schema:fundingScheme']",
-        "type": "object",
+        "type": "array",
         "fields": [
             {
-                "jsonPath": "$['schema:fundingScheme']['schema:award']",
+                "jsonPath": "$['schema:fundingScheme']['index']['schema:award']",
                 "title": "Award/Grant",
                 "description": "An award won by or for this service",
                 "type": "string"
             },
             {
-                "jsonPath": "$['schema:fundingScheme']['schema:funding']['schema:identifier']",
+                "jsonPath": "$['schema:fundingScheme']['index']['schema:funding']['schema:identifier']",
                 "title": "Grant Identifier",
                 "description": "A unique identifier to identify the funder organisation; ROR identifiers are valid",
                 "type": "string"
             },
             {
-                "jsonPath": "$['schema:fundingScheme']['schema:funding']['schema:description']",
+                "jsonPath": "$['schema:fundingScheme']['index']['schema:funding']['schema:description']",
                 "title": "Grant Description",
                 "description": "A description of the service's grant",
                 "type": "string"
             },
             {
-                "jsonPath": "$['schema:fundingScheme']['schema:funding']['schema:funder']",
+                "jsonPath": "$['schema:fundingScheme']['index']['schema:funding']['schema:funder']",
                 "title": "Funding Organisation",
                 "description": "An organization that supports (sponsors) something through some kind of financial contribution",
                 "type": "ror",

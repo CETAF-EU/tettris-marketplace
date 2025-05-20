@@ -494,7 +494,7 @@
           }
         },
         "schema:fundingScheme": {
-          "type": "object",
+          "type": "array",
           "description": "A FundingScheme combines organizational, project and policy aspects of grant-based funding that sets guidelines, principles and mechanisms to support other kinds of projects and activities.",
           "properties": {
             "schema:award": {
