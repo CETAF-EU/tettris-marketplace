@@ -72,11 +72,11 @@ const Support = () => {
                             <Row className="flex-grow-1">
                                 <Col className="d-flex flex-column justify-content-center align-items-center">
                                     <Row><Col><h2 className="fs-2 fw-lightBold">Support</h2></Col></Row>
-                                    <Row className="mt-2"><Col><p>You can contact us at info@cetaf.org for any questions or issues you may have.</p></Col></Row>
+                                    <Row className="mt-2"><Col><p>You can contact us at support@dissco.jitbit.com for any questions or issues you may have.</p></Col></Row>
                                     <Row className="mt-2">
                                         <Col>
                                             <p>
-                                                Need further assistance ? <a href="https://dissco.jitbit.com/helpdesk/User/Login" target="_blank" rel="noopener noreferrer" className="tc-tertiary">Create a support ticket</a>.
+                                                Need further assistance? <a href="mailto:support@dissco.jitbit.com" className="tc-tertiary">Create a support ticket</a>.
                                             </p>
                                         </Col>
                                     </Row>
