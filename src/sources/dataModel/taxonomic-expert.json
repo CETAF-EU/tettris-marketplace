@@ -559,7 +559,7 @@
                                 "description": "The type of the affiliation",
                                 "const": "schema:Organization"
                             },
-                            "schema:identifier": {
+                            "schema:orcid": {
                                 "type": "string",
                                 "description": "A unique identifier to identify the author's affiliation; ROR identifiers are valid",
                                 "examples": [

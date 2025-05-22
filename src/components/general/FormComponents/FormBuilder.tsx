@@ -146,7 +146,7 @@ const FormBuilder = (props: Props) => {
                 }
                 else if (field.jsonPath === "$['schema:person']['schema:email']" &&  OrcidData?.email) {
                     jp.value(initialFormValues, field.jsonPath, OrcidData.email);
-                } else if (field.jsonPath === "$['schema:person']['schema:identifier']" &&  OrcidData?.orcid) {
+                } else if (field.jsonPath === "$['schema:person']['schema:orcid']" &&  OrcidData?.orcid) {
                     jp.value(initialFormValues, field.jsonPath, OrcidData.orcid);
                 } else {
                     jp.value(initialFormValues, field.jsonPath, DetermineInitialFormValue(field.type, field.const));

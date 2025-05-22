@@ -11,7 +11,7 @@ const Support = () => {
     const fetch = useFetch();
     const [errorMessage] = useState<string | undefined>();
     const [displaySpinner, setDisplaySpinner] = useState<boolean>(false);
-
+    
     // Spinner timeout
     useEffect(() => {
         const timer = setTimeout(() => {
