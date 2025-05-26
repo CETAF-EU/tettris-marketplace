@@ -28,33 +28,25 @@ const GetTaxonomicExperts = async ({ pageNumber, pageSize, searchFilters }: { pa
         Object.entries(searchFilters).forEach(([key, value]) => {
             if (key === 'query') {
                 /* Set query to name search */
-                filters = filters.concat(` AND ` + `(` + `/taxonomicExpert/schema\\:person/schema\\:name:` + `${value}*`
-                    + `)`
-                );
+                filters = filters.concat(` AND (/taxonomicExpert/schema\\:person/schema\\:name:${value}*)`);
             }
             if (key === 'location') {
-                /* Set array search for language */
-                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:person/schema\\:language/_:` + `${value}`);
+                filters = filters.concat(` AND /taxonomicExpert/schema\\:person/schema\\:location:${value}`);            
             }
             if (key === 'language') {
-                /* Set array search for language */
-                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:person/schema\\:language/_:` + `${value}`);
-            }
-            if (key === 'country') {
-                /* Set array search for country */
-                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:person/schema\\:location:` + `${value}`);
+                filters = filters.concat(` AND /taxonomicExpert/schema\\:person/schema\\:language/_:${value}`);
             }
             if (key === 'taxonomicGroup') {
                 /* Set taxonomic range search */
-                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:Taxon/schema\\:discipline/_:` + `${value}`);
+                filters = filters.concat(` AND /taxonomicExpert/schema\\:Taxon/schema\\:discipline/_:${value}`);
             }
             if (key === 'subTaxonomicGroup') {
                 /* Set taxonomic range search */
-                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:Taxon/schema\\:additionalType/_:` + `${value}`);
+                filters = filters.concat(` AND /taxonomicExpert/schema\\:Taxon/schema\\:additionalType/_:${value}`);
             }
             if (key === 'appliedResearch') {
                 /* Set array search for Research Project */
-                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:Taxon/schema\\:ResearchProject/_:` + `${value}`);
+                filters = filters.concat(` AND /taxonomicExpert/schema\\:Taxon/schema\\:ResearchProject/_:${value}`);
             }
         });
     };
