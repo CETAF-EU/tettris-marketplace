@@ -561,6 +561,7 @@
                   "fa"
                 ]
               },
+              "title": "Languages",
               "description": "Languages the user is proficient or fluent in."
             },
             "schema:age": {
@@ -693,6 +694,7 @@
                 "2024",
                 "2025"
               ],
+              "title": "Year of Birth",
               "description": "Age category of the taxonomist. This data will be shown anonymously for trend analysis."
             },
             "schema:gender": {
@@ -704,10 +706,12 @@
                 "other",
                 "prefer not to say"
               ],
+              "title": "Gender",
               "description": "Gender category of the taxonomist. This data will be shown anonymously for trend analysis."
             },
             "schema:affiliation": {
               "type": "object",
+              "title": "Affiliation",
               "properties": {
                 "@type": {
                   "type": "string",
@@ -751,6 +755,7 @@
             },
             "schema:ProfilePicture": {
               "type": "string",
+              "title": "Profile Image",
               "format": "uri",
               "description": "URL or file path of the profile image. The image can be in PNG, JPG, or TIFF format.",
               "pattern": "^.*\\.(png|jpg|jpeg|tiff)$"
@@ -761,8 +766,9 @@
           "type": "object",
           "title": "Taxonomic & Research Scope",
           "properties": {
-            "schema:taxonomicRange": {
+            "schema:discipline": {
               "type": "array",
+              "title": "Taxonomic Discipline",
               "items": {
                 "type": "string",
                 "enum": [
@@ -776,14 +782,15 @@
               },
               "description": "Taxonomic discipline."
             },
-            "schema:subfields": {
+            "schema:additionalType": {
+              "title": "Subdiscipline",
               "type": "array",
               "items": {
                 "type": "string"
               },
               "description": "Subfields within the selected discipline."
             },
-            "schema:scope": {
+            "schema:about": {
               "type": "string",
               "format": "textarea",
               "maxLength": 2048,
@@ -797,6 +804,7 @@
             },
             "schema:spatialCoverage": {
               "type": "array",
+              "title": "Geographic region",
               "items": {
                 "type": "string",
                 "enum": [
@@ -830,7 +838,7 @@
               },
               "description": "Geographic region"
             },
-            "schema:stratigraphy": {
+            "schema:temporalCoverage": {
               "type": "string",
               "maxLength": 200,
               "title": "Stratigraphy age",
@@ -841,8 +849,9 @@
                 }
               }
             },
-            "schema:methodology": {
+            "schema:measurementTechnique": {
               "type": "array",
+              "title": "Taxonomic methodology",
               "items": {
                 "type": "string",
                 "enum": [
@@ -1109,7 +1118,7 @@
             }
           }
         },
-        "schema:EducationAndTrainingProvision": {
+        "schema:educationAndTrainingProvision": {
           "type": "array",
           "title": "Education And Training Provision",
           "items": {
