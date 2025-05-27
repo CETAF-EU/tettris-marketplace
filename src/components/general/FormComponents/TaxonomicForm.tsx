@@ -16,6 +16,8 @@ import { useOrcidCallback } from 'api/orcid/auth';
 const TaxonomicForm = () => {
     const [completed, setCompleted] = useState<boolean>(false);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [isRegistering, setIsRegistering] = useState<boolean>(false);
+    const [loginError, setLoginError] = useState<string>('');
 
     const { userData, error } = useOrcidCallback();
 
@@ -83,7 +85,137 @@ const TaxonomicForm = () => {
                                 </Col>
                             </Row>
                         )}
+                        {isExpertForm && !isLoggedIn && (
+                            <Row className="my-3">
+                                <Col>
+                                    <div className="d-flex align-items-center justify-content-center">
+                                        <hr className="flex-grow-1" />
+                                        <span className="mx-3 text-muted">or</span>
+                                        <hr className="flex-grow-1" />
+                                    </div>
+                                </Col>
+                            </Row>
+                        )}
+                        {isExpertForm && !isLoggedIn && (
+                            <Row className="mt-3">
+                                <Col>
+                                    <Card className="w-100 px-4 py-3">
+                                        <Row>
+                                            <Col>
+                                                <div>
+                                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                                        <h2 className="fs-4 mb-0">{loginError ? 'Login' : 'Login or Register'}</h2>
+                                                        <button
+                                                            className="btn btn-link p-0"
+                                                            style={{ fontSize: '1rem' }}
+                                                            onClick={() => {
+                                                                setIsRegistering(prev => !prev);
+                                                                setLoginError('');
+                                                            }}
+                                                            type="button"
+                                                        >
+                                                            {typeof isRegistering !== 'undefined' && isRegistering
+                                                                ? 'Already have an account ? Login'
+                                                                : 'New here ? Register'}
+                                                        </button>
+                                                    </div>
+                                                    <form
+                                                        onSubmit={async e => {
+                                                            e.preventDefault();
+                                                            const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value;
+                                                            const password = (e.currentTarget.elements.namedItem('password') as HTMLInputElement).value;
+                                                            let confirmPassword = '';
+                                                            if (isRegistering) {
+                                                                confirmPassword = (e.currentTarget.elements.namedItem('confirmPassword') as HTMLInputElement).value;
+                                                            }
 
+                                                            // Simple email regex for validation
+                                                            const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+                                                            const passwordValid = password.length >= 8;
+
+                                                            if (!emailValid || !passwordValid) {
+                                                                setLoginError('Invalid email or password.');
+                                                                return;
+                                                            }
+
+                                                            if (isRegistering) {
+                                                                if (password !== confirmPassword) {
+                                                                    setLoginError('Passwords do not match.');
+                                                                    return;
+                                                                }
+                                                                if (!emailValid) {
+                                                                    console.log('Invalid email format:', email);
+                                                                    setLoginError('Invalid email format.');
+                                                                    return;
+                                                                }
+                                                                if (!passwordValid) {
+                                                                    setLoginError('Password must be at least 8 characters.');
+                                                                    return;
+                                                                }
+                                                                // Simulate registration logic
+                                                                if (email === 'test@example.com') {
+                                                                    setLoginError('Email already registered.');
+                                                                } else {
+                                                                    setIsLoggedIn(true);
+                                                                    setLoginError('');
+                                                                }
+                                                            } else {
+                                                                // Simulate login logic
+                                                                if (email === 'test@example.com' && password === 'password123') {
+                                                                    setIsLoggedIn(true);
+                                                                    setLoginError('');
+                                                                } else {
+                                                                    setLoginError('Invalid email or password.');
+                                                                }
+                                                            }
+                                                        }}
+                                                    >
+                                                        <div className="mb-3">
+                                                            <label htmlFor="email" className="form-label">Email address</label>
+                                                            <input type="email" className={`form-control${loginError ? ' is-invalid' : ''}`} id="email" name="email" required />
+                                                        </div>
+                                                        <div className="mb-3">
+                                                            <label htmlFor="password" className="form-label">Password</label>
+                                                            <input
+                                                                type="password"
+                                                                className={`form-control${loginError ? ' is-invalid' : ''}`}
+                                                                id="password"
+                                                                name="password"
+                                                                required
+                                                                minLength={8}
+                                                                autoComplete="current-password"
+                                                                aria-describedby="passwordHelp"
+                                                            />
+                                                            <div id="passwordHelp" className="form-text">
+                                                                Password must be at least 8 characters.
+                                                            </div>
+                                                        </div>
+                                                        {isRegistering && (
+                                                            <div className="mb-3">
+                                                                <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+                                                                <input
+                                                                    type="password"
+                                                                    className={`form-control${loginError ? ' is-invalid' : ''}`}
+                                                                    id="confirmPassword"
+                                                                    name="confirmPassword"
+                                                                    required
+                                                                    minLength={8}
+                                                                    autoComplete="new-password"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        <button type="submit" className="btn btn-primary mt-2">
+                                                            {typeof isRegistering !== 'undefined' && isRegistering ? 'Register' : 'Login with Email'}
+                                                        </button>
+                                                        {loginError && <div className="text-danger mt-2">{loginError}</div>}
+                                                    </form>
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                    </Card>
+                                </Col>
+                            </Row>
+                        )}
                         {
                         (!isExpertForm || isLoggedIn) &&
                          (
