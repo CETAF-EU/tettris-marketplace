@@ -12,6 +12,7 @@ import { BreadCrumbs } from 'components/general/CustomComponents';
 import FormBuilder from 'components/general/FormComponents/FormBuilder';
 import { Color, getColor } from '../ColorPage';
 import { useOrcidCallback } from 'api/orcid/auth';
+import checkIfEmailExists from 'api/taxonomicExpert/checkIfEmailExists';
 
 const TaxonomicForm = () => {
     const [completed, setCompleted] = useState<boolean>(false);
@@ -61,11 +62,10 @@ const TaxonomicForm = () => {
                                 <BreadCrumbs />
                             </Col>
                         </Row>
-
                         {isExpertForm && !isLoggedIn && (
                             <Row>
                                 <Col>
-                                    <Card className="w-100 px-4 py-3">
+                                    <Card className="w-100 px-4 py-3 mt-3">
                                         <Row>
                                             <Col>
                                                 <h2 className="fs-4">Login with ORCID</h2>
@@ -122,53 +122,52 @@ const TaxonomicForm = () => {
                                                     <form
                                                         onSubmit={async e => {
                                                             e.preventDefault();
-                                                            const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value;
-                                                            const password = (e.currentTarget.elements.namedItem('password') as HTMLInputElement).value;
-                                                            let confirmPassword = '';
-                                                            if (isRegistering) {
-                                                                confirmPassword = (e.currentTarget.elements.namedItem('confirmPassword') as HTMLInputElement).value;
+
+                                                            const form = e.currentTarget as HTMLFormElement;
+                                                            const email = form.elements.namedItem('email') as HTMLInputElement;
+                                                            const password = form.elements.namedItem('password') as HTMLInputElement;
+                                                            const confirmPasswordInput = form.elements.namedItem('confirmPassword') as HTMLInputElement;
+
+                                                            if (!email || !password) {
+                                                                setLoginError('Email and password fields are required.');
+                                                                return;
                                                             }
 
-                                                            // Simple email regex for validation
-                                                            const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-                                                            const passwordValid = password.length >= 8;
+                                                            const emailValue = email.value.trim();
+                                                            const passwordValue = password.value.trim();
+                                                            const confirmPassword = isRegistering && confirmPasswordInput ? confirmPasswordInput.value.trim() : '';
+
+                                                            const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
+                                                            const passwordValid = passwordValue.length >= 8;
 
                                                             if (!emailValid || !passwordValid) {
                                                                 setLoginError('Invalid email or password.');
                                                                 return;
                                                             }
 
+                                                            const exist = await checkIfEmailExists(emailValue, passwordValue);
+
                                                             if (isRegistering) {
-                                                                if (password !== confirmPassword) {
+                                                                if (exist) {
+                                                                    setLoginError('Email already registered.');
+                                                                    return;
+                                                                }
+                                                                if (passwordValue !== confirmPassword) {
                                                                     setLoginError('Passwords do not match.');
                                                                     return;
                                                                 }
-                                                                if (!emailValid) {
-                                                                    console.log('Invalid email format:', email);
-                                                                    setLoginError('Invalid email format.');
-                                                                    return;
-                                                                }
-                                                                if (!passwordValid) {
-                                                                    setLoginError('Password must be at least 8 characters.');
-                                                                    return;
-                                                                }
-                                                                // Simulate registration logic
-                                                                if (email === 'test@example.com') {
-                                                                    setLoginError('Email already registered.');
-                                                                } else {
-                                                                    setIsLoggedIn(true);
-                                                                    setLoginError('');
-                                                                }
+                                                                setIsLoggedIn(true);
+                                                                setLoginError('');
                                                             } else {
-                                                                // Simulate login logic
-                                                                if (email === 'test@example.com' && password === 'password123') {
-                                                                    setIsLoggedIn(true);
-                                                                    setLoginError('');
-                                                                } else {
+                                                                if (!exist) {
                                                                     setLoginError('Invalid email or password.');
+                                                                    return;
                                                                 }
+                                                                setIsLoggedIn(true);
+                                                                setLoginError('');
                                                             }
                                                         }}
+
                                                     >
                                                         <div className="mb-3">
                                                             <label htmlFor="email" className="form-label">Email address</label>
