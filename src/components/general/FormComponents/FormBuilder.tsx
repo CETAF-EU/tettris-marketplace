@@ -370,7 +370,22 @@ const FormBuilder = (props: Props) => {
                                 </Col>
                             </Row>
                         }
-                        <Row className="mt-5">
+                        <Row className="mt-3">
+                            <Col>
+                                <div className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="policyCheck"
+                                        required
+                                    />
+                                    <label className="form-check-label" htmlFor="policyCheck">
+                                        I agree to the <a href="https://cetaf.org/privacy/" target="_blank" rel="noopener noreferrer">policy</a>
+                                    </label>
+                                </div>
+                            </Col>
+                        </Row>
+                        <Row className="mt-3">
                             <Col>
                                 <Row>
                                     <Col lg="auto">
