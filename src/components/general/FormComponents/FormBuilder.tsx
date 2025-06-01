@@ -503,14 +503,16 @@ function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValu
                 SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
                 SetServiceTypes={field.title === 'Service Type' ? (serviceTypes: string[]) => setServiceTypes(serviceTypes) : undefined} />;
         } case 'orcid': {
-            if (orcid)
-                return <></>
-            return <ORCIDField field={field}
-                fieldValue={fieldValues as Dict}
-                values={values}
-                SetFieldValue={(fieldName: string, value: Dict) => {
-                    SetFieldValue?.(fieldName, value);
-                } } />;
+            if (orcid) {
+                return <StringField field={field} values={values} />;
+            } else {
+                return <ORCIDField field={field}
+                    fieldValue={fieldValues as Dict}
+                    values={values}
+                    SetFieldValue={(fieldName: string, value: Dict) => {
+                        SetFieldValue?.(fieldName, value);
+                    } } />;
+            }
         } case 'ror': {
             return <RORField field={field}
                 fieldValue={fieldValues as Dict}
