@@ -247,8 +247,8 @@ const FormBuilder = (props: Props) => {
      * @param fieldValues The current field values of the form field
      * @returns JSX Component of form field
      */
-    const ConstructFormField = (field: FormField, values: Dict, SetFieldValue: Function, fieldValues?: any) => {
-        return generateFieldComponent(field, fieldValues, SetFieldValue, values, setServiceTypes);
+    const ConstructFormField = (field: FormField, values: Dict, SetFieldValue: Function, orcid: string, fieldValues?: any) => {
+        return generateFieldComponent(field, fieldValues, SetFieldValue, values, orcid, setServiceTypes);
     };
 
     /**
@@ -392,7 +392,7 @@ const FormBuilder = (props: Props) => {
                                                             className="mt-3 mt-lg-2"
                                                         >
                                                             <Col>
-                                                                {ConstructFormField(field, values, setFieldValue, jp.value(values, field.jsonPath))}
+                                                                {ConstructFormField(field, values, setFieldValue, jp.value(values, field.jsonPath), OrcidData?.orcid)}
                                                             </Col>
                                                         </Row>
                                                     ))}
@@ -471,7 +471,7 @@ const FormBuilder = (props: Props) => {
 
 export default FormBuilder;
 
-function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValue: Function, values: Dict, setServiceTypes: (serviceTypes: string[]) => void) {
+function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValue: Function, values: Dict, orcid: string, setServiceTypes: (serviceTypes: string[]) => void) {
     switch (field.type) {
         case 'hidden': {
             return <HiddenField field={field} />;
@@ -503,6 +503,8 @@ function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValu
                 SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
                 SetServiceTypes={field.title === 'Service Type' ? (serviceTypes: string[]) => setServiceTypes(serviceTypes) : undefined} />;
         } case 'orcid': {
+            if (orcid)
+                return <></>
             return <ORCIDField field={field}
                 fieldValue={fieldValues as Dict}
                 values={values}

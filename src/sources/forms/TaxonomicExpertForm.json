@@ -19,6 +19,13 @@
                 "required": true
             },
             {
+                "jsonPath": "$['schema:person']['schema:orcid']",
+                "title": "ORCID",
+                "description": "A unique identifier to identify the author; ORCID identifiers are valid",
+                "type": "orcid",
+                "required": true
+            },
+            {
                 "jsonPath": "$['schema:person']['schema:headline']",
                 "title": "Headline description",
                 "description": "A description of your job role or what you are an expert in. For example: Expert on Bee Taxonomy; Professor of Entomology, Citizen scientist on butterfly monitoring).",
