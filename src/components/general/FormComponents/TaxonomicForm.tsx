@@ -3,6 +3,7 @@ import { Container, Row, Col, Card } from 'react-bootstrap';
 
 /* Import Sources */
 import TaxonomicExpertFormJSON from 'sources/forms/TaxonomicExpertForm.json';
+import TaxonomicExpertFormOrcidJSON from 'sources/forms/TaxonomicExpertFormOrcid.json';
 import TaxonomicServiceFormJSON from 'sources/forms/TaxonomicServiceForm.json';
 
 /* Import Components */
@@ -39,11 +40,12 @@ const TaxonomicForm = () => {
         ? 'Your submission is received and will be processed by the Marketplace! A CETAF administrator will review the request. The review can take up to 5 working days. Your profile will be published on the Marketplace once the review is completed.\nThank you for using the Taxonomic Marketplace!'
         : 'Your submission is received and will be processed by the Marketplace! A CETAF administrator will review and score the taxonomic service. When the score is sufficient, the service will be published in the Marketplace catalog.\nThank you for using the Taxonomic Marketplace!';
 
-    const formTemplate = isExpertForm ? TaxonomicExpertFormJSON : TaxonomicServiceFormJSON;
+    let formTemplate = isExpertForm ? TaxonomicExpertFormJSON : TaxonomicServiceFormJSON;
     const color = "fs-2 tc-" + getColor(window.location) as Color;
 
     useEffect(() => {
         if (userData) {
+            formTemplate = TaxonomicExpertFormOrcidJSON;
             setIsLoggedIn(true);
         }
     }, [userData]);
