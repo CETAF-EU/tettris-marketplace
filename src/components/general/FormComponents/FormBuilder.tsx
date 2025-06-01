@@ -105,6 +105,51 @@ const FormBuilder = (props: Props) => {
         return jsonPath.replaceAll('[', '_').replaceAll(']', '').replaceAll("'", '');
     };
 
+    const populateInitialValuesFromTaxonomicExpert = (
+        TaxonomicExpert: TaxonomicExpert,
+        initialFormValues: any,
+        formTemplate: any
+        ) => {
+        const isFormEmpty = isEmpty(initialFormValues);
+        if (!TaxonomicExpert || !isFormEmpty) return;
+
+        console.log('🔄 Constructing initial form values from existing TaxonomicExpert');
+
+        Object.entries(formTemplate).forEach(([_key, formSection]: any) => {
+            const isArray = formSection.type === 'array';
+
+            // Initialize empty array for repeatable sections
+            if (isArray) {
+            jp.value(initialFormValues, formSection.jsonPath ?? '', []);
+            }
+
+            formSection.fields.forEach((field: any) => {
+            let targetPath = '';
+
+            if (isArray) {
+                const pathSuffix = FlattenJSONPath(field.jsonPath).split('_').at(-1) as string;
+                targetPath = `${formSection.jsonPath ?? ''}[0]['${pathSuffix}']`;
+            } else {
+                targetPath = field.jsonPath;
+            }
+
+            // Attempt to extract value from TaxonomicExpert
+            const value = jp.value(TaxonomicExpert.taxonomicExpert, targetPath);
+
+            if (value !== undefined && value !== null) {
+                jp.value(initialFormValues, targetPath, value);
+                console.log(`[✔] Set from expert: ${targetPath} →`, value);
+            } else {
+                const defaultValue = DetermineInitialFormValue(field.type, field.const);
+                jp.value(initialFormValues, targetPath, defaultValue);
+                console.log(`[❌] Fallback: ${targetPath} →`, defaultValue);
+            }
+            });
+        });
+    };
+
+
+
     /**
      * Function to determine the initial form field type 
      * @param fieldType
@@ -128,8 +173,13 @@ const FormBuilder = (props: Props) => {
         };
     };
 
+    /* Construct initial form values from existing taxonomic expert */
+    if (TaxonomicExpert !== null && isEmpty(initialFormValues)) {
+        populateInitialValuesFromTaxonomicExpert(TaxonomicExpert, initialFormValues, formTemplate);
+    }
     /* Construct initial form values */
-    if (isEmpty(initialFormValues)) {
+    else if (isEmpty(initialFormValues)) {
+        console.log('Constructing initial form values from OrcidData or null');
         Object.entries(formTemplate).forEach(([_key, formSection]) => {
             if (formSection.type === 'array') {
                 jp.value(initialFormValues, formSection.jsonPath ?? '', []);

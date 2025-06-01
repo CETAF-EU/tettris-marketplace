@@ -12,8 +12,8 @@ import { BreadCrumbs } from 'components/general/CustomComponents';
 import FormBuilder from 'components/general/FormComponents/FormBuilder';
 import { Color, getColor } from '../ColorPage';
 import { useOrcidCallback } from 'api/orcid/auth';
-import checkIfEmailExists from 'api/taxonomicExpert/checkIfEmailExists';
-import checkIfOrcidExists from 'api/taxonomicExpert/checkIfOrcidExists';
+import checkIfEmailExists from 'api/email/checkIfEmailExists';
+import checkIfOrcidExists from 'api/orcid/checkIfOrcidExists';
 import { TaxonomicExpert } from 'app/Types';
 
 const TaxonomicForm = () => {
@@ -155,7 +155,9 @@ const TaxonomicForm = () => {
                                                             }
 
                                                             const exist = await checkIfEmailExists(emailValue, isRegistering ? passwordValue : undefined);
-
+                                                            if (exist) {
+                                                                setExpertExists(exist as TaxonomicExpert);
+                                                            }
                                                             if (isRegistering) {
                                                                 if (exist) {
                                                                     setLoginError('Email already registered.');

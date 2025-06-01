@@ -5,7 +5,7 @@ import { TaxonomicExpert, CordraResultArray } from 'app/Types';
  * @param email - The email to check.
  * @returns True if the email exists, false otherwise.
  */
-const checkIfEmailExists = async (email: string, password?: string): Promise<boolean> => {
+const checkIfEmailExists = async (email: string, password?: string): Promise<TaxonomicExpert | boolean> => {
 
     console.log('Checking if email exists:', email);
 
@@ -52,7 +52,7 @@ const checkIfEmailExists = async (email: string, password?: string): Promise<boo
             return true;
         }
         console.log('Password does not match for email:', email);
-        return false;
+        return taxonomicExperts[0];
     } catch (error) {
         console.error('Email existence check failed:', error);
         return false;

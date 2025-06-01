@@ -292,7 +292,7 @@
                 "required": true
             },
             {
-                "jsonPath": "$['schema:person']['schema:birthDate']",
+                "jsonPath": "$['schema:person']['schema:age']",
                 "title": "Age",
                 "description": "Select your birth year.",
                 "type": "select",
