@@ -225,7 +225,7 @@ const TaxonomicForm = () => {
                             </Row>
                         )}
                         {
-                        // (!isExpertForm || isLoggedIn) &&
+                        (!isExpertForm || isLoggedIn) &&
                          (
                             <Row className="mt-3">
                                 <Col>
