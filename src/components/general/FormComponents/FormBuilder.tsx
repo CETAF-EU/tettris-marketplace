@@ -107,7 +107,7 @@ const FormBuilder = (props: Props) => {
 
     const populateInitialValuesFromTaxonomicExpert = (
         TaxonomicExpert: TaxonomicExpert,
-        initialFormValues: any,
+        initialFormValues: Dict,
         formTemplate: any
         ) => {
         const isFormEmpty = isEmpty(initialFormValues);
@@ -135,7 +135,7 @@ const FormBuilder = (props: Props) => {
 
             // Attempt to extract value from TaxonomicExpert
             const value = jp.value(TaxonomicExpert.taxonomicExpert, targetPath);
-
+            console.log(`[🔍] Looking for value at: ${targetPath} →`, value);
             if (value !== undefined && value !== null) {
                 jp.value(initialFormValues, targetPath, value);
                 console.log(`[✔] Set from expert: ${targetPath} →`, value);
@@ -206,7 +206,7 @@ const FormBuilder = (props: Props) => {
             });
         });
     }
-
+    
     /* Construct form sections */
     Object.entries(formTemplate).forEach(([_key, formSection]) => {
         if ((serviceTypes && formSection.applicableToServiceTypes?.some(type => serviceTypes.includes(type))) || !formSection.applicableToServiceTypes || !serviceTypes) {
@@ -260,6 +260,7 @@ const FormBuilder = (props: Props) => {
         });
     };
 
+    console.log('values', initialFormValues);
     return (
         <div>
             <Formik initialValues={initialFormValues}
@@ -468,6 +469,7 @@ const FormBuilder = (props: Props) => {
 export default FormBuilder;
 
 function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValue: Function, values: Dict, setServiceTypes: (serviceTypes: string[]) => void) {
+    console.log('Generating field component for:', field.title, 'with type:', field.type, 'and values:', fieldValues);
     switch (field.type) {
         case 'hidden': {
             return <HiddenField field={field} />;

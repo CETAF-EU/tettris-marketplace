@@ -19,8 +19,8 @@ import { TaxonomicExpert } from 'app/Types';
 const TaxonomicForm = () => {
     const [completed, setCompleted] = useState<boolean>(false);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [moreLogin, setMoreLogin] = useState<boolean>(false);
     const [expertExists, setExpertExists] = useState<TaxonomicExpert | null>(null);
-    const [isRegistering, setIsRegistering] = useState<boolean>(true);
     const [loginError, setLoginError] = useState<string>('');
 
     const { userData, error } = useOrcidCallback();
@@ -46,7 +46,10 @@ const TaxonomicForm = () => {
         const checkOrcid = async () => {
             if (userData) {
                 setExpertExists(await checkIfOrcidExists(userData.orcid));
-                setIsLoggedIn(true);
+                if (expertExists)
+                    setLoginError('You are already registered as a taxonomic expert. Please send a ticket to the Marketplace helpdesk to update your profile.');
+                else 
+                    setIsLoggedIn(true);
             }
         };
         checkOrcid();
@@ -79,12 +82,22 @@ const TaxonomicForm = () => {
                                                 <p className="mt-2">
                                                     To proceed, please log in using your ORCID account. This ensures that your submission is linked to your professional profile.
                                                 </p>
-                                                <button
-                                                    className="btn btn-primary mt-3"
-                                                    onClick={redirectToOrcidAuth}
-                                                >
-                                                    Login with ORCID
-                                                </button>
+                                                <div className="d-flex justify-content-between align-items-center mt-3">
+                                                    <button
+                                                        className="btn btn-primary"
+                                                        onClick={redirectToOrcidAuth}
+                                                    >
+                                                        Login with ORCID
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-link p-0 ms-2"
+                                                        style={{ fontSize: '0.95rem' }}
+                                                        onClick={() => setMoreLogin(m => !m)}
+                                                        type="button"
+                                                    >
+                                                        more
+                                                    </button>
+                                                </div>
                                                 {error && <p className="text-danger mt-3">{error}</p>}
                                             </Col>
                                         </Row>
@@ -92,7 +105,7 @@ const TaxonomicForm = () => {
                                 </Col>
                             </Row>
                         )}
-                        {isExpertForm && !isLoggedIn && (
+                        {moreLogin && isExpertForm && !isLoggedIn && (
                             <Row className="my-3">
                                 <Col>
                                     <div className="d-flex align-items-center justify-content-center">
@@ -104,7 +117,7 @@ const TaxonomicForm = () => {
                             </Row>
                         )}
                         {
-                        isExpertForm && !isLoggedIn && 
+                        moreLogin && isExpertForm && !isLoggedIn && 
                         (
                             <Row className="mt-3">
                                 <Col>
@@ -113,19 +126,15 @@ const TaxonomicForm = () => {
                                             <Col>
                                                 <div>
                                                     <div className="d-flex justify-content-between align-items-center mb-3">
-                                                        <h2 className="fs-4 mb-0">{loginError ? 'Login' : 'Register or Login'}</h2>
+                                                        <h2 className="fs-4 mb-0">{'Register with an Email'}</h2>
                                                         <button
                                                             className="btn btn-link p-0"
                                                             style={{ fontSize: '1rem' }}
                                                             onClick={() => {
-                                                                setIsRegistering(prev => !prev);
                                                                 setLoginError('');
                                                             }}
                                                             type="button"
                                                         >
-                                                            {typeof isRegistering !== 'undefined' && isRegistering
-                                                                ? 'Already have an account ? Login'
-                                                                : 'New here ? Register'}
                                                         </button>
                                                     </div>
                                                     <form
@@ -134,49 +143,24 @@ const TaxonomicForm = () => {
 
                                                             const form = e.currentTarget as HTMLFormElement;
                                                             const email = form.elements.namedItem('email') as HTMLInputElement;
-                                                            const password = form.elements.namedItem('password') as HTMLInputElement;
-                                                            const confirmPasswordInput = form.elements.namedItem('confirmPassword') as HTMLInputElement;
-
-                                                            if (!email || !password) {
-                                                                setLoginError('Email and password fields are required.');
-                                                                return;
-                                                            }
-
                                                             const emailValue = email.value.trim();
-                                                            const passwordValue = password.value.trim();
-                                                            const confirmPassword = isRegistering && confirmPasswordInput ? confirmPasswordInput.value.trim() : '';
-
                                                             const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
-                                                            const passwordValid = passwordValue.length >= 8;
 
-                                                            if (!emailValid || !passwordValid) {
+                                                            if (!emailValid) {
                                                                 setLoginError('Invalid email or password.');
                                                                 return;
                                                             }
 
-                                                            const exist = await checkIfEmailExists(emailValue, isRegistering ? passwordValue : undefined);
+                                                            const exist = await checkIfEmailExists(emailValue);
                                                             if (exist) {
                                                                 setExpertExists(exist as TaxonomicExpert);
                                                             }
-                                                            if (isRegistering) {
-                                                                if (exist) {
-                                                                    setLoginError('Email already registered.');
-                                                                    return;
-                                                                }
-                                                                if (passwordValue !== confirmPassword) {
-                                                                    setLoginError('Passwords do not match.');
-                                                                    return;
-                                                                }
-                                                                setIsLoggedIn(true);
-                                                                setLoginError('');
-                                                            } else {
-                                                                if (!exist) {
-                                                                    setLoginError('Invalid email or password.');
-                                                                    return;
-                                                                }
-                                                                setIsLoggedIn(true);
-                                                                setLoginError('');
+                                                            if (exist) {
+                                                                setLoginError('Email already registered. Please send a ticket to the Marketplace helpdesk to update your profile.');
+                                                                return;
                                                             }
+                                                            setIsLoggedIn(true);
+                                                            setLoginError('');
                                                         }}
 
                                                     >
@@ -184,38 +168,8 @@ const TaxonomicForm = () => {
                                                             <label htmlFor="email" className="form-label">Email address</label>
                                                             <input type="email" className={`form-control${loginError ? ' is-invalid' : ''}`} id="email" name="email" required />
                                                         </div>
-                                                        <div className="mb-3">
-                                                            <label htmlFor="password" className="form-label">Password</label>
-                                                            <input
-                                                                type="password"
-                                                                className={`form-control${loginError ? ' is-invalid' : ''}`}
-                                                                id="password"
-                                                                name="password"
-                                                                required
-                                                                minLength={8}
-                                                                autoComplete="current-password"
-                                                                aria-describedby="passwordHelp"
-                                                            />
-                                                            <div id="passwordHelp" className="form-text">
-                                                                Password must be at least 8 characters.
-                                                            </div>
-                                                        </div>
-                                                        {isRegistering && (
-                                                            <div className="mb-3">
-                                                                <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
-                                                                <input
-                                                                    type="password"
-                                                                    className={`form-control${loginError ? ' is-invalid' : ''}`}
-                                                                    id="confirmPassword"
-                                                                    name="confirmPassword"
-                                                                    required
-                                                                    minLength={8}
-                                                                    autoComplete="new-password"
-                                                                />
-                                                            </div>
-                                                        )}
                                                         <button type="submit" className="btn btn-primary mt-2">
-                                                            {typeof isRegistering !== 'undefined' && isRegistering ? 'Register' : 'Login with Email'}
+                                                            {'Register'}
                                                         </button>
                                                         {loginError && <div className="text-danger mt-2">{loginError}</div>}
                                                     </form>
