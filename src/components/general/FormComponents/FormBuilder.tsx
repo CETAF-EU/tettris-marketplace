@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Row, Col } from 'react-bootstrap';
 
 /* Import Types */
-import { FormField, Dict } from "app/Types";
+import { FormField, Dict, TaxonomicExpert } from "app/Types";
 
 /* Import API */
 import InsertTaxonomicService from "api/taxonomicService/InsertTaxonomicService";
@@ -47,6 +47,7 @@ type Props = {
         name?: string;
         email?: string;
     },
+    TaxonomicExpert : TaxonomicExpert | null,
     SetCompleted: Function
 };
 
@@ -57,8 +58,9 @@ type Props = {
  * @returns JSX Component
  */
 const FormBuilder = (props: Props) => {
-    const { formTemplate,OrcidData, SetCompleted } = props;
+    const { formTemplate,OrcidData, TaxonomicExpert, SetCompleted } = props;
 
+    console.log('taxonomic expert', TaxonomicExpert);
     /* Hooks */
     const captchaHook = useCaptchaHook({
         siteKey: import.meta.env.VITE_FRIENDLY_CAPTCHA_SITEKEY,
@@ -370,7 +372,22 @@ const FormBuilder = (props: Props) => {
                                 </Col>
                             </Row>
                         }
-                        <Row className="mt-5">
+                        <Row className="mt-3">
+                            <Col>
+                                <div className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="policyCheck"
+                                        required
+                                    />
+                                    <label className="form-check-label" htmlFor="policyCheck">
+                                        I agree to the <a href="https://cetaf.org/privacy/" target="_blank" rel="noopener noreferrer">policy</a>
+                                    </label>
+                                </div>
+                            </Col>
+                        </Row>
+                        <Row className="mt-3">
                             <Col>
                                 <Row>
                                     <Col lg="auto">
