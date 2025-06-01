@@ -30,21 +30,26 @@ export function useOrcidCallback() {
             const response = await axios.post('https://sandbox.cetaf.org/orcid/api/orcid/token', { code });
 
             if (response.status !== 200) {
+                console.log('Failed to login with ORCID:', response.status, response.data);
                 throw new Error('Failed to login with ORCID');
             }
             if (await checkIfOrcidExists(response.data.orcid) !== null){
+                console.log('ORCID already exists in the system:', response.data.orcid);
                 throw new Error('ORCID already exists in the system');
             }
             return response.data;
         } catch (error) {
             if (error === 'ORCID already exists in the system') {
+                console.error('ORCID already exists in the system:', error);
                 throw new Error('ORCID already exists in the system');
             }
             else if (axios.isAxiosError(error)) {
+                console.error('Failed to login with ORCID:', error.response?.status, error.response?.data);
                 throw new Error(error.response?.data?.message ?? 'Failed to login with ORCID');
             }
             else {
                 setError('An unknown error occurred while logging in with ORCID');
+                console.error('An unknown error occurred while logging in with ORCID:', error);
                 throw new Error('Failed to login with ORCID');
             }
         }
