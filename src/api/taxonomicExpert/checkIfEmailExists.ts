@@ -10,7 +10,7 @@ const checkIfEmailExists = async (email: string, password?: string): Promise<boo
     console.log('Checking if email exists:', email);
 
     let taxonomicExperts: TaxonomicExpert[] = [];
-    const filters = `/taxonomicExpert/@type:TaxonomicExpert AND (/taxonomicExpert/schema\\:person/schema\\:email:${email})`;
+    const filters = `/taxonomicExpert/@type:TaxonomicExpert AND (/taxonomicExpert/schema\\:person/schema\\:email:"${email}")`;
     
     try {
         const response = await axios.get('/Op.Search', {
@@ -38,9 +38,20 @@ const checkIfEmailExists = async (email: string, password?: string): Promise<boo
         if (emailExist === email)
         {
             console.log('Email exists:', emailExist);
+            if (password !== undefined) {
+                return true;
+            }
+        }
+        else {
+            console.log('Email does not match:', emailExist);
+            return false;
+        }
+        const passwpordExist = taxonomicExperts[0].taxonomicExpert?.['schema:person']?.['schema:password'] as string || null;
+        if (password && passwpordExist === password) {
+            console.log('Password matches for email:', email);
             return true;
         }
-        console.log('Email does not exist:', emailExist);
+        console.log('Password does not match for email:', email);
         return false;
     } catch (error) {
         console.error('Email existence check failed:', error);

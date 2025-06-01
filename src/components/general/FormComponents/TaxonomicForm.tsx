@@ -17,7 +17,7 @@ import checkIfEmailExists from 'api/taxonomicExpert/checkIfEmailExists';
 const TaxonomicForm = () => {
     const [completed, setCompleted] = useState<boolean>(false);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-    const [isRegistering, setIsRegistering] = useState<boolean>(false);
+    const [isRegistering, setIsRegistering] = useState<boolean>(true);
     const [loginError, setLoginError] = useState<string>('');
 
     const { userData, error } = useOrcidCallback();
@@ -104,7 +104,7 @@ const TaxonomicForm = () => {
                                             <Col>
                                                 <div>
                                                     <div className="d-flex justify-content-between align-items-center mb-3">
-                                                        <h2 className="fs-4 mb-0">{loginError ? 'Login' : 'Login or Register'}</h2>
+                                                        <h2 className="fs-4 mb-0">{loginError ? 'Login' : 'Register or Login'}</h2>
                                                         <button
                                                             className="btn btn-link p-0"
                                                             style={{ fontSize: '1rem' }}
@@ -145,7 +145,7 @@ const TaxonomicForm = () => {
                                                                 return;
                                                             }
 
-                                                            const exist = await checkIfEmailExists(emailValue, passwordValue);
+                                                            const exist = await checkIfEmailExists(emailValue, isRegistering ? passwordValue : undefined);
 
                                                             if (isRegistering) {
                                                                 if (exist) {
