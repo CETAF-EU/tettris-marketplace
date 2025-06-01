@@ -12,10 +12,16 @@ import { BreadCrumbs } from 'components/general/CustomComponents';
 import FormBuilder from 'components/general/FormComponents/FormBuilder';
 import { Color, getColor } from '../ColorPage';
 import { useOrcidCallback } from 'api/orcid/auth';
+import checkIfEmailExists from 'api/taxonomicExpert/checkIfEmailExists';
+import checkIfOrcidExists from 'api/taxonomicExpert/checkIfOrcidExists';
+import { TaxonomicExpert } from 'app/Types';
 
 const TaxonomicForm = () => {
     const [completed, setCompleted] = useState<boolean>(false);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [expertExists, setExpertExists] = useState<TaxonomicExpert | null>(null);
+    const [isRegistering, setIsRegistering] = useState<boolean>(true);
+    const [loginError, setLoginError] = useState<string>('');
 
     const { userData, error } = useOrcidCallback();
 
@@ -37,9 +43,13 @@ const TaxonomicForm = () => {
     const color = "fs-2 tc-" + getColor(window.location) as Color;
 
     useEffect(() => {
-        if (userData) {
-            setIsLoggedIn(true);
-        }
+        const checkOrcid = async () => {
+            if (userData) {
+                setExpertExists(await checkIfOrcidExists(userData.orcid));
+                setIsLoggedIn(true);
+            }
+        };
+        checkOrcid();
     }, [userData]);
 
     const redirectToOrcidAuth = () => {
@@ -59,11 +69,10 @@ const TaxonomicForm = () => {
                                 <BreadCrumbs />
                             </Col>
                         </Row>
-
                         {isExpertForm && !isLoggedIn && (
                             <Row>
                                 <Col>
-                                    <Card className="w-100 px-4 py-3">
+                                    <Card className="w-100 px-4 py-3 mt-3">
                                         <Row>
                                             <Col>
                                                 <h2 className="fs-4">Login with ORCID</h2>
@@ -83,7 +92,138 @@ const TaxonomicForm = () => {
                                 </Col>
                             </Row>
                         )}
+                        {isExpertForm && !isLoggedIn && (
+                            <Row className="my-3">
+                                <Col>
+                                    <div className="d-flex align-items-center justify-content-center">
+                                        <hr className="flex-grow-1" />
+                                        <span className="mx-3 text-muted">or</span>
+                                        <hr className="flex-grow-1" />
+                                    </div>
+                                </Col>
+                            </Row>
+                        )}
+                        {
+                        isExpertForm && !isLoggedIn && 
+                        (
+                            <Row className="mt-3">
+                                <Col>
+                                    <Card className="w-100 px-4 py-3">
+                                        <Row>
+                                            <Col>
+                                                <div>
+                                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                                        <h2 className="fs-4 mb-0">{loginError ? 'Login' : 'Register or Login'}</h2>
+                                                        <button
+                                                            className="btn btn-link p-0"
+                                                            style={{ fontSize: '1rem' }}
+                                                            onClick={() => {
+                                                                setIsRegistering(prev => !prev);
+                                                                setLoginError('');
+                                                            }}
+                                                            type="button"
+                                                        >
+                                                            {typeof isRegistering !== 'undefined' && isRegistering
+                                                                ? 'Already have an account ? Login'
+                                                                : 'New here ? Register'}
+                                                        </button>
+                                                    </div>
+                                                    <form
+                                                        onSubmit={async e => {
+                                                            e.preventDefault();
 
+                                                            const form = e.currentTarget as HTMLFormElement;
+                                                            const email = form.elements.namedItem('email') as HTMLInputElement;
+                                                            const password = form.elements.namedItem('password') as HTMLInputElement;
+                                                            const confirmPasswordInput = form.elements.namedItem('confirmPassword') as HTMLInputElement;
+
+                                                            if (!email || !password) {
+                                                                setLoginError('Email and password fields are required.');
+                                                                return;
+                                                            }
+
+                                                            const emailValue = email.value.trim();
+                                                            const passwordValue = password.value.trim();
+                                                            const confirmPassword = isRegistering && confirmPasswordInput ? confirmPasswordInput.value.trim() : '';
+
+                                                            const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
+                                                            const passwordValid = passwordValue.length >= 8;
+
+                                                            if (!emailValid || !passwordValid) {
+                                                                setLoginError('Invalid email or password.');
+                                                                return;
+                                                            }
+
+                                                            const exist = await checkIfEmailExists(emailValue, isRegistering ? passwordValue : undefined);
+
+                                                            if (isRegistering) {
+                                                                if (exist) {
+                                                                    setLoginError('Email already registered.');
+                                                                    return;
+                                                                }
+                                                                if (passwordValue !== confirmPassword) {
+                                                                    setLoginError('Passwords do not match.');
+                                                                    return;
+                                                                }
+                                                                setIsLoggedIn(true);
+                                                                setLoginError('');
+                                                            } else {
+                                                                if (!exist) {
+                                                                    setLoginError('Invalid email or password.');
+                                                                    return;
+                                                                }
+                                                                setIsLoggedIn(true);
+                                                                setLoginError('');
+                                                            }
+                                                        }}
+
+                                                    >
+                                                        <div className="mb-3">
+                                                            <label htmlFor="email" className="form-label">Email address</label>
+                                                            <input type="email" className={`form-control${loginError ? ' is-invalid' : ''}`} id="email" name="email" required />
+                                                        </div>
+                                                        <div className="mb-3">
+                                                            <label htmlFor="password" className="form-label">Password</label>
+                                                            <input
+                                                                type="password"
+                                                                className={`form-control${loginError ? ' is-invalid' : ''}`}
+                                                                id="password"
+                                                                name="password"
+                                                                required
+                                                                minLength={8}
+                                                                autoComplete="current-password"
+                                                                aria-describedby="passwordHelp"
+                                                            />
+                                                            <div id="passwordHelp" className="form-text">
+                                                                Password must be at least 8 characters.
+                                                            </div>
+                                                        </div>
+                                                        {isRegistering && (
+                                                            <div className="mb-3">
+                                                                <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+                                                                <input
+                                                                    type="password"
+                                                                    className={`form-control${loginError ? ' is-invalid' : ''}`}
+                                                                    id="confirmPassword"
+                                                                    name="confirmPassword"
+                                                                    required
+                                                                    minLength={8}
+                                                                    autoComplete="new-password"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        <button type="submit" className="btn btn-primary mt-2">
+                                                            {typeof isRegistering !== 'undefined' && isRegistering ? 'Register' : 'Login with Email'}
+                                                        </button>
+                                                        {loginError && <div className="text-danger mt-2">{loginError}</div>}
+                                                    </form>
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                    </Card>
+                                </Col>
+                            </Row>
+                        )}
                         {
                         (!isExpertForm || isLoggedIn) &&
                          (
@@ -103,7 +243,7 @@ const TaxonomicForm = () => {
                                         {!completed && (
                                             <Row>
                                                 <Col>
-                                                    <FormBuilder formTemplate={formTemplate} OrcidData={userData ?? {}} SetCompleted={() => setCompleted(true)} />
+                                                    <FormBuilder formTemplate={formTemplate} OrcidData={userData ?? {}} TaxonomicExpert={expertExists} SetCompleted={() => setCompleted(true)} />
                                                 </Col>
                                             </Row>
                                         )}
