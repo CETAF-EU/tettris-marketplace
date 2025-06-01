@@ -34,9 +34,13 @@ export function useOrcidCallback() {
             return response.data;
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                console.error('Backend error:', error.response?.data ?? error.message);
-            } else {
-                console.error('Unknown error:', error);
+                setError(error.response?.data?.message ?? 'An error occurred while logging in with ORCID');
+            }
+            else if (error === 'ORCID already exists in the system') {
+                setError('This ORCID is already registered in the system');
+            }
+            else {
+                setError('An unknown error occurred while logging in with ORCID');
             }
             throw new Error('Failed to login with ORCID');
         }
