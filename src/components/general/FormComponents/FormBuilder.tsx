@@ -180,7 +180,6 @@ const FormBuilder = (props: Props) => {
     // }
     /* Construct initial form values */
     if (isEmpty(initialFormValues)) {
-        console.log('Constructing initial form values from OrcidData or null');
         Object.entries(formTemplate).forEach(([_key, formSection]) => {
             if (formSection.type === 'array') {
                 jp.value(initialFormValues, formSection.jsonPath ?? '', []);
@@ -473,7 +472,6 @@ const FormBuilder = (props: Props) => {
 export default FormBuilder;
 
 function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValue: Function, values: Dict, setServiceTypes: (serviceTypes: string[]) => void) {
-    console.log('Generating field component for:', field.title, 'with type:', field.type, 'and values:', fieldValues);
     switch (field.type) {
         case 'hidden': {
             return <HiddenField field={field} />;

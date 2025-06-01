@@ -13,7 +13,6 @@ import FormBuilder from 'components/general/FormComponents/FormBuilder';
 import { Color, getColor } from '../ColorPage';
 import { useOrcidCallback } from 'api/orcid/auth';
 import checkIfEmailExists from 'api/email/checkIfEmailExists';
-import checkIfOrcidExists from 'api/orcid/checkIfOrcidExists';
 import { TaxonomicExpert } from 'app/Types';
 
 const TaxonomicForm = () => {
@@ -44,16 +43,7 @@ const TaxonomicForm = () => {
     const color = "fs-2 tc-" + getColor(window.location) as Color;
 
     useEffect(() => {
-        const checkOrcid = async () => {
-            if (userData) {
-                setExpertExists(await checkIfOrcidExists(userData.orcid));
-                if (expertExists)
-                    setLoginError('You are already registered as a taxonomic expert. Please send a ticket to the Marketplace helpdesk to update your profile.');
-                else 
-                    setIsLoggedIn(true);
-            }
-        };
-        checkOrcid();
+        setIsLoggedIn(true);
     }, [userData]);
 
     const redirectToOrcidAuth = () => {

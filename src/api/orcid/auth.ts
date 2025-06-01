@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import checkIfOrcidExists from './checkIfOrcidExists';
 
 interface OrcidUserData {
     orcid: string;
@@ -27,7 +28,9 @@ export function useOrcidCallback() {
             if (response.status !== 200) {
                 throw new Error('Failed to login with ORCID');
             }
-
+            if (await checkIfOrcidExists(response.data.orcid) !== null){
+                throw new Error('ORCID already exists in the system');
+            }
             return response.data;
         } catch (error) {
             if (axios.isAxiosError(error)) {
