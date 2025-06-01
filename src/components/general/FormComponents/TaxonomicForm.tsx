@@ -20,6 +20,7 @@ const TaxonomicForm = () => {
     const [completed, setCompleted] = useState<boolean>(false);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [moreLogin, setMoreLogin] = useState<boolean>(false);
+    const [email, setEmail] = useState<string>('');
     const [expertExists, setExpertExists] = useState<TaxonomicExpert | null>(null);
     const [loginError, setLoginError] = useState<string>('');
 
@@ -145,12 +146,10 @@ const TaxonomicForm = () => {
                                                             const email = form.elements.namedItem('email') as HTMLInputElement;
                                                             const emailValue = email.value.trim();
                                                             const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
-
                                                             if (!emailValid) {
                                                                 setLoginError('Invalid email or password.');
                                                                 return;
                                                             }
-
                                                             const exist = await checkIfEmailExists(emailValue);
                                                             if (exist) {
                                                                 setExpertExists(exist as TaxonomicExpert);
@@ -159,6 +158,7 @@ const TaxonomicForm = () => {
                                                                 setLoginError('Email already registered. Please send a ticket to the Marketplace helpdesk to update your profile.');
                                                                 return;
                                                             }
+                                                            setEmail(emailValue);
                                                             setIsLoggedIn(true);
                                                             setLoginError('');
                                                         }}
@@ -199,7 +199,7 @@ const TaxonomicForm = () => {
                                         {!completed && (
                                             <Row>
                                                 <Col>
-                                                    <FormBuilder formTemplate={formTemplate} OrcidData={userData ?? {}} TaxonomicExpert={expertExists} SetCompleted={() => setCompleted(true)} />
+                                                    <FormBuilder formTemplate={formTemplate} OrcidData={userData ?? {}} TaxonomicExpert={expertExists} Email={email} SetCompleted={() => setCompleted(true)} />
                                                 </Col>
                                             </Row>
                                         )}

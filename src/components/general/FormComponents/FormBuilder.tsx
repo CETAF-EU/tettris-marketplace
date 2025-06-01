@@ -48,6 +48,7 @@ type Props = {
         email?: string;
     },
     TaxonomicExpert : TaxonomicExpert | null,
+    Email: string | null,
     SetCompleted: Function
 };
 
@@ -58,7 +59,7 @@ type Props = {
  * @returns JSX Component
  */
 const FormBuilder = (props: Props) => {
-    const { formTemplate,OrcidData, TaxonomicExpert, SetCompleted } = props;
+    const { formTemplate,OrcidData, TaxonomicExpert, Email, SetCompleted } = props;
 
     console.log('taxonomic expert', TaxonomicExpert);
     /* Hooks */
@@ -174,11 +175,11 @@ const FormBuilder = (props: Props) => {
     };
 
     /* Construct initial form values from existing taxonomic expert */
-    if (TaxonomicExpert !== null && isEmpty(initialFormValues)) {
-        populateInitialValuesFromTaxonomicExpert(TaxonomicExpert, initialFormValues, formTemplate);
-    }
+    // if (TaxonomicExpert !== null && isEmpty(initialFormValues)) {
+    //     populateInitialValuesFromTaxonomicExpert(TaxonomicExpert, initialFormValues, formTemplate);
+    // }
     /* Construct initial form values */
-    else if (isEmpty(initialFormValues)) {
+    if (isEmpty(initialFormValues)) {
         console.log('Constructing initial form values from OrcidData or null');
         Object.entries(formTemplate).forEach(([_key, formSection]) => {
             if (formSection.type === 'array') {
@@ -198,6 +199,9 @@ const FormBuilder = (props: Props) => {
                 }
                 else if (field.jsonPath === "$['schema:person']['schema:email']" &&  OrcidData?.email) {
                     jp.value(initialFormValues, field.jsonPath, OrcidData.email);
+                }
+                else if (field.jsonPath === "$['schema:person']['schema:email']" &&  Email) {
+                    jp.value(initialFormValues, field.jsonPath, Email);
                 } else if (field.jsonPath === "$['schema:person']['schema:orcid']" &&  OrcidData?.orcid) {
                     jp.value(initialFormValues, field.jsonPath, OrcidData.orcid);
                 } else {
