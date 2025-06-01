@@ -48,6 +48,7 @@ type Props = {
         email?: string;
     },
     TaxonomicExpert : TaxonomicExpert | null,
+    Email: string | null,
     SetCompleted: Function
 };
 
@@ -58,7 +59,7 @@ type Props = {
  * @returns JSX Component
  */
 const FormBuilder = (props: Props) => {
-    const { formTemplate,OrcidData, TaxonomicExpert, SetCompleted } = props;
+    const { formTemplate,OrcidData, TaxonomicExpert, Email, SetCompleted } = props;
 
     console.log('taxonomic expert', TaxonomicExpert);
     /* Hooks */
@@ -105,6 +106,51 @@ const FormBuilder = (props: Props) => {
         return jsonPath.replaceAll('[', '_').replaceAll(']', '').replaceAll("'", '');
     };
 
+    const populateInitialValuesFromTaxonomicExpert = (
+        TaxonomicExpert: TaxonomicExpert,
+        initialFormValues: Dict,
+        formTemplate: any
+        ) => {
+        const isFormEmpty = isEmpty(initialFormValues);
+        if (!TaxonomicExpert || !isFormEmpty) return;
+
+        console.log('🔄 Constructing initial form values from existing TaxonomicExpert');
+
+        Object.entries(formTemplate).forEach(([_key, formSection]: any) => {
+            const isArray = formSection.type === 'array';
+
+            // Initialize empty array for repeatable sections
+            if (isArray) {
+            jp.value(initialFormValues, formSection.jsonPath ?? '', []);
+            }
+
+            formSection.fields.forEach((field: any) => {
+            let targetPath = '';
+
+            if (isArray) {
+                const pathSuffix = FlattenJSONPath(field.jsonPath).split('_').at(-1) as string;
+                targetPath = `${formSection.jsonPath ?? ''}[0]['${pathSuffix}']`;
+            } else {
+                targetPath = field.jsonPath;
+            }
+
+            // Attempt to extract value from TaxonomicExpert
+            const value = jp.value(TaxonomicExpert.taxonomicExpert, targetPath);
+            console.log(`[🔍] Looking for value at: ${targetPath} →`, value);
+            if (value !== undefined && value !== null) {
+                jp.value(initialFormValues, targetPath, value);
+                console.log(`[✔] Set from expert: ${targetPath} →`, value);
+            } else {
+                const defaultValue = DetermineInitialFormValue(field.type, field.const);
+                jp.value(initialFormValues, targetPath, defaultValue);
+                console.log(`[❌] Fallback: ${targetPath} →`, defaultValue);
+            }
+            });
+        });
+    };
+
+
+
     /**
      * Function to determine the initial form field type 
      * @param fieldType
@@ -128,8 +174,13 @@ const FormBuilder = (props: Props) => {
         };
     };
 
+    /* Construct initial form values from existing taxonomic expert */
+    // if (TaxonomicExpert !== null && isEmpty(initialFormValues)) {
+    //     populateInitialValuesFromTaxonomicExpert(TaxonomicExpert, initialFormValues, formTemplate);
+    // }
     /* Construct initial form values */
     if (isEmpty(initialFormValues)) {
+        console.log('Constructing initial form values from OrcidData or null');
         Object.entries(formTemplate).forEach(([_key, formSection]) => {
             if (formSection.type === 'array') {
                 jp.value(initialFormValues, formSection.jsonPath ?? '', []);
@@ -148,6 +199,9 @@ const FormBuilder = (props: Props) => {
                 }
                 else if (field.jsonPath === "$['schema:person']['schema:email']" &&  OrcidData?.email) {
                     jp.value(initialFormValues, field.jsonPath, OrcidData.email);
+                }
+                else if (field.jsonPath === "$['schema:person']['schema:email']" &&  Email) {
+                    jp.value(initialFormValues, field.jsonPath, Email);
                 } else if (field.jsonPath === "$['schema:person']['schema:orcid']" &&  OrcidData?.orcid) {
                     jp.value(initialFormValues, field.jsonPath, OrcidData.orcid);
                 } else {
@@ -156,7 +210,7 @@ const FormBuilder = (props: Props) => {
             });
         });
     }
-
+    
     /* Construct form sections */
     Object.entries(formTemplate).forEach(([_key, formSection]) => {
         if ((serviceTypes && formSection.applicableToServiceTypes?.some(type => serviceTypes.includes(type))) || !formSection.applicableToServiceTypes || !serviceTypes) {
@@ -210,6 +264,7 @@ const FormBuilder = (props: Props) => {
         });
     };
 
+    console.log('values', initialFormValues);
     return (
         <div>
             <Formik initialValues={initialFormValues}
@@ -418,6 +473,7 @@ const FormBuilder = (props: Props) => {
 export default FormBuilder;
 
 function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValue: Function, values: Dict, setServiceTypes: (serviceTypes: string[]) => void) {
+    console.log('Generating field component for:', field.title, 'with type:', field.type, 'and values:', fieldValues);
     switch (field.type) {
         case 'hidden': {
             return <HiddenField field={field} />;

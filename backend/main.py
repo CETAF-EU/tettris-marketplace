@@ -121,7 +121,7 @@ async def orcid_login(payload: ORCIDCode):
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the ORCID API"}
+    return {"message": "Welcome to the TETTRIs Marketplace API"}
 
 
 def main():
