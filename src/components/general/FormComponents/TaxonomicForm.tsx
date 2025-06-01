@@ -13,10 +13,13 @@ import FormBuilder from 'components/general/FormComponents/FormBuilder';
 import { Color, getColor } from '../ColorPage';
 import { useOrcidCallback } from 'api/orcid/auth';
 import checkIfEmailExists from 'api/taxonomicExpert/checkIfEmailExists';
+import checkIfOrcidExists from 'api/taxonomicExpert/checkIfOrcidExists';
+import { TaxonomicExpert } from 'app/Types';
 
 const TaxonomicForm = () => {
     const [completed, setCompleted] = useState<boolean>(false);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [expertExists, setExpertExists] = useState<TaxonomicExpert | null>(null);
     const [isRegistering, setIsRegistering] = useState<boolean>(true);
     const [loginError, setLoginError] = useState<string>('');
 
@@ -40,9 +43,13 @@ const TaxonomicForm = () => {
     const color = "fs-2 tc-" + getColor(window.location) as Color;
 
     useEffect(() => {
-        if (userData) {
-            setIsLoggedIn(true);
-        }
+        const checkOrcid = async () => {
+            if (userData) {
+                setExpertExists(await checkIfOrcidExists(userData.orcid));
+                setIsLoggedIn(true);
+            }
+        };
+        checkOrcid();
     }, [userData]);
 
     const redirectToOrcidAuth = () => {
@@ -96,7 +103,9 @@ const TaxonomicForm = () => {
                                 </Col>
                             </Row>
                         )}
-                        {isExpertForm && !isLoggedIn && (
+                        {
+                        isExpertForm && !isLoggedIn && 
+                        (
                             <Row className="mt-3">
                                 <Col>
                                     <Card className="w-100 px-4 py-3">
@@ -234,7 +243,7 @@ const TaxonomicForm = () => {
                                         {!completed && (
                                             <Row>
                                                 <Col>
-                                                    <FormBuilder formTemplate={formTemplate} OrcidData={userData ?? {}} SetCompleted={() => setCompleted(true)} />
+                                                    <FormBuilder formTemplate={formTemplate} OrcidData={userData ?? {}} TaxonomicExpert={expertExists} SetCompleted={() => setCompleted(true)} />
                                                 </Col>
                                             </Row>
                                         )}

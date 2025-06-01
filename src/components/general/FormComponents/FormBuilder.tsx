@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Row, Col } from 'react-bootstrap';
 
 /* Import Types */
-import { FormField, Dict } from "app/Types";
+import { FormField, Dict, TaxonomicExpert } from "app/Types";
 
 /* Import API */
 import InsertTaxonomicService from "api/taxonomicService/InsertTaxonomicService";
@@ -47,6 +47,7 @@ type Props = {
         name?: string;
         email?: string;
     },
+    TaxonomicExpert : TaxonomicExpert | null,
     SetCompleted: Function
 };
 
@@ -57,8 +58,9 @@ type Props = {
  * @returns JSX Component
  */
 const FormBuilder = (props: Props) => {
-    const { formTemplate,OrcidData, SetCompleted } = props;
+    const { formTemplate,OrcidData, TaxonomicExpert, SetCompleted } = props;
 
+    console.log('taxonomic expert', TaxonomicExpert);
     /* Hooks */
     const captchaHook = useCaptchaHook({
         siteKey: import.meta.env.VITE_FRIENDLY_CAPTCHA_SITEKEY,
