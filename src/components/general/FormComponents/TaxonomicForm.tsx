@@ -13,6 +13,7 @@ import FormBuilder from 'components/general/FormComponents/FormBuilder';
 import { Color, getColor } from '../ColorPage';
 import { useOrcidCallback } from 'api/orcid/auth';
 import checkIfEmailExists from 'api/email/checkIfEmailExists';
+import checkIfOrcidExists from 'api/orcid/checkIfOrcidExists';
 import { TaxonomicExpert } from 'app/Types';
 
 const TaxonomicForm = () => {
@@ -43,7 +44,9 @@ const TaxonomicForm = () => {
     const color = "fs-2 tc-" + getColor(window.location) as Color;
 
     useEffect(() => {
-        setIsLoggedIn(true);
+        if (userData) {
+            setIsLoggedIn(true);
+        }
     }, [userData]);
 
     const redirectToOrcidAuth = () => {
