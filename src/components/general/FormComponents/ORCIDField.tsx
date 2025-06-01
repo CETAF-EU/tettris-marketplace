@@ -79,7 +79,7 @@ const ORCIDField = (props: Props) => {
 
     /* Class Names */
     const formFieldClass = classNames({
-        'b-error': (field.required && !isEmpty(values) && !jp.value(values, field.jsonPath)?.['schema:identifier'])
+        'b-error': (field.required && !isEmpty(values) && (typeof jp.value(values, field.jsonPath) !== 'string' || isEmpty(jp.value(values, field.jsonPath))))
     });
 
     return (
@@ -92,10 +92,10 @@ const ORCIDField = (props: Props) => {
                         {field.title}
                     </p>
                 </Col>
-                {(field.required && !isEmpty(values) && isEmpty(jp.value(values, field.jsonPath)?.['schema:identifier'])) &&
+                {(field.required && !isEmpty(values) && (typeof jp.value(values, field.jsonPath) !== 'string' || isEmpty(jp.value(values, field.jsonPath)))) &&
                     <Col className="d-flex align-items-center">
                         <p className="fs-5 fs-lg-4 tc-error">
-                            This field is required
+                            This field is required 
                         </p>
                     </Col>
                 }
@@ -163,8 +163,6 @@ const ORCIDField = (props: Props) => {
                                         jsonPath = jsonPath.concat(`['${localPathSegment}']`);
                                     }
                                 });
-                                console.log(jsonPath);
-                                console.log(dropdownOption?.value);
                                 SetFieldValue(jsonPath, dropdownOption?.value);
                             }}
                         />
