@@ -54,7 +54,11 @@
         },
         "schema:reference": {
           "type": "string",
-          "title": "Reference"
+          "title": "Reference",
+          "internalOnly": true,
+          "ui": {
+            "inputType": "hidden"
+          }
         },
         "schema:age": {
           "type": "string",
