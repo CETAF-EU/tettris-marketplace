@@ -24,7 +24,7 @@ const TaxonomicForm = () => {
     const [loginError, setLoginError] = useState<string>('');
 
     const { userData, error } = useOrcidCallback();
-    
+
     const isExpertForm = location.pathname.includes("/te");
 
     const title = isExpertForm

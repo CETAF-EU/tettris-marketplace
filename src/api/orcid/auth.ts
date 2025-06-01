@@ -14,11 +14,15 @@ export function useOrcidCallback() {
 
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
-
+    
     if (code) {
         loginWithOrcid(code)
             .then((data) => setUserData(data))
             .catch((err) => setError(err.message));
+        // Remove the 'code' param from the URL after extracting it
+        const url = new URL(window.location.href);
+        url.searchParams.delete('code');
+        window.history.replaceState({}, document.title, url.pathname + url.search);
     }
 
     async function loginWithOrcid(code: string): Promise<OrcidUserData> {
