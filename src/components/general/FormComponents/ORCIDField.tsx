@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { Field } from "formik";
 import jp from 'jsonpath';
 import { isEmpty } from "lodash";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Select from "react-select";
 
@@ -16,6 +16,7 @@ import { GetOrcidByName } from 'api/orcid/GetOrcidByName';
 /* Import Components */
 import { Button, Spinner } from 'components/general/CustomComponents';
 import { getColor, Color } from 'components/general/ColorPage'
+import checkIfOrcidExists from 'api/orcid/checkIfOrcidExists';
 
 /* Props Type */
 type Props = {
@@ -41,12 +42,50 @@ const ORCIDField = (props: Props) => {
     const [query, setQuery] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [dropdownOptions, setDropdownOptions] = useState<DropdownItem[] | undefined>();
-
+    const [orcidExists, setOrcidExists] = useState<boolean>(false);
     /* Determine variant */
     const variant: Color = getColor(window.location) as Color;
     /**
      * Function to search for RORs and fill the dropdown with options
      */
+
+    useEffect(() => {
+    }, [values]);
+
+    const validateOrcid = async (orcid: string) => {
+        let jsonPath: string = '';
+
+        /* Format JSON path */
+        field.jsonPath.split('][').forEach(pathSegment => {
+            const localPathSegment = pathSegment.replace('$', '').replace('[', '').replace(']', '').replaceAll("'", '');
+
+            if (!isNaN(Number(localPathSegment))) {
+                jsonPath = jsonPath.concat(`[${localPathSegment}]`);
+            } else {
+                jsonPath = jsonPath.concat(`['${localPathSegment}']`);
+            }
+        });
+        if (typeof orcid === 'string' && orcid.trim() !== '') {
+            const exists = await checkIfOrcidExists(orcid.trim());
+            if (exists !== null) {
+                setOrcidExists(true);
+                console.log('not right', fieldValue);
+                SetFieldValue(jsonPath, '');
+                console.log('reset not right', fieldValue);
+            }
+            else {
+                setOrcidExists(false);
+                SetFieldValue(jsonPath, orcid.trim());
+                console.log('right', fieldValue);
+            }
+        } else {
+            setOrcidExists(false);
+            console.log('not not right', fieldValue);
+            SetFieldValue(jsonPath, '');
+            console.log('reset not not right', fieldValue);
+        }
+    };
+
     const SearchForOrcid = async () => {
         setLoading(true);
 
@@ -79,7 +118,12 @@ const ORCIDField = (props: Props) => {
 
     /* Class Names */
     const formFieldClass = classNames({
-        'b-error': (field.required && !isEmpty(values) && (typeof jp.value(values, field.jsonPath) !== 'string' || isEmpty(jp.value(values, field.jsonPath))))
+        'b-error': (
+            (field.required && !isEmpty(values) &&
+                (typeof jp.value(values, field.jsonPath) !== 'string' ||
+                isEmpty(jp.value(values, field.jsonPath))))
+            || orcidExists
+        )
     });
 
     return (
@@ -92,10 +136,11 @@ const ORCIDField = (props: Props) => {
                         {field.title}
                     </p>
                 </Col>
-                {(field.required && !isEmpty(values) && (typeof jp.value(values, field.jsonPath) !== 'string' || isEmpty(jp.value(values, field.jsonPath)))) &&
+                {((field.required && !isEmpty(values) && (typeof jp.value(values, field.jsonPath) !== 'string' || isEmpty(jp.value(values, field.jsonPath)))) || orcidExists) &&
                     <Col className="d-flex align-items-center">
                         <p className="fs-5 fs-lg-4 tc-error">
-                            This field is required 
+
+                            {orcidExists ?  "This ORCID number already exists in the database" : "This field is required"  }
                         </p>
                     </Col>
                 }
@@ -151,19 +196,7 @@ const ORCIDField = (props: Props) => {
                             placeholder="Select an option"
                             className={formFieldClass}
                             onChange={(dropdownOption) => {
-                                let jsonPath: string = '';
-
-                                /* Format JSON path */
-                                field.jsonPath.split('][').forEach(pathSegment => {
-                                    const localPathSegment = pathSegment.replace('$', '').replace('[', '').replace(']', '').replaceAll("'", '');
-
-                                    if (!isNaN(Number(localPathSegment))) {
-                                        jsonPath = jsonPath.concat(`[${localPathSegment}]`);
-                                    } else {
-                                        jsonPath = jsonPath.concat(`['${localPathSegment}']`);
-                                    }
-                                });
-                                SetFieldValue(jsonPath, dropdownOption?.value);
+                                validateOrcid(dropdownOption?.value)
                             }}
                         />
                     </Col>

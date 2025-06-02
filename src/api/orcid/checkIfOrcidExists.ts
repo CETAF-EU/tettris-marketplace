@@ -34,7 +34,6 @@ const checkIfOrcidExists = async (orcid: string): Promise<TaxonomicExpert | null
         });
 
         const orcidExist = taxonomicExperts[0].taxonomicExpert?.['schema:person']?.['schema:orcid'] as string || null;
-        console.log('Orcid existence check result:', orcidExist)
         if (orcidExist === orcid)
         {
             console.log('Orcid exists:', orcidExist);
