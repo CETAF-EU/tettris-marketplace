@@ -61,7 +61,7 @@ type Props = {
 const FormBuilder = (props: Props) => {
     const { formTemplate,OrcidData, TaxonomicExpert, Email, SetCompleted } = props;
 
-    console.log('taxonomic expert', TaxonomicExpert);
+    console.log('taxonomicExpert', TaxonomicExpert);
     /* Hooks */
     const captchaHook = useCaptchaHook({
         siteKey: import.meta.env.VITE_FRIENDLY_CAPTCHA_SITEKEY,
@@ -263,7 +263,6 @@ const FormBuilder = (props: Props) => {
         });
     };
 
-    console.log('values', initialFormValues);
     return (
         <div>
             <Formik initialValues={initialFormValues}
@@ -353,7 +352,13 @@ const FormBuilder = (props: Props) => {
                             } finally {
                                 setLoading(false);
                             };
-                        } else if (window.location.pathname.includes('/te')) {  
+                        } else if (window.location.pathname.includes('/te')) {
+                            if (OrcidData?.orcid) {
+                                jp.value(values, "$['schema:person']['schema:orcid']", OrcidData.orcid);
+                            }
+                            if (Email) {
+                                jp.value(values, "$['schema:person']['schema:email']", Email);
+                            }
                             let taxonomicExpertRecord = cloneDeep(values);
 
                             RemoveEmptyProperties(taxonomicExpertRecord);

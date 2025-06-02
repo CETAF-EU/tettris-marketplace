@@ -34,7 +34,6 @@ const checkIfEmailExists = async (email: string, password?: string): Promise<Tax
         });
 
         const emailExist = taxonomicExperts[0].taxonomicExpert?.['schema:person']?.['schema:email'] as string || null;
-        console.log('Email existence check result:', emailExist);
         if (emailExist === email)
         {
             console.log('Email exists:', emailExist);
@@ -46,13 +45,13 @@ const checkIfEmailExists = async (email: string, password?: string): Promise<Tax
             console.log('Email does not match:', emailExist);
             return false;
         }
-        const passwpordExist = taxonomicExperts[0].taxonomicExpert?.['schema:person']?.['schema:password'] as string || null;
-        if (password && passwpordExist === password) {
-            console.log('Password matches for email:', email);
-            return true;
-        }
-        console.log('Password does not match for email:', email);
-        return taxonomicExperts[0];
+        // const passwpordExist = taxonomicExperts[0].taxonomicExpert?.['schema:person']?.['schema:password'] as string || null;
+        // if (password && passwpordExist === password) {
+        //     console.log('Password matches for email:', email);
+        //     return true;
+        // }
+        // console.log('Password does not match for email:', email);
+        return true;
     } catch (error) {
         console.error('Email existence check failed:', error);
         return false;

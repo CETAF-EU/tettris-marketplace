@@ -12,13 +12,6 @@
                 "required": true
             },
             {
-                "jsonPath": "$['schema:person']['schema:email']",
-                "title": "Email",
-                "type": "string",
-                "description": "The email address of the taxonomic expert.",
-                "required": true
-            },
-            {
                 "jsonPath": "$['schema:person']['schema:orcid']",
                 "title": "ORCID",
                 "description": "A unique identifier to identify the author; ORCID identifiers are valid",
