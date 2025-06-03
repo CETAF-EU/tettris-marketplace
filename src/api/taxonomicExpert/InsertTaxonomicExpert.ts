@@ -16,7 +16,6 @@ const InsertTaxonomicExpert = async ({ taxonomicExpertRecord }: { taxonomicExper
     let taxonomicExpert: TaxonomicExpert | undefined;
 
     if (taxonomicExpertRecord) {
-        console.log("Inserting Taxonomic Expert", taxonomicExpertRecord);
         const imageValue = taxonomicExpertRecord['schema:person']['schema:ProfilePicture'];
 
         if (imageValue) {
