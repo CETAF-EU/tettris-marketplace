@@ -411,7 +411,7 @@
                 "title": "Expertise biography",
                 "description": "A brief description of your expertise, skills and services.",
                 "type": "string",
-                "maxChars": 200,
+                "maxChars": 500,
                 "required": false
             },
             {
@@ -526,7 +526,6 @@
                     "North America",
                     "South America",
                     "Pacific",
-                    "World/NA",
                     "Arctic Ocean",
                     "Indian Ocean",
                     "North Atlantic: unknown",
