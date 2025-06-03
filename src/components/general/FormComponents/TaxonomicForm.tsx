@@ -137,10 +137,16 @@ const TaxonomicForm = () => {
 
                                                             const form = e.currentTarget as HTMLFormElement;
                                                             const email = form.elements.namedItem('email') as HTMLInputElement;
+                                                            const emailConfirm = form.elements.namedItem('emailConfirm') as HTMLInputElement;
                                                             const emailValue = email.value.trim();
+                                                            const emailConfirmValue = emailConfirm.value.trim();
                                                             const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
                                                             if (!emailValid) {
-                                                                setLoginError('Invalid email or password.');
+                                                                setLoginError('Invalid email.');
+                                                                return;
+                                                            }
+                                                            if (emailValue !== emailConfirmValue) {
+                                                                setLoginError('Email addresses do not match.');
                                                                 return;
                                                             }
                                                             const exist = await checkIfEmailExists(emailValue);
@@ -160,6 +166,16 @@ const TaxonomicForm = () => {
                                                         <div className="mb-3">
                                                             <label htmlFor="email" className="form-label">Email address</label>
                                                             <input type="email" className={`form-control${loginError ? ' is-invalid' : ''}`} id="email" name="email" required />
+                                                        </div>
+                                                        <div className="mb-3">
+                                                            <label htmlFor="emailConfirm" className="form-label">Confirm Email address</label>
+                                                            <input
+                                                                type="email"
+                                                                className={`form-control${loginError ? ' is-invalid' : ''}`}
+                                                                id="emailConfirm"
+                                                                name="emailConfirm"
+                                                                required
+                                                            />
                                                         </div>
                                                         <button type="submit" className="btn btn-primary mt-2">
                                                             {'Register'}
