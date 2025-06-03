@@ -53,7 +53,7 @@ const TopBar = (props: Props) => {
     const { taxonomicExpert } = props;
     
     const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] as string || 'Any name provided';
-    const orcidID = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:identifier'] as string || null;
+    const orcidID = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:orcid'] as string || null;
     const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] as string || 'Any headline provided';
     const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] as string || 'Any location provided';
     const language = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language']?.join(' / ').toUpperCase() ?? 'Any languages provided';

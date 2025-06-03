@@ -103,10 +103,10 @@ const ExperienceBlock = (props: Props) => {
                 <Col>
                     <div className="h-100 b-tertiary px-4 py-3">
                         <Row className="d-flex align-items-center mb-3">
-                            <Col className="d-flex align-items-center">
+                            <Col lg='4' className="d-flex align-items-center">
                                 <p className='fw-bold'>Education level</p>
                             </Col>
-                            <Col lg='auto' className="d-flex align-items-center justify-content-center">
+                            <Col lg='8' className="d-flex align-items-center justify-content-center">
                                 <Row className="text-end">
                                     {educationLevel.map((level) => (
                                         <p key={level}>{level}</p>
