@@ -123,10 +123,9 @@ const WorldMap = (props: Props) => {
       }
     }
   }
-  console.log('Region', region);
-  const selectedMarineMarkers = marineMarkers.filter(marker => region?.includes(marker.name));
 
-  console.log('markers', selectedMarineMarkers);
+  const selectedMarineMarkers = marineMarkers.filter(marker => region?.includes(marker.name));
+  
   return (
     <div className="map-container" style={{
             backgroundColor: region?.includes("World Marine") ? "#b3d1ff" : "transparent", // Light blue for marine
