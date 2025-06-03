@@ -49,8 +49,8 @@ async def upload_image(
     file: UploadFile = File(...),
     _: None = Depends(limit_profile_picture)
 ):
-    suffix = Path(file.filename).suffix
-    filename = f"{uuid.uuid4()}{suffix}"
+    suffix = Path(file.filename).suffix.lower()
+    filename = f"{uuid.uuid4()}{suffix}".lower()
     file_path = UPLOAD_DIR / filename
 
     with open(file_path, "wb") as f:
