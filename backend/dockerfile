@@ -22,6 +22,7 @@ COPY ./backend .
 RUN echo "VITE_ORCID_CLIENT_ID=$VITE_ORCID_CLIENT_ID" >> .env
 RUN echo "VITE_ORCID_CLIENT_SECRET=$VITE_ORCID_CLIENT_SECRET" >> .env
 RUN echo "VITE_ORCID_REDIRECT_URI=$VITE_ORCID_REDIRECT_URI" >> .env
+RUN echo "VITE_IMAGE_API=$VITE_IMAGE_API" >> .env
 
 RUN mkdir -p /app/uploads
 # Run FastAPI with Uvicorn

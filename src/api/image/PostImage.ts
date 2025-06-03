@@ -25,6 +25,7 @@ export async function postImage(file: File | string): Promise<{ url: string }> {
         {
             headers: {
                 'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${import.meta.env.VITE_IMAGE_API}`,
             },
         }
     );

@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException, Query, status, Depends, Request
 from fastapi.staticfiles import StaticFiles
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pathlib import Path
 import shutil
 import uuid
@@ -32,10 +33,22 @@ MAX_PROFILE_PIC_SIZE = 2 * 1024 * 1024  # 2 MB
 ORCID_CLIENT_ID = os.getenv("VITE_ORCID_CLIENT_ID")
 ORCID_CLIENT_SECRET = os.getenv("VITE_ORCID_CLIENT_SECRET")
 ORCID_REDIRECT_URI = os.getenv("VITE_ORCID_REDIRECT_URI")
+IMAGE_API = os.getenv("VITE_IMAGE_API")
 
 class ORCIDCode(BaseModel):
     code: str
 
+security = HTTPBearer()
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    if token != IMAGE_API:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid token"
+        )
+
+# Size Limit
 async def limit_profile_picture(request: Request):
     content_length = request.headers.get("content-length")
     if content_length and int(content_length) > MAX_PROFILE_PIC_SIZE:
@@ -43,16 +56,15 @@ async def limit_profile_picture(request: Request):
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             detail="Profile picture too large (max 2 MB)."
         )
-    
+
+# Upload Endpoint
 @app.post("/api/upload-image")
 async def upload_image(
     file: UploadFile = File(...),
-    _: None = Depends(limit_profile_picture)
+    _: None = Depends(limit_profile_picture),
+    __: None = Depends(verify_token)
 ):
-    # Ensure the extension is lowercase (e.g., .jpg, .png)
     suffix = Path(file.filename).suffix.lower()
-    
-    # Create a safe, unique, lowercase filename
     filename = f"{uuid.uuid4()}{suffix}"
     file_path = UPLOAD_DIR / filename
 
@@ -60,7 +72,6 @@ async def upload_image(
         shutil.copyfileobj(file.file, f)
 
     return {"url": f"https://sandbox.cetaf.org/uploads/{filename}"}
-
 @app.get("/api/orcid/search")
 async def search_orcid(q: str = Query(..., min_length=1)):
     safe_query = quote_plus(q)
