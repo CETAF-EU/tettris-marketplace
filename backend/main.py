@@ -45,7 +45,7 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     if token != IMAGE_API:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Invalid token"
+            detail=token+"|"+IMAGE_API
         )
 
 # Size Limit
