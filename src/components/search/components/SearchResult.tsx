@@ -172,7 +172,7 @@ const SearchResult = (props: Props) => {
         const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] ?? '';
         const languages = (taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language'] || []).join(' / ').toUpperCase() || '';
         const discipline = taxonomicExpert?.taxonomicExpert?.['schema:Taxon']?.['schema:discipline'] || [];
-        
+        const subDiscipline = taxonomicExpert?.taxonomicExpert?.['schema:Taxon']?.['schema:additionalType'] || [];
         return (
             <div className={`${styles.searchResult} w-100 bgc-white mt-lg-1 pt-3 pb-2 px-3`}>
                 <button type="button"
@@ -180,36 +180,46 @@ const SearchResult = (props: Props) => {
                     onClick={() => SelectTaxonomicExpert(taxonomicExpert)}
                 >
                     <Col className="h-100 d-flex flex-column">
-                        {/* Title */}
-                        <Row>
+                        {/* Title, Headline */}
+                        <Row className="mb-2">
                             <Col>
                                 <p className="fs-4 fs-lg-default fw-bold textOverflow">{name}</p>
+                                <p className="fs-6 fs-lg-4 textOverflow">{headline}</p>
                             </Col>
                         </Row>
-                        {/*Headline, Taxonomic Range and profile picture */}
-                        <Row className='mb-2 justify-content-between'>
-                            <Col className=''>
-                                <Row className='mb-2'>
-                                    <Col>
-                                        <p className="fs-6 fs-lg-4  textOverflow">{headline}</p>
-                                    </Col>
-                                </Row>
+                        {/*Taxonomic Range and profile picture */}
+                        <Row className=' mb-1 justify-content-between'>
+                            <Col>
                                 <Row className='h-100'>
                                     <Col>
                                         <p className='fst-italic fs-4'>{discipline[0]}</p>
-                                        <p className='fst-italic fs-4'>{discipline[1]}</p>
-                                        <p className='fst-italic fs-4'>{discipline[2]}</p>
+                                        <p className='fst-italic fs-4'>{discipline[1] ?? subDiscipline[0]}</p>
+                                        <p className='fst-italic fs-4'>{discipline[2] ?? subDiscipline[1]}</p>
                                     </Col>
                                 </Row>
                             </Col>
                             <Col className="d-flex justify-content-end">
-                                <div className="h-100 w-100 overflow-hidden" style={{ maxWidth: '6rem', aspectRatio: '1 / 1' }}>
-                                    <img 
-                                        src={logoImage} 
-                                        alt="Logo" 
-                                        className="h-100 w-100 object-fit-contain"
+                                <div
+                                    style={{
+                                        width: '5rem',
+                                        height: '5rem',
+                                        overflow: 'hidden',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                    >
+                                    <img
+                                        src={logoImage}
+                                        alt="Profile"
+                                        style={{
+                                        maxWidth: '100%',
+                                        maxHeight: '100%',
+                                        objectFit: 'contain',
+                                        display: 'block'
+                                        }}
                                     />
-                                </div>
+                                    </div>
                             </Col>
                         </Row>
                         {/* Languages and countries */}

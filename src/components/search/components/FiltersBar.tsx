@@ -167,7 +167,7 @@ const FiltersBar = (props: Props) => {
         }, [values.serviceType]);
 
         return (
-            <Form>
+            <Form translate="no">
                 <Row className="align-items-end">
                     {/* Search Bar */}
                     <Col 
