@@ -411,7 +411,7 @@
                 "title": "Expertise biography",
                 "description": "A brief description of your expertise, skills and services.",
                 "type": "string",
-                "maxChars": 200,
+                "maxChars": 500,
                 "required": false
             },
             {
