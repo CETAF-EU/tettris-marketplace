@@ -131,7 +131,8 @@ const FiltersBar = (props: Props) => {
                 initialValues[filter.name] = filter.default ?? '';
             }
         });
-
+        searchParams.delete('query');
+        initialValues['query'] = '';
         setSearchParams(searchParams);
         setInitialValues({ ...initialValues });
     };
