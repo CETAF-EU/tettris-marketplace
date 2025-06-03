@@ -49,8 +49,11 @@ async def upload_image(
     file: UploadFile = File(...),
     _: None = Depends(limit_profile_picture)
 ):
+    # Ensure the extension is lowercase (e.g., .jpg, .png)
     suffix = Path(file.filename).suffix.lower()
-    filename = f"{uuid.uuid4()}{suffix}".lower()
+    
+    # Create a safe, unique, lowercase filename
+    filename = f"{uuid.uuid4()}{suffix}"
     file_path = UPLOAD_DIR / filename
 
     with open(file_path, "wb") as f:
