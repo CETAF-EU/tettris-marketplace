@@ -2,6 +2,7 @@ import {
   ComposableMap,
   Geographies,
   Geography,
+  Marker,
 } from 'react-simple-maps';
 
 // URL to the TopoJSON world map
@@ -67,14 +68,23 @@ const pacificIslands = [
   "Papua New Guinea", "Samoa", "Solomon Is.", "Tonga", "Tuvalu", "Vanuatu"
 ];
 
-const worldMarine = [
-  "Arctic Ocean", "Indian Ocean", "Southern Ocean", "North Atlantic: unknown",
-  "North Atlantic: deep sea", "North Atlantic: shelf area & adjacent sea",
-  "South Atlantic: unknown", "South Atlantic: deep sea",
-  "South Atlantic: shelf area & adjacent seas", "North Pacific: unknown",
-  "North Pacific: deep sea", "North Pacific: shelf area & adjacent seas",
-  "South Pacific: unknown", "South Pacific: deep sea",
-  "South Pacific: shelf area & adjacent seas"
+const marineMarkers: { name: string; coordinates: [number, number] }[] = [
+  { name: "Arctic Ocean", coordinates: [0, 85] },
+  { name: "Indian Ocean", coordinates: [80, -20] },
+  { name: "Southern Ocean", coordinates: [0, -60] },
+  { name: "North Atlantic: unknown", coordinates: [-40, 45] },
+  { name: "North Atlantic: deep sea", coordinates: [-30, 40] },
+  { name: "North Atlantic: shelf area & adjacent sea", coordinates: [-10, 50] },
+  { name: "South Atlantic: unknown", coordinates: [-20, -20] },
+  { name: "South Atlantic: deep sea", coordinates: [-10, -30] },
+  { name: "South Atlantic: shelf area & adjacent seas", coordinates: [0, -20] },
+  { name :"Pacific", coordinates: [-100, 0] },
+  { name: "North Pacific: unknown", coordinates: [-150, 30] },
+  { name: "North Pacific: deep sea", coordinates: [-160, 20] },
+  { name: "North Pacific: shelf area & adjacent seas", coordinates: [-140, 35] },
+  { name: "South Pacific: unknown", coordinates: [-130, -20] },
+  { name: "South Pacific: deep sea", coordinates: [-120, -30] },
+  { name: "South Pacific: shelf area & adjacent seas", coordinates: [-110, -25] },
 ];
 
 const worldUnknown = ["World/NA"];
@@ -90,7 +100,6 @@ const allRegions = {
   "North America": northAmericanCountries,
   "South America": southAmericanCountries,
   "Pacific Islands": pacificIslands,
-  "World Marine": worldMarine,
   WorldUnknown: worldUnknown,
 };
 
@@ -114,8 +123,16 @@ const WorldMap = (props: Props) => {
       }
     }
   }
+  console.log('Region', region);
+  const selectedMarineMarkers = marineMarkers.filter(marker => region?.includes(marker.name));
+
+  console.log('markers', selectedMarineMarkers);
   return (
-    <div className="map-container">
+    <div className="map-container" style={{
+            backgroundColor: region?.includes("World Marine") ? "#b3d1ff" : "transparent", // Light blue for marine
+            padding: "1rem", // optional styling
+            borderRadius: "0.5rem", // optional styling
+          }}>
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{
@@ -142,6 +159,18 @@ const WorldMap = (props: Props) => {
             })
           }
         </Geographies>
+        {selectedMarineMarkers.map(({ name, coordinates }) => (
+          <Marker key={name} coordinates={coordinates}>
+            <circle r={10} fill="#7ba9dc" stroke="#fff" strokeWidth={1} />
+            <text
+              textAnchor="middle"
+              y={-10}
+              style={{ fontFamily: "system-ui", fill: "#333", fontSize: 40 }}
+            >
+              {name}
+            </text>
+          </Marker>
+        ))}
       </ComposableMap>
     </div>
   );
