@@ -66,10 +66,10 @@ const ExperienceBlock = (props: Props) => {
             0: { color: "#3498db" }, // Filled sections (blue)
             1: { color: "#3498db" },
             2: { color: "#3498db" },
-            3: { color: "#e0e0e0" }, // Empty sections (gray)
-            4: { color: "#e0e0e0" },
-            5: { color: "#e0e0e0" },
-            6: { color: "#e0e0e0" },
+            3: { color: "#3498db" },
+            4: { color: "#3498db" },
+            5: { color: "#3498db" },
+            6: { color: "#3498db" },
         },
     };
     
