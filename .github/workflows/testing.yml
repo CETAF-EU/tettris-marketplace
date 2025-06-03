@@ -17,6 +17,7 @@ env:
   VITE_EMAILJS_USER_ID: ${{ secrets.VITE_EMAILJS_USER_ID }}
   VITE_ORCID_CLIENT_ID: ${{ secrets.VITE_ORCID_CLIENT_ID }}
   VITE_ORCID_CLIENT_SECRET: ${{ secrets.VITE_ORCID_CLIENT_SECRET }}
+  VITE_IMAGE_API: ${{ secrets.VITE_IMAGE_API }}
   VITE_ORCID_REDIRECT_URI: https://sandbox.cetaf.org/te/registerYourExpertise
   VITE_DEV: true
   
@@ -44,6 +45,7 @@ jobs:
         echo "VITE_ORCID_CLIENT_ID=${{ env.VITE_ORCID_CLIENT_ID }}" >> .env
         echo "VITE_ORCID_CLIENT_SECRET=${{ env.VITE_ORCID_CLIENT_SECRET }}" >> .env
         echo "VITE_ORCID_REDIRECT_URI=${{ env.VITE_ORCID_REDIRECT_URI }}" >> .env
+        echo "VITE_ORCID_REDIRECT_URI=${{ env.VITE_IMAGE_API }}" >> .env
         echo "VITE_DEV=true" >> .env
   
     - name: Install dependencies
@@ -72,6 +74,7 @@ jobs:
           --build-arg VITE_ORCID_CLIENT_ID=${{ env.VITE_ORCID_CLIENT_ID }} \
           --build-arg VITE_ORCID_CLIENT_SECRET=${{ env.VITE_ORCID_CLIENT_SECRET }} \
           --build-arg VITE_ORCID_REDIRECT_URI=${{ env.VITE_ORCID_REDIRECT_URI }} \
+          --build-arg VITE_IMAGE_API=${{ env.VITE_IMAGE_API }} \
           -f backend/Dockerfile \
           -t ${{ env.DOCKERHUB_REPOSITORY }}:backend-${{ env.DOCKER_IMAGE_TAG }} .
 
@@ -92,6 +95,7 @@ jobs:
           --build-arg VITE_ORCID_CLIENT_ID=${{ env.VITE_ORCID_CLIENT_ID }} \
           --build-arg VITE_ORCID_CLIENT_SECRET=${{ env.VITE_ORCID_CLIENT_SECRET }} \
           --build-arg VITE_ORCID_REDIRECT_URI=${{ env.VITE_ORCID_REDIRECT_URI }} \
+          --build-arg VITE_ORCID_REDIRECT_URI=${{ env.VITE_IMAGE_API }} \
           --build-arg VITE_DEV=true \
           -t ${{ env.DOCKERHUB_REPOSITORY }}:frontend-${{ env.DOCKER_IMAGE_TAG }} .
 
