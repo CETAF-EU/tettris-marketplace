@@ -19,13 +19,14 @@ export async function postImage(file: File | string): Promise<{ url: string }> {
         formData.append('file', file);
     }
 
+    const token = "Bearer " + import.meta.env.VITE_IMAGE_API;
     const response = await axios.post(
         'https://sandbox.cetaf.org/api/upload-image',
         formData,
         {
             headers: {
                 'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${import.meta.env.VITE_IMAGE_API}`,
+                'Authorization': token,
             },
         }
     );
