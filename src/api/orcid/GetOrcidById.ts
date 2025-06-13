@@ -23,7 +23,7 @@ export async function getOrcidById(orcidId: string): Promise<OrcidUser | null> {
         const user: OrcidUser = {
             orcid: data['orcid-identifier'].path,
             name: data['person']['name']['given-names'].value + ' ' + data['person']['name']['family-name'].value,
-            email: data['person']['emails']?.email?.[0]?.email || undefined,
+            email: data['person']['emails']?.email?.[0]?.email ?? undefined,
             otherDetails: data,
         };
 

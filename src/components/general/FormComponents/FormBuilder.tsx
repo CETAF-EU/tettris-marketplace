@@ -164,11 +164,7 @@ const FormBuilder = (props: Props) => {
             case 'multi-string':
                 return [''];
             case 'ror':
-                return {
-                    "@type": "schema:Organization",
-                    "schema:identifier": '',
-                    "schema:name": ''
-                };
+                return '';
             default:
                 return fieldConst ?? '';
         };
@@ -282,7 +278,6 @@ const FormBuilder = (props: Props) => {
                             }
                         });
                     };
-
                     const ValidateArrayComponent = (field: Dict) => {
                         Object.values(field).forEach(value => {
                             if (Array.isArray(value) && isEmpty(value)) {
