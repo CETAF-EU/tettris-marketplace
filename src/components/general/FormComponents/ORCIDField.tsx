@@ -69,20 +69,15 @@ const ORCIDField = (props: Props) => {
             const exists = await checkIfOrcidExists(orcid.trim());
             if (exists !== null) {
                 setOrcidExists(true);
-                console.log('not right', fieldValue);
                 SetFieldValue(jsonPath, '');
-                console.log('reset not right', fieldValue);
             }
             else {
                 setOrcidExists(false);
                 SetFieldValue(jsonPath, orcid.trim());
-                console.log('right', fieldValue);
             }
         } else {
             setOrcidExists(false);
-            console.log('not not right', fieldValue);
             SetFieldValue(jsonPath, '');
-            console.log('reset not not right', fieldValue);
         }
     };
 
@@ -90,7 +85,6 @@ const ORCIDField = (props: Props) => {
         setLoading(true);
 
         const orcids = await GetOrcidByName(query);
-        console.log(orcids);
         /* Reset field name */
         SetFieldValue(field.jsonPath.replace('$', ''), {
             "schema:identifier": '',
