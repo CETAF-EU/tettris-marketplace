@@ -443,6 +443,21 @@ const FormBuilder = (props: Props) => {
                         </Row>
                         <Row className="mt-3">
                             <Col>
+                                <div className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="submitOnceCheck"
+                                        required
+                                    />
+                                    <label className="form-check-label" htmlFor="submitOnceCheck">
+                                        I understand that I can only submit this form once.
+                                    </label>
+                                </div>
+                            </Col>
+                        </Row>
+                        <Row className="mt-3">
+                            <Col>
                                 <Row>
                                     <Col lg="auto">
                                         <Button type="submit"
