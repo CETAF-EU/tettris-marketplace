@@ -53,11 +53,7 @@ const RORField = (props: Props) => {
         const rors = await GetRORsByName({ query });
 
         /* Reset field name */
-        SetFieldValue(field.jsonPath.replace('$', ''), {
-            "schema:identifier": '',
-            "schema:name": '',
-            "schema:url": ''
-        });
+        SetFieldValue(field.jsonPath.replace('$', ''), '');
 
         /* Construct dropdown items from ROR */
         const dropdownOptions: DropdownItem[] = [
@@ -167,13 +163,16 @@ const RORField = (props: Props) => {
                                         jsonPath = jsonPath.concat(`['${localPathSegment}']`);
                                     }
                                 });
-
-                                SetFieldValue(jsonPath, {
-                                    "@type": "schema:Organization",
-                                    "schema:identifier": dropdownOption?.value,
-                                    "schema:name": dropdownOption?.label,
-                                    "schema:url": dropdownOption?.url
-                                });
+                                if (dropdownOption?.value === '') {
+                                    SetFieldValue(jsonPath, '');
+                                } else {
+                                    SetFieldValue(jsonPath, {
+                                        "@type": "schema:Organization",
+                                        "schema:identifier": dropdownOption?.value,
+                                        "schema:name": dropdownOption?.label,
+                                        "schema:url": dropdownOption?.url
+                                    });
+                                }
                             }}
                         />
                     </Col>

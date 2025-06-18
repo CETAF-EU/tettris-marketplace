@@ -164,11 +164,7 @@ const FormBuilder = (props: Props) => {
             case 'multi-string':
                 return [''];
             case 'ror':
-                return {
-                    "@type": "schema:Organization",
-                    "schema:identifier": '',
-                    "schema:name": ''
-                };
+                return '';
             default:
                 return fieldConst ?? '';
         };
@@ -282,7 +278,6 @@ const FormBuilder = (props: Props) => {
                             }
                         });
                     };
-
                     const ValidateArrayComponent = (field: Dict) => {
                         Object.values(field).forEach(value => {
                             if (Array.isArray(value) && isEmpty(value)) {
@@ -442,6 +437,21 @@ const FormBuilder = (props: Props) => {
                                     />
                                     <label className="form-check-label" htmlFor="policyCheck">
                                         I agree to the <a href="https://cetaf.org/privacy/" target="_blank" rel="noopener noreferrer">policy</a>
+                                    </label>
+                                </div>
+                            </Col>
+                        </Row>
+                        <Row className="mt-3">
+                            <Col>
+                                <div className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="submitOnceCheck"
+                                        required
+                                    />
+                                    <label className="form-check-label" htmlFor="submitOnceCheck">
+                                        I understand that I can only submit this form once.
                                     </label>
                                 </div>
                             </Col>

@@ -295,7 +295,7 @@
             {
                 "jsonPath": "$['schema:person']['schema:age']",
                 "title": "Age",
-                "description": "Select your birth year.",
+                "description": "Select your birth year. This information is for the dashboard which will show general trends in the age of taxonomists and will be shown anonymously.",
                 "type": "select",
                 "options": [
                     "2009",
@@ -388,7 +388,7 @@
             {
                 "jsonPath": "$['schema:person']['schema:gender']",
                 "title": "Gender",
-                "description": "Select your gender",
+                "description": "Select your gender. This is asked so that we understand the gender balance currently in taxonomy and will be presented anonymously in the dashboard.",
                 "type": "select",
                 "options": [
                     "Female",
@@ -425,7 +425,7 @@
                 "jsonPath": "$['schema:person']['schema:ProfilePicture']",
                 "title": "Profile image",
                 "description": "A link to the profile image of the taxonomic expert.",
-                "type": "string",
+                "type": "image",
                 "required": false
             }
         ]
