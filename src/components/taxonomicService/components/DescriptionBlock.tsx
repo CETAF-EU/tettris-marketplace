@@ -42,7 +42,7 @@ const DescriptionBlock = (props: Props) => {
         <div className={descriptionBlockClass}>
             <Row className="h-100">
                 {/* Preview image, if available */}
-                {taxonomicService.taxonomicService['schema:associatedMedia']?.length &&
+                {taxonomicService.taxonomicService['schema:associatedMedia']?.[0]?.['schema:contentUrl'] &&
                     <Col xs={{ span: 12 }} lg={{ span: 3 }}
                         className="h-100 bgc-white me-3 mb-3 mb-lg-0"
                     >

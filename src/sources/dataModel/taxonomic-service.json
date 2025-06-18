@@ -613,42 +613,39 @@
                                 "examples": [
                                     "This grant was given for exceptional performance"
                                 ]
+                            },
+                            "schema:funder": {
+                                "type": "object",                               
+                                "description": "An organization that supports (sponsors) something through some kind of financial contribution.",
+                                "properties": {
+                                    "@type": {
+                                        "type": "string",
+                                        "description": "The type of funder",
+                                        "const": "schema:Organization"
+                                    },
+                                    "schema:identifier": {
+                                        "type": "string",
+                                        "description": "A unique identifier to identify the funder organisation; ROR identifiers are valid",
+                                        "examples": [
+                                            "https://ror.org/0566bfb96"
+                                        ]
+                                    },
+                                    "schema:name": {
+                                        "type": "string",
+                                        "description": "The name of the funder (funding program)",
+                                        "examples": [
+                                            "Horizon 2020"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "@type",
+                                    "schema:identifier"
+                                ],
+                                "additionalProperties": false
                             }
                         },
                         "additionalProperties": false
-                    },
-                    "schema:funder": {
-                        "type": "array",
-                        "description": "An organization that supports (sponsors) something through some kind of financial contribution.",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "@type": {
-                                    "type": "string",
-                                    "description": "The type of funder",
-                                    "const": "schema:Organization"
-                                },
-                                "schema:identifier": {
-                                    "type": "string",
-                                    "description": "A unique identifier to identify the funder organisation; ROR identifiers are valid",
-                                    "examples": [
-                                        "https://ror.org/0566bfb96"
-                                    ]
-                                },
-                                "schema:name": {
-                                    "type": "string",
-                                    "description": "The name of the funder (funding program)",
-                                    "examples": [
-                                        "Horizon 2020"
-                                    ]
-                                }
-                            },
-                            "required": [
-                                "@type",
-                                "schema:identifier"
-                            ],
-                            "additionalProperties": false
-                        }
                     }
                 }
             },
