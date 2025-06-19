@@ -13,7 +13,7 @@ import { setIsApiOnline } from 'redux-store/AppStore';
 import { getTaxonomicService, setTaxonomicService } from 'redux-store/TaxonomicServiceSlice';
 
 /* Import Types */
-import { TaxonomicService as TaxonomicServiceType, Funder, Dict } from 'app/Types';
+import { TaxonomicService as TaxonomicServiceType, Funder } from 'app/Types';
 
 /* Import API */
 import GetTaxonomicService from 'api/taxonomicService/GetTaxonomicService';
@@ -170,46 +170,52 @@ const TaxonomicService = () => {
                                                 </Col>
                                             }
                                             {/* Show funding details if funding object is present in taxonomic service */}
-                                     {Array.isArray(taxonomicService.taxonomicService['schema:fundingScheme']) &&
-                                        taxonomicService.taxonomicService['schema:fundingScheme']
-                                            .map((scheme, index) => {
-                                                const hasFundingInfo =
-                                                    scheme['schema:award'] ??
-                                                    scheme['schema:funding']?.['schema:identifier'] ??
-                                                    scheme['schema:funding']?.['schema:description'] ??
-                                                    scheme['schema:funder'];
-                                                
-                                                const numberedName = (taxonomicService.taxonomicService['schema:fundingScheme']?.length ?? 0) > 1 ? `Funding ${index + 1}` : "Funding";
+                                    {Array.isArray(taxonomicService.taxonomicService['schema:fundingScheme']) &&
+                                        taxonomicService.taxonomicService['schema:fundingScheme'].map((scheme, index) => {
+                                            const hasFundingInfo =
+                                                scheme['schema:award'] ||
+                                                scheme['schema:funding']?.['schema:identifier'] ||
+                                                scheme['schema:funding']?.['schema:description'] ||
+                                                (Array.isArray(scheme['schema:funder']) && scheme['schema:funder'].length > 0);
 
-                                                return hasFundingInfo ? (
-                                                    <Col
-                                                        key={`funding-block-${scheme['@id'] ?? scheme['schema:award'] ?? index}`}
-                                                        xs={{ span: 12 }}
-                                                        lg={{ span: 4 }}
-                                                        className="mt-4 mt-lg-0 mb-lg-3"
-                                                    >
-                                                        <DetailsBlock
-                                                            name={numberedName}
-                                                            properties={{
-                                                                award: scheme['schema:award'],
-                                                                fundingId: scheme['schema:funding']?.['schema:identifier'],
-                                                                fundingDescription: scheme['schema:funding']?.['schema:description'],
-                                                                funders: scheme['schema:funder'] as Dict[] as Funder[],
-                                                            }}
-                                                        />
-                                                    </Col>
-                                                ) : null;
-                                            })}
+                                            const numberedName =
+                                                (taxonomicService.taxonomicService['schema:fundingScheme']?.length ?? 0) > 1
+                                                    ? `Funding ${index + 1}`
+                                                    : "Funding";
 
-
-                                            {/* Show multimedia block, if multimedia is present */}
-                                            {taxonomicService.taxonomicService['schema:associatedMedia'] &&
-                                                <Col xs={{ span: 12 }} lg
+                                            return hasFundingInfo ? (
+                                                <Col
+                                                    key={`funding-block-${scheme['schema:award'] ?? scheme['schema:funding']?.['schema:identifier'] ?? index}`}
+                                                    xs={{ span: 12 }}
+                                                    lg={{ span: 4 }}
                                                     className="mt-4 mt-lg-0 mb-lg-3"
                                                 >
-                                                    <MultimediaBlock multimediaItems={taxonomicService.taxonomicService['schema:associatedMedia']} />
+                                                    <DetailsBlock
+                                                        name={numberedName}
+                                                        properties={{
+                                                            award: scheme['schema:award'],
+                                                            fundingId: scheme['schema:funding']?.['schema:identifier'],
+                                                            fundingDescription: scheme['schema:funding']?.['schema:description'],
+                                                            funders: (() => {
+                                                                const funder = scheme['schema:funding']?.['schema:funder'];
+                                                                if (!funder) return undefined;
+                                                                return Array.isArray(funder) ? funder as unknown as Funder[] : [funder] as unknown as Funder[];
+                                                            })(),
+                                                        }}
+                                                    />
                                                 </Col>
-                                            }
+                                            ) : null;
+                                        })}
+
+                                        
+                                        {/* Show multimedia block, if multimedia is present */}
+                                        {taxonomicService.taxonomicService['schema:associatedMedia']?.[0]?.['schema:contentUrl'] &&
+                                            <Col xs={{ span: 12 }} lg
+                                                className="mt-4 mt-lg-0 mb-lg-3"
+                                            >
+                                                <MultimediaBlock multimediaItems={taxonomicService.taxonomicService['schema:associatedMedia']} />
+                                            </Col>
+                                        }
                                         </Row>
                                     </Col>
                                 </Row>
@@ -232,11 +238,11 @@ const TaxonomicService = () => {
                                     <Row className="mt-2">
                                         <Col>
                                             <p>
-                                                Retry or go back to <Link to="/"
-                                                    className="tc-primary"
-                                                >
+                                                Retry or go back to 
+                                                <Link to="/" className="tc-primary">
                                                     home
-                                                </Link></p>
+                                                </Link>
+                                            </p>
                                         </Col>
                                     </Row>
                                 </Col>

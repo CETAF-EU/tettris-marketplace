@@ -66,7 +66,7 @@ const ORCIDField = (props: Props) => {
             }
         });
         if (typeof orcid === 'string' && orcid.trim() !== '') {
-            const exists = await checkIfOrcidExists(orcid.trim());
+            const exists = window.location.href.includes('/ts/') ? null : await checkIfOrcidExists(orcid.trim());
             if (exists !== null) {
                 setOrcidExists(true);
                 SetFieldValue(jsonPath, '');

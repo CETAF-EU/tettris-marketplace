@@ -29,6 +29,7 @@ import { Button, Spinner } from "components/general/CustomComponents";
 import { Color, getColor } from "components/general/ColorPage";
 import ORCIDField from "./ORCIDField";
 import ImageField from "./ImageField";
+import MultiRORField from "./MultiRORField";
 
 
 /* Props Type */
@@ -426,7 +427,7 @@ const FormBuilder = (props: Props) => {
                                 </Col>
                             </Row>
                         }
-                        <Row className="mt-3">
+                        {!window.location.pathname.includes('/ts') && (<Row className="mt-3">
                             <Col>
                                 <div className="form-check">
                                     <input
@@ -440,22 +441,24 @@ const FormBuilder = (props: Props) => {
                                     </label>
                                 </div>
                             </Col>
-                        </Row>
-                        <Row className="mt-3">
-                            <Col>
-                                <div className="form-check">
-                                    <input
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        id="submitOnceCheck"
-                                        required
-                                    />
-                                    <label className="form-check-label" htmlFor="submitOnceCheck">
-                                        I understand that I can only submit this form once.
-                                    </label>
-                                </div>
-                            </Col>
-                        </Row>
+                        </Row>)}
+                        {!window.location.pathname.includes('/ts') && (
+                            <Row className="mt-3">
+                                <Col>
+                                    <div className="form-check">
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            id="submitOnceCheck"
+                                            required
+                                        />
+                                        <label className="form-check-label" htmlFor="submitOnceCheck">
+                                            I understand that I can only submit this form once.
+                                        </label>
+                                    </div>
+                                </Col>
+                            </Row>
+                        )}
                         <Row className="mt-3">
                             <Col>
                                 <Row>
@@ -527,6 +530,13 @@ function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValu
         } case 'ror': {
             return <RORField field={field}
                 fieldValue={fieldValues as Dict}
+                values={values}
+                SetFieldValue={(fieldName: string, value: Dict) => {
+                    SetFieldValue?.(fieldName, value);
+                } } />;
+        } case 'multi-ror': {
+            return <MultiRORField field={field}
+                fieldValue={fieldValues as Dict[]}
                 values={values}
                 SetFieldValue={(fieldName: string, value: Dict) => {
                     SetFieldValue?.(fieldName, value);
