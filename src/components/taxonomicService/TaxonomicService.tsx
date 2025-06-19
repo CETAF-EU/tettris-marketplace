@@ -238,11 +238,11 @@ const TaxonomicService = () => {
                                     <Row className="mt-2">
                                         <Col>
                                             <p>
-                                                Retry or go back to <Link to="/"
-                                                    className="tc-primary"
-                                                >
+                                                Retry or go back to 
+                                                <Link to="/" className="tc-primary">
                                                     home
-                                                </Link></p>
+                                                </Link>
+                                            </p>
                                         </Col>
                                     </Row>
                                 </Col>

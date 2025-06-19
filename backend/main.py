@@ -18,9 +18,9 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # or ["http://localhost:3000"] for specific origin
+    allow_origins=["https://marketplace.cetaf.org", "https://sandbox.cetaf.org"],
     allow_credentials=True,
-    allow_methods=["*"],  # or ["GET", "POST", "OPTIONS"]
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
