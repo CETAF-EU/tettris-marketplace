@@ -157,7 +157,6 @@ const SearchResult = (props: Props) => {
     }
     else if (taxonomicExpert) {
         /* Base variables */
-        const logoImage = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:ProfilePicture'] as string || 'https://i.pinimg.com/236x/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg';
         const id = taxonomicExpert.taxonomicExpert['@id'].replace(import.meta.env.VITE_HANDLE_URL as string, '');
         const url = `/te/${id}`;
 
@@ -173,7 +172,8 @@ const SearchResult = (props: Props) => {
             dispatch(setTaxonomicExpert(data));
             navigate(url);
         };
-
+        
+        const logoImage = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:ProfilePicture'] as string || 'https://i.pinimg.com/236x/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg';
         const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] ?? '';
         const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] ?? '';
         const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] ?? '';
