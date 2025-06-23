@@ -65,6 +65,7 @@ const TopBar = (props: Props) => {
     const personalLinks = Array.isArray(taxonomicExpert?.taxonomicExpert?.['schema:person']?.["schema:links"])
         ? taxonomicExpert.taxonomicExpert['schema:person']["schema:links"].flat()
         : null;
+    const datePublished = taxonomicExpert?.taxonomicExpert?.['schema:datePublished'] as string || null;
     return (<>
         <Col lg='auto' className="mb-3">
             <Row className="text-center">
@@ -150,6 +151,14 @@ const TopBar = (props: Props) => {
                             ) : null
                         ))
                     ) : null}
+                </Col>
+            </Row>
+            <Row className="justify-content-center text-center mt-5 mb-3">
+                <Col xs="auto" className='text-center'>
+                    {datePublished ? (
+                        <p className="fw-lightBold">Last update on {new Date(datePublished).toLocaleDateString()}</p>
+                    ) : (
+                        <p className="fw-lightBold">No update date provided</p>)}
                 </Col>
             </Row>
         </Col>
