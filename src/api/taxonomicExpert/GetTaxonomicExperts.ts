@@ -29,7 +29,9 @@ const GetTaxonomicExperts = async ({ pageNumber, pageSize, searchFilters }: { pa
             if (key === 'query') {
                 /* Set query to name search */
                 const escaped = value.replace(/([*?\\:])/g, '\\$1');
-                filters = filters.concat(` AND (/taxonomicExpert/schema\\:person/schema\\:name:${escaped}*)`);
+                filters = filters.concat(` AND (/taxonomicExpert/schema\\:person/schema\\:name:${escaped}*) OR
+                    (/taxonomicExpert/schema\\:person/schema\\:name:${escaped}~10)`
+                );
             }
             if (key === 'location') {
                 filters = filters.concat(` AND /taxonomicExpert/schema\\:person/schema\\:location:${value}`);            
