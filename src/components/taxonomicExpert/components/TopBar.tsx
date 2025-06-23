@@ -79,7 +79,7 @@ const TopBar = (props: Props) => {
                 <Col xs={12} md="auto"> 
                     {orcidID ? (
                     <a href={"https://orcid.org/" + orcidID} target="_blank" rel="noopener noreferrer">
-                        <p className="fw-lightBold bi bi-link-45deg"> {orcidID}</p>
+                        <p className="fw-lightBold bi bi-link-45deg"> ORCID number</p>
                     </a>
                     ) : (
                     <p className="fw-lightBold bi bi-link-45deg"> Any orcid ID provided</p>
