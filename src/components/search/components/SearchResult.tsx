@@ -38,26 +38,29 @@ const SearchResult = (props: Props) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
+    const id = taxonomicService?.taxonomicService['@id'].replace(import.meta.env.VITE_HANDLE_URL as string, '') ?? taxonomicExpert?.taxonomicExpert['@id'].replace(import.meta.env.VITE_HANDLE_URL as string, '');
+    const url = taxonomicService ? `/ts/${id}` : `/te/${id}`;
+    
+    const handleClick = (
+        e: React.MouseEvent<HTMLAnchorElement>,
+        data: TaxonomicService | TaxonomicExpert
+    ) => {
+        if (
+            e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0
+        ) return; // laisses le comportement natif (nouvel onglet, etc.)
+
+        e.preventDefault();
+        if (taxonomicService) {
+            dispatch(setTaxonomicService(data as TaxonomicService));
+        } else {
+            dispatch(setTaxonomicExpert(data as TaxonomicExpert));
+        }
+        navigate(url);
+    }
   
 
     if (taxonomicService)
     {
-        const id = taxonomicService.taxonomicService['@id'].replace(import.meta.env.VITE_HANDLE_URL as string, '');
-        const url = `/ts/${id}`;
-
-        const handleClick = (
-        e: React.MouseEvent<HTMLAnchorElement>,
-        data: TaxonomicService
-        ) => {
-            if (
-                e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0
-            ) return; // laisses le comportement natif (nouvel onglet, etc.)
-
-            e.preventDefault();
-            dispatch(setTaxonomicService(data));
-            navigate(url);
-        };
-
         /* Base variables */
         const logoImage: string | undefined = taxonomicService?.taxonomicService['schema:service']['schema:logo'];
 
@@ -157,22 +160,6 @@ const SearchResult = (props: Props) => {
     }
     else if (taxonomicExpert) {
         /* Base variables */
-        const id = taxonomicExpert.taxonomicExpert['@id'].replace(import.meta.env.VITE_HANDLE_URL as string, '');
-        const url = `/te/${id}`;
-
-        const handleClick = (
-        e: React.MouseEvent<HTMLAnchorElement>,
-        data: TaxonomicExpert
-        ) => {
-            if (
-                e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0
-            ) return; // laisses le comportement natif (nouvel onglet, etc.)
-
-            e.preventDefault();
-            dispatch(setTaxonomicExpert(data));
-            navigate(url);
-        };
-        
         const logoImage = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:ProfilePicture'] as string || 'https://i.pinimg.com/236x/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg';
         const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] ?? '';
         const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] ?? '';
