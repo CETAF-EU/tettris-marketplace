@@ -424,7 +424,7 @@
             {
                 "jsonPath": "$['schema:person']['schema:ProfilePicture']",
                 "title": "Profile image",
-                "description": "Upload a profile image that represents you as a taxonomic expert. This image will be displayed on your profile page.",
+                "description": "Profile image (max 2MB). This will be displayed on your profile page.",
                 "type": "image",
                 "required": false
             }
