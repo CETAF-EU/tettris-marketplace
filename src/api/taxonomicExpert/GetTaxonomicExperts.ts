@@ -30,7 +30,11 @@ const GetTaxonomicExperts = async ({ pageNumber, pageSize, searchFilters }: { pa
                 /* Set query to name search */
                 const escaped = value.replace(/([*?\\:])/g, '\\$1');
                 filters = filters.concat(` AND (/taxonomicExpert/schema\\:person/schema\\:name:${escaped}*) OR
-                    (/taxonomicExpert/schema\\:person/schema\\:name:${escaped}~10)`
+                    (/taxonomicExpert/schema\\:person/schema\\:name:${escaped}~10) OR
+                    (/taxonomicExpert/schema\\:Taxon/schema\\:spatialCoverage/_:${escaped}*) OR
+                    (/taxonomicExpert/schema\\:Taxon/schema\\:spatialCoverage/_:${escaped}~10) OR
+                    (/taxonomicExpert/schema\\:occupation/schema\\:educationalLevel/_:${escaped}*) OR
+                    (/taxonomicExpert/schema\\:occupation/schema\\:educationalLevel/_:${escaped}~10)`
                 );
             }
             if (key === 'location') {
