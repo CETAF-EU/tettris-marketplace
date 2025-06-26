@@ -45,6 +45,7 @@ const FiltersBar = ({ ToggleFilters }: Props) => {
         }))
     }));
 
+    // Check if the serviceType in searchParams has changed
     const newServiceType = searchParams.get('serviceType') ?? '';
     if (newServiceType !== currentServiceType) {
         // Clear all filters except serviceType and query when service type changes
