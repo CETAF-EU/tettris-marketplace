@@ -1,8 +1,8 @@
 /* Import Dependencies */
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
-import { Formik, Form, FormikProps } from 'formik';
-import { useEffect, useState } from 'react';
+import { Formik, Form } from 'formik';
+import { useMemo } from 'react';
 import { Row, Col } from 'react-bootstrap';
 
 /* Import Hooks */
@@ -28,229 +28,167 @@ import { Color, getColor } from 'components/general/ColorPage';
 
 /* Props Type */
 type Props = {
-    ToggleFilters?: Function
+  ToggleFilters?: Function;
 };
 
-/** Component that renders the Filters Bar on the Search page */
-const FiltersBar = (props: Props) => {
-    const { ToggleFilters } = props;
+const FiltersBar = ({ ToggleFilters }: Props) => {
+  const [searchParams, setSearchParams] = useSearchParams();
 
-    /* Hooks */
-    const [searchParams, setSearchParams] = useSearchParams();
+  const FiltersType: FilterType[] = import.meta.env.VITE_DEV === 'true' ? [...DevFilters.filters] : [...Filters.filters];
+  const taxonomicServicefilters: FilterType[] = [...TaxonomicServiceFilters.taxonomicServiceFilters];
+  const taxonomicExpertFilters: FilterType[] = TaxonimicExpertFilters.taxonomicExpertFilters.map(filter => ({
+    ...filter,
+    options: filter.options.map(option => ({
+      ...option,
+      value: option.value ?? ''
+    }))
+  }));
 
-    /* State */
-    const [currentServiceType, setCurrentServiceType] = useState(searchParams.get('serviceType') ?? '');
-    const [initialValues, setInitialValues] = useState<Dict>({});
+  const determineFilters = (): { filters: FilterType[], hint: string } => {
+    const filters: FilterType[] = [];
+    const serviceType = searchParams.get('serviceType');
+    let hint = "pollinator academy";
 
-    /* Base variables */
-    const FiltersType: FilterType[] = import.meta.env.VITE_DEV === 'true' ? [...DevFilters.filters] : [...Filters.filters];
-    const taxonomicServicefilters: FilterType[] = [...TaxonomicServiceFilters.taxonomicServiceFilters];
-    const taxonomicExpertFilters: FilterType[] = TaxonimicExpertFilters.taxonomicExpertFilters.map(filter => ({
-        ...filter,
-        options: filter.options.map(option => ({
-            ...option,
-            value: option.value ?? ''
-        }))
-    }));
+    if (!serviceType) {
+      filters.push(...taxonomicServicefilters);
+    } else if (serviceType === 'taxonomicExpert') {
+      let subGroup = "";
+      if (searchParams.get('taxonomicGroup')) {
+        subGroup = "sub" + (searchParams.get('taxonomicGroup') as string).charAt(0).toUpperCase() +
+          (searchParams.get('taxonomicGroup') as string).slice(1) + "Group";
+      }
 
-    /* Determine filters based on service type */
-    const determineFilters = (): { filters: FilterType[], hint: string } => {
-        const filters: FilterType[] = [];
-        const serviceType = searchParams.get('serviceType');
-        let hint = "pollinator academy";
+      let i = 0;
+      while (i < taxonomicExpertFilters.length) {
+        const filter = taxonomicExpertFilters[i];
 
-        if (!serviceType) {
-            filters.push(...taxonomicServicefilters);
-        } else if (serviceType === 'taxonomicExpert') {
-            let subGroup = "";
-            if (searchParams.get('taxonomicGroup')) {
-                subGroup = "sub" + (searchParams.get('taxonomicGroup') as string).charAt(0).toUpperCase() + 
-                          (searchParams.get('taxonomicGroup') as string).slice(1) + "Group";
+        if (filter.name == "taxonomicGroup") {
+          filters.push(filter);
+          i++;
+
+          if (searchParams.get('taxonomicGroup')) {
+            while (i < taxonomicExpertFilters.length && !taxonomicExpertFilters[i].name.includes(subGroup)) {
+              i++;
             }
-            
-            let i = 0;
-            while (i < taxonomicExpertFilters.length) {
-                const filter = taxonomicExpertFilters[i];
+            filters.push(taxonomicExpertFilters[i++]);
 
-                if (filter.name == "taxonomicGroup") {
-                    filters.push(filter);
-                    i++;
-
-                    if (searchParams.get('taxonomicGroup')) {
-                        while (i < taxonomicExpertFilters.length && !taxonomicExpertFilters[i].name.includes(subGroup)) {
-                            i++;
-                        }
-                        filters.push(taxonomicExpertFilters[i++]);
-
-                        while (i < taxonomicExpertFilters.length && taxonomicExpertFilters[i].name.includes('sub')) {
-                            i++;
-                        }
-                    } else {
-                        filters.push(taxonomicExpertFilters[i++]);
-                        while (i < taxonomicExpertFilters.length && taxonomicExpertFilters[i].name.includes('sub')) {
-                            i++;
-                        }
-                    }
-                } else {
-                    filters.push(filter);
-                    i++;
-                }
+            while (i < taxonomicExpertFilters.length && taxonomicExpertFilters[i].name.includes('sub')) {
+              i++;
             }
-            hint = "John Doe";
+          } else {
+            filters.push(taxonomicExpertFilters[i++]);
+            while (i < taxonomicExpertFilters.length && taxonomicExpertFilters[i].name.includes('sub')) {
+              i++;
+            }
+          }
+        } else {
+          filters.push(filter);
+          i++;
         }
+      }
+      hint = "John Doe";
+    }
 
-        /* Set initial values */
-        filters.unshift(...FiltersType);
-        FiltersType.forEach((filter) => {
-            initialValues[filter.name] = searchParams.get(filter.name) ?? filter.default;
-        });
+    filters.unshift(...FiltersType);
+    return { filters, hint };
+  };
 
-        return { filters, hint };
-    };
+  const { filters, hint } = useMemo(() => determineFilters(), [searchParams.toString()]);
 
-    const { filters, hint } = determineFilters();
-
-    /* Effect to track serviceType changes in URL */
-    useEffect(() => {
-        const newServiceType = searchParams.get('serviceType') ?? '';
-        if (newServiceType !== currentServiceType) {
-            setCurrentServiceType(newServiceType);
-        }
-    }, [searchParams]);
-
-    /**
-     * Function that resets all search filters, except for taxonomic service type
-     */
-    const ResetSearchFilters = () => {
-        const serviceTypeValue = searchParams.get('serviceType');
-        filters.forEach(filter => {
-            if (filter.name === 'serviceType') {
-                initialValues[filter.name] = serviceTypeValue ?? filter.default ?? '';
-            } else {
-                searchParams.delete(filter.name);
-                initialValues[filter.name] = filter.default ?? '';
-            }
-        });
-        searchParams.delete('query');
-        initialValues['query'] = '';
-        setSearchParams(searchParams);
-        setInitialValues({ ...initialValues });
-    };
-
-    /* Class Names */
-    const serviceTypeClass = classNames({
-        'tr-smooth': true,
-        'tc-primary': !searchParams.get('serviceType'),
-        'tc-secondary': searchParams.get('serviceType') === 'referenceCollection',
-        'tc-tertiary': searchParams.get('serviceType') === 'taxonomicExpert'
+  const initialValues = useMemo(() => {
+    const values: Dict = { query: searchParams.get('query') ?? '' };
+    filters.forEach((filter) => {
+      values[filter.name] = searchParams.get(filter.name) ?? filter.default ?? '';
     });
-    const variant: Color = getColor(window.location) as Color;
+    return values;
+  }, [searchParams.toString(), filters]);
 
-    /* Formik content component */
-    const FormikContent = ({ values, setFieldValue, submitForm }: FormikProps<any>) => {
-        /* Effect to reset filters when serviceType changes */
-        useEffect(() => {
-            if (values.serviceType !== currentServiceType) {
-                // Reset all other filters to their defaults
-                filters.forEach(filter => {
-                    if (filter.name !== 'serviceType' && filter.default !== undefined) {
-                        setFieldValue(filter.name, filter.default);
-                        searchParams.delete(filter.name);
-                    }
-                });
-                
-                // Update current serviceType
-                setCurrentServiceType(values.serviceType);
-                
-                // Update URL params immediately
-                setSearchParams(searchParams);
-            }
-        }, [values.serviceType]);
+  const ResetSearchFilters = (resetForm: Function) => {
+    const newValues: Dict = {};
+    filters.forEach(filter => {
+      if (filter.name === 'serviceType') return; // don't reset serviceType
+      searchParams.delete(filter.name);
+      newValues[filter.name] = filter.default ?? '';
+    });
+    searchParams.delete('query');
+    newValues['query'] = '';
+    setSearchParams(searchParams);
+    resetForm({ values: { ...initialValues, ...newValues } });
+  };
 
-        return (
-            <Form translate="no">
-                <Row className="align-items-end">
-                    {/* Search Bar */}
-                    <Col 
-                        xs={12} 
-                        lg={filters.length > 4 ? 2 : 4} 
-                        className="mb-4 mb-lg-0"
-                    >
-                        <p className={`${serviceTypeClass} fs-5 fw-lightBold`}>Search query</p>
-                        <QueryBar name="query" placeholder={hint}>
-                            <FontAwesomeIcon icon={faMagnifyingGlass} />
-                        </QueryBar>
-                    </Col>
-            
-                    {/* Filters */}
-                    <Col>
-                        <Row>
-                            {filters.map((filter) => (
-                                <Col 
-                                    key={filter.name}
-                                    xs={12} 
-                                    lg={filters.length > 4 ? Math.max(3 / filters.length, 2) : 3}
-                                    className="mb-2 mb-lg-0"
-                                >
-                                    <Filter 
-                                        filter={filter}
-                                        currentValue={values[filter.name as keyof typeof values]}
-                                        hasDefault={!!filters.find(originalFilter => originalFilter.name === filter.name)?.default}
-                                        SetFilterValue={(value: string | number | boolean) => setFieldValue(filter.name, value)}
-                                        SubmitForm={() => submitForm()}
-                                    />
-                                </Col>
-                            ))}
-                        </Row>
-                    </Col>
-            
-                    {/* Search button */}
-                    <Col lg="auto" className="d-none d-lg-block">
-                        <Button type="submit" variant={variant}>
-                            <p>Search</p>
-                        </Button>
-                    </Col>
-            
-                    {/* Deselect all filters button */}
-                    <Col lg="auto" className="ps-0 d-none d-lg-block">
-                        <Button 
-                            type="button"
-                            variant="primary"
-                            className="bgc-error"
-                            OnClick={() => ResetSearchFilters()}
-                        >
-                            <FontAwesomeIcon icon={faFilterCircleXmark} size="lg" />
-                        </Button>
-                    </Col>
-                </Row>
-            </Form>                
-        );
-    };
+  const serviceTypeClass = classNames({
+    'tr-smooth': true,
+    'tc-primary': !searchParams.get('serviceType'),
+    'tc-secondary': searchParams.get('serviceType') === 'referenceCollection',
+    'tc-tertiary': searchParams.get('serviceType') === 'taxonomicExpert'
+  });
 
-    return (
-        <Formik 
-            initialValues={{
-                query: searchParams.get('query') ?? '',
-                ...initialValues
-            }}
-            enableReinitialize={true}
-            onSubmit={async (values) => {
-                await new Promise((resolve) => setTimeout(resolve, 100));
+  const variant: Color = getColor(window.location) as Color;
 
-                Object.entries(values).forEach(([key, value]) => {
-                    searchParams.delete(key);
-                    if (value && value !== 'taxonomicService') {
-                        searchParams.set(key, value);
-                    }
-                });
-
-                setSearchParams(searchParams);
-                ToggleFilters?.();
-            }}
-        >
-            {FormikContent}
-        </Formik>
-    );
-}
+  return (
+    <Formik
+      initialValues={initialValues}
+      enableReinitialize={true}
+      onSubmit={async (values) => {
+        Object.entries(values).forEach(([key, value]) => {
+          searchParams.delete(key);
+          if (value && value !== 'taxonomicService') {
+            searchParams.set(key, value);
+          }
+        });
+        setSearchParams(searchParams);
+        ToggleFilters?.();
+      }}
+    >
+      {({ values, setFieldValue, submitForm, resetForm }) => (
+        <Form translate="no">
+          <Row className="align-items-end">
+            <Col xs={12} lg={filters.length > 4 ? 2 : 4} className="mb-4 mb-lg-0">
+              <p className={`${serviceTypeClass} fs-5 fw-lightBold`}>Search query</p>
+              <QueryBar name="query" placeholder={hint}>
+                <FontAwesomeIcon icon={faMagnifyingGlass} />
+              </QueryBar>
+            </Col>
+            <Col>
+              <Row>
+                {filters.map((filter) => (
+                  <Col
+                    key={filter.name}
+                    xs={12}
+                    lg={filters.length > 4 ? Math.max(3 / filters.length, 2) : 3}
+                    className="mb-2 mb-lg-0"
+                  >
+                    <Filter
+                      filter={filter}
+                      currentValue={values[filter.name as keyof typeof values]}
+                      hasDefault={!!filters.find(originalFilter => originalFilter.name === filter.name)?.default}
+                      SetFilterValue={(value: string | number | boolean) => setFieldValue(filter.name, value)}
+                      SubmitForm={() => submitForm()}
+                    />
+                  </Col>
+                ))}
+              </Row>
+            </Col>
+            <Col lg="auto" className="d-none d-lg-block">
+              <Button type="submit" variant={variant}>
+                <p>Search</p>
+              </Button>
+            </Col>
+            <Col lg="auto" className="ps-0 d-none d-lg-block">
+              <Button
+                type="button"
+                variant="primary"
+                className="bgc-error"
+                OnClick={() => ResetSearchFilters(resetForm)}
+              >
+                <FontAwesomeIcon icon={faFilterCircleXmark} size="lg" />
+              </Button>
+            </Col>
+          </Row>
+        </Form>
+      )}
+    </Formik>
+  );
+};
 
 export default FiltersBar;
