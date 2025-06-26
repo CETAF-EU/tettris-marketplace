@@ -35,40 +35,65 @@ const Dropdown = ({
 	searchable = false,
 	onOpen,
 }: Props) => {
-	const [selectItems, setSelectItems] = useState<typeof items>(items);
+	const [selectItems, setSelectItems] = useState<typeof items>([]);
+
+	const menuPortalTarget = useRef<HTMLElement | null>(null);
 
 	useEffect(() => {
-		if (
-			(placeholder && !selectedItem && !items.find((item) => [placeholder, "Reset filter"].includes(item.label)))
-		) {
-			items.unshift({
+		menuPortalTarget.current = document.body;
+	}, []);
+
+	useEffect(() => {
+		const newItems = [...items];
+
+		const hasResetFilter = newItems.some((item) => item.label === "Reset filter");
+
+		// Always ensure "Reset filter" or placeholder is present at top when hasDefault is false
+		if (!hasDefault && !hasResetFilter) {
+			newItems.unshift({
+				label: "Reset filter",
+				value: "",
+			});
+		} else if (!hasDefault && hasResetFilter) {
+			newItems[0] = {
+				label: "Reset filter",
+				value: "",
+			};
+		} else if (placeholder && !selectedItem && !newItems.find((item) => item.label === placeholder)) {
+			newItems.unshift({
 				label: placeholder,
 				value: "",
 			});
 		}
-		setSelectItems([...items]);
-	}, [items, placeholder, selectedItem]);
+
+		setSelectItems(newItems);
+	}, [items, placeholder, selectedItem, hasDefault]);
 
 	const CheckItems = (option: SingleValue<DropdownItem> | undefined) => {
-		if ((option?.value || selectedItem) && !selectItems.find((item) => item.label === "Reset filter")) {
-			if (!hasDefault && selectItems[0].label !== placeholder) {
-				selectItems.unshift({
+		let updatedItems = [...selectItems];
+		const hasReset = updatedItems.some((item) => item.label === "Reset filter");
+
+		if ((option?.value || selectedItem) && !hasReset) {
+			if (!hasDefault && updatedItems[0].label !== placeholder) {
+				updatedItems.unshift({
 					label: "Reset filter",
 					value: "",
 				});
 			} else if (!hasDefault) {
-				selectItems[0].label = "Reset filter";
+				updatedItems[0] = {
+					label: "Reset filter",
+					value: "",
+				};
 			}
-		} else if (!option?.value && selectItems.find((item) => item.label === "Reset filter")) {
-			selectItems[0].label = placeholder ?? "Select an option";
+		} else if (!option?.value && hasReset) {
+			updatedItems[0] = {
+				label: placeholder ?? "Select an option",
+				value: "",
+			};
 		}
-		setSelectItems([...selectItems]);
-	};
 
-	const menuPortalTarget = useRef<HTMLElement | null>(null);
-	useEffect(() => {
-		menuPortalTarget.current = document.body;
-	}, []);
+		setSelectItems(updatedItems);
+	};
 
 	return (
 		<Select
