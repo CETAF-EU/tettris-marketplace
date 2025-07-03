@@ -95,7 +95,7 @@ const TopBar = (props: Props) => {
             </Row>
             <Row className="justify-content-center text-center custom-justify">
                 <Col xs={12}>
-                    <Row className="mt-5 d-none d-md-flex" />
+                    <Row className="mt-5 d-none d-md-flex custom-top" />
 
                     <Row className="mt-1 mb-3 justify-content-center custom-justify">
                         <Col xs="auto">
@@ -156,7 +156,8 @@ const TopBar = (props: Props) => {
                     ) : null}
                 </Col>
             </Row>
-            <Row className="justify-content-center text-center mt-5 mb-3">
+            <Row className="mt-5 d-none d-md-flex custom-top" />
+            <Row className="justify-content-center text-center mb-3">
                 <Col xs="auto" className='text-center'>
                     {datePublished ? (
                         <p className="fw-lightBold">Last update on {new Date(datePublished).toLocaleDateString()}</p>
