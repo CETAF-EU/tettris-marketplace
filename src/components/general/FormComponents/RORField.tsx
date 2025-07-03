@@ -65,8 +65,11 @@ const RORField = (props: Props) => {
         ];
 
         rors.forEach(ror => {
+            let label = ror?.names.find((nameObject: { lang: string, value: string }) => nameObject?.lang === 'en')?.value ?? ror?.names[0].value ?? '';
+            if (label !== '')
+                label += ' - ' + ror.id;
             dropdownOptions.push({
-                label: ror?.names.find((nameObject: { lang: string, value: string }) => nameObject?.lang === 'en')?.value ?? ror?.names[0].value ?? '',
+                label: label,
                 value: ror.id,
                 url: ror?.links?.find((link: { type: string, value: string }) => link.type === 'website')?.value ?? 'N/A'
             });
@@ -169,7 +172,7 @@ const RORField = (props: Props) => {
                                     SetFieldValue(jsonPath, {
                                         "@type": "schema:Organization",
                                         "schema:identifier": dropdownOption?.value,
-                                        "schema:name": dropdownOption?.label,
+                                        "schema:name": dropdownOption?.label.split(" - ")[0].trim(),
                                         "schema:url": dropdownOption?.url
                                     });
                                 }

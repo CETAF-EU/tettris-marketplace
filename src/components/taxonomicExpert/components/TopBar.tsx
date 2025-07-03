@@ -93,36 +93,39 @@ const TopBar = (props: Props) => {
                     <p className="fw-lightBold bi bi-globe2"> {language}</p>
                 </Col>
             </Row>
-            <Row className="justify-content-center text-center text-md-start">
-                <Row className='mt-5 d-none d-md-flex'></Row>
-                <Row className='mt-1 mb-3'>
-                    <Col xs={12} md="auto">
-                        <p className="fs-3 fw-bold">{headline}</p>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col xs={12} md="auto">
-                        <p className="fw-lightBold">{affiliationName}</p>
-                    </Col>
-                    <Col xs={12} md="auto">
-                        {affiliationURLText ? (
+            <Row className="justify-content-center text-center custom-justify">
+                <Col xs={12}>
+                    <Row className="mt-5 d-none d-md-flex" />
+
+                    <Row className="mt-1 mb-3 justify-content-center custom-justify">
+                        <Col xs="auto">
+                            <p className="fs-3 fw-bold text-center">{headline}</p>
+                        </Col>
+                    </Row>
+                    <Row className="justify-content-center text-center custom-justify">
+                        <Col xs={12} md="auto">
+                            <p className="fw-lightBold mb-1">{affiliationName}</p>
+                        </Col>
+                        <Col xs={12} md="auto">
+                            {affiliationURLText ? (
                             <a href={affiliationURLText} target="_blank" rel="noopener noreferrer">
                                 <i className="fw-lightBold bi bi-link-45deg"></i> URL
                             </a>
-                        ) : (
+                            ) : (
                             <i className="fw-lightBold bi bi-link-45deg">No URL provided</i>
-                        )}
-                    </Col>
-                    <Col xs={12} md="auto">
-                        {affiliationURL ? (
+                            )}
+                        </Col>
+                        <Col xs={12} md="auto">
+                            {affiliationURL ? (
                             <a href={affiliationURL} target="_blank" rel="noopener noreferrer">
                                 <i className="fw-lightBold bi bi-link-45deg"> ROR ID</i>
                             </a>
-                        ) : (
+                            ) : (
                             <i className="fw-lightBold bi bi-link-45deg">No ROR ID provided</i>
-                        )}
-                    </Col>
-                </Row>
+                            )}
+                        </Col>
+                    </Row>
+                </Col>
             </Row>
         </Col>
         <Col lg="2" className="d-none d-lg-block"></Col>

@@ -390,7 +390,7 @@ const FormBuilder = (props: Props) => {
 
                                                     {section.fields.map(field => (
                                                         <Row key={field.jsonPath}
-                                                            className="mt-3 mt-lg-2"
+                                                            className="mt-3 mt-lg-3"
                                                         >
                                                             <Col>
                                                                 {ConstructFormField(field, values, setFieldValue, jp.value(values, field.jsonPath))}

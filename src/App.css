@@ -31,6 +31,13 @@ html {
   }
 }
 
+@media (min-width: 992px) {
+  .custom-justify {
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+}
+
 .custom-card {
   border: 1px solid #ccc; /* Straight border */
   border-radius: 0; /* Remove rounded corners */
