@@ -41,6 +41,7 @@ const RORField = (props: Props) => {
     const [query, setQuery] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [dropdownOptions, setDropdownOptions] = useState<DropdownItem[] | undefined>();
+    const [NoAffiliation, setNoAffiliation] = useState<boolean>(false);
 
     /* Determine variant */
     const variant: Color = getColor(window.location) as Color;
@@ -81,7 +82,7 @@ const RORField = (props: Props) => {
 
     /* Class Names */
     const formFieldClass = classNames({
-        'b-error': (field.required && !isEmpty(values) && !jp.value(values, field.jsonPath)?.['schema:identifier'])
+        'b-error': (field.required && !isEmpty(values) && !jp.value(values, field.jsonPath)?.['schema:identifier'] && !NoAffiliation)
     });
 
     return (
@@ -139,6 +140,40 @@ const RORField = (props: Props) => {
                         </p>
                     </Button>
                 </Col>
+                {window.location.href.includes('/te/') && (
+                    <Col xs="auto" lg="auto">
+                        <Button type="button"
+                            variant={NoAffiliation ? 'primary' : variant}
+                            className="fs-5 fs-lg-4 mt-2 mt-lg-0"
+                            OnClick={() => {
+                                let jsonPath: string = '';
+                                
+                                /* Format JSON path */
+                                field.jsonPath.split('][').forEach(pathSegment => {
+                                    const localPathSegment = pathSegment.replace('$', '').replace('[', '').replace(']', '').replaceAll("'", '');
+                                    
+                                    if (!isNaN(Number(localPathSegment))) {
+                                        jsonPath = jsonPath.concat(`[${localPathSegment}]`);
+                                    } else {
+                                        jsonPath = jsonPath.concat(`['${localPathSegment}']`);
+                                    }
+                                });
+                                console.log('Setting ROR field to no affiliation', jsonPath);
+                                SetFieldValue(jsonPath, {
+                                    "@type": "schema:Organization",
+                                    "schema:identifier": '',
+                                    "schema:name": '',
+                                    "schema:url": ''
+                                });
+                                setNoAffiliation(!NoAffiliation);
+                            }}
+                        >
+                            <p>
+                                {NoAffiliation ? "✓ No affiliation" : "No affiliation"}
+                            </p>
+                        </Button>
+                    </Col>
+                )}
             </Row>
             {/* Display ROR selection dropdown if dropdown options is not undefiend */}
             {dropdownOptions &&
@@ -169,6 +204,7 @@ const RORField = (props: Props) => {
                                 if (dropdownOption?.value === '') {
                                     SetFieldValue(jsonPath, '');
                                 } else {
+                                    console.log('Setting ROR field', jsonPath, dropdownOption);
                                     SetFieldValue(jsonPath, {
                                         "@type": "schema:Organization",
                                         "schema:identifier": dropdownOption?.value,
