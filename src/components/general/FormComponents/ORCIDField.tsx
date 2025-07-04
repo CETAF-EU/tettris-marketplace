@@ -81,17 +81,19 @@ const ORCIDField = (props: Props) => {
         }
     };
 
-    const SearchForOrcid = async () => {
-        setLoading(true);
+const SearchForOrcid = async () => {
+    setLoading(true);
 
+    try {
         const orcids = await GetOrcidByName(query);
-        /* Reset field name */
+
+        // Reset field value
         SetFieldValue(field.jsonPath.replace('$', ''), {
             "schema:identifier": '',
             "schema:name": '',
         });
 
-        /* Construct dropdown items from ROR */
+        // Build dropdown options
         const dropdownOptions: DropdownItem[] = [
             {
                 label: 'Select an organisation',
@@ -104,11 +106,15 @@ const ORCIDField = (props: Props) => {
                 label: orcid?.name,
                 value: orcid?.identifier,
             });
-        })
+        });
 
         setDropdownOptions(dropdownOptions);
+    } catch (error) {
+        console.error("ORCID search failed:", error);
+    } finally {
         setLoading(false);
-    };
+    }
+};
 
     /* Class Names */
     const formFieldClass = classNames({
