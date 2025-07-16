@@ -166,7 +166,7 @@ const Home = () => {
                                         <Col xs={{ span: 4 }}
                                             lg={{ span: 4 }}
                                         >
-                                            <HomeCategory title="Expertise Taxonomists"
+                                            <HomeCategory title="Taxonomic Experts"
                                                 subTitle="Go engage"
                                                 count={counts.taxonomicExpertise}
                                                 link={import.meta.env.VITE_DEV === 'true' ? "/search?serviceType=taxonomicExpert" : "/taxonomicExpert"}

@@ -49,7 +49,7 @@ const TopBar = () => {
         textButton = "Suggest a new reference collection"        
     }
     else if (searchParams.get('serviceType') === 'taxonomicExpert') {
-        textButton = "Register your expertise"
+        textButton = "Add my expertise"
         path = "/te/registerYourExpertise"
     }
     const variant: Color = getColor(window.location) as Color;
