@@ -92,7 +92,7 @@ function TrainingCard({ data }: { readonly data: any }) {
                         <i className="bi bi-link-45deg me-2"></i> URL
                     </Card.Link>
                     <Card.Link href={availableThrough} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center">
-                        <i className="bi bi-link-45deg me-2"></i> Avaible though DEST
+                        <i className="bi bi-link-45deg me-2"></i> Available through DEST
                     </Card.Link>
                 </div>
             </Card.Body>

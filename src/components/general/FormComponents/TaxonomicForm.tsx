@@ -58,9 +58,9 @@ const TaxonomicForm = () => {
         <div className="h-100 d-flex flex-column">
             <Header />
 
-            <Container fluid className="flex-grow-1 overflow-hidden">
+            <Container fluid className="flex-grow-1 overflow-scroll">
                 <Row className="h-100">
-                    <Col xs={{ span: 10, offset: 1 }} lg={{ span: 6, offset: 3 }} className="h-100 pt-4 pt-lg-5 pb-4 overflow-scroll">
+                    <Col xs={{ span: 10, offset: 1 }} lg={{ span: 6, offset: 3 }} className="h-100 pt-4 pt-lg-5 pb-4">
                         <Row>
                             <Col>
                                 <BreadCrumbs />
