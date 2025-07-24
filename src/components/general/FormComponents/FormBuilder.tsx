@@ -516,10 +516,95 @@ function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValu
                 values={values}
                 SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)} />;
         } case 'multi-select': {
-            return <MultiSelectField field={field}
-                values={values}
-                SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
-                SetServiceTypes={field.title === 'Service Type' ? (serviceTypes: string[]) => setServiceTypes(serviceTypes) : undefined} />;
+            if (field.title === 'Taxonomic sub-discipline') {
+
+                // Define sub-disciplines for each main discipline
+                const disciplineSubgroups = {
+                    "botany": [
+                        "Algae",
+                        "Bryophytes",
+                        "Macrofungi, Lichens & Myxomycetes (Mycology)",
+                        "Plant Genetic Resources",
+                        "Pteridophytes",
+                        "Seed plants"
+                    ],
+                    
+                    "invertebrates": [
+                        "Arachnids",
+                        "Cnidaria (jellyfish, coral, anemones)",
+                        "Crustaceans & Myriapods",
+                        "Echinodermata (starfish, sea urchins, sea cucumbers)",
+                        "Insects",
+                        "Invertebrates Genetic Resources",
+                        "Mollusca (bivalves, gastropods, cephalopods)",
+                        "Porifera (Sponges)",
+                        "Other Invertebrate Zoology"
+                    ],
+                    
+                    "vertebrates": [
+                        "Amphibians",
+                        "Birds",
+                        "Fishes",
+                        "Mammals",
+                        "Reptiles",
+                        "Vertebrates Genetic Resources",
+                        "Other Vertebrate Zoology"
+                    ],
+                    
+                    "palaeontology": [
+                        "Fossil Invertebrates",
+                        "Fossil Plants & Fungi",
+                        "Fossil Vertebrates",
+                        "Other Palaeontology"
+                    ],
+                    
+                    "microbiology": [
+                        "Algae (in microbiology collection)",
+                        "Bacteria & Archaea",
+                        "Eukaryotic Microorganisms",
+                        "Microfungi (including moulds, yeasts)",
+                        "Phages",
+                        "Plasmids",
+                        "Protozoa",
+                        "Viruses",
+                        "Other Microbiology Objects (e.g. mixed or other kinds of microorganisms)"
+                    ],
+                    
+                    "ecoEnvDNA": [
+                        "ECO-DNA (environmental DNA)",
+                        "ECO-OTH"
+                    ]
+                };
+                
+                // Initialize empty options array
+                field.options = [];
+                
+                // Get the selected disciplines
+                const selectedDisciplines = Array.isArray(values['schema:Taxon']['schema:discipline']) 
+                  ? values['schema:Taxon']['schema:discipline'] 
+                  : [values['schema:Taxon']['schema:discipline']];
+                
+                // Add sub-disciplines for each selected discipline
+                selectedDisciplines.forEach(discipline => {
+                  const key = discipline as keyof typeof disciplineSubgroups;
+                  if (disciplineSubgroups[key]) {
+                    // Add the sub-disciplines to the options array
+                    disciplineSubgroups[key].forEach(subgroup => {
+                        field.options?.push(`${subgroup}`);
+                    });
+                  }
+                });
+                return <MultiSelectField field={field}
+                    values={values}
+                    SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
+                />;
+            }
+            else { 
+                return <MultiSelectField field={field}
+                    values={values}
+                    SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
+                    SetServiceTypes={field.title === 'Service Type' ? (serviceTypes: string[]) => setServiceTypes(serviceTypes) : undefined} />;
+            }
         } case 'orcid': {
             return <ORCIDField field={field}
                 fieldValue={fieldValues as Dict}
