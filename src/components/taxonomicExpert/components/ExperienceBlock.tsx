@@ -33,7 +33,7 @@ const ExperienceBlock = (props: Props) => {
         "16 - 20 years",
         "21 - 25 years",
         "26 - 30 years",
-        ">30 years"
+        "> 30 years"
     ]
 
     const index = experienceRanges.indexOf(yearsOfExperience)
@@ -48,13 +48,12 @@ const ExperienceBlock = (props: Props) => {
     ];
       
     const options = {
-        width: 400,
-        height: 100,
-        chartArea: { width: "80%", height: "20%" },
+        chartArea: { width: "95%", height: "30%" },
         bar: { groupWidth: "100%"},
         backgroundColor: "transparent",
         legend: { position: "none" },
         isStacked: true,
+        enableInteractivity: false,
         hAxis: {
             title: "Yrs",
             textStyle: { fontSize: 10 },
@@ -74,13 +73,13 @@ const ExperienceBlock = (props: Props) => {
     };
     
     const customTicks = [
-        { v: 0, f: "0-5" },
-        { v: 1, f: "6-10" },
-        { v: 2, f: "11-15" },
-        { v: 3, f: "16-20" },
-        { v: 4, f: "21-25" },
-        { v: 5, f: "26-30" },
-        { v: 6, f: ">30" },
+        { v: 0, f: "~ 0" },
+        { v: 1, f: "~ 5" },
+        { v: 2, f: "~ 10" },
+        { v: 3, f: "~ 15" },
+        { v: 4, f: "~ 20" },
+        { v: 5, f: "~ 25" },
+        { v: 6, f: "> 30" },
     ];
     
     // Apply the custom ticks to the hAxis (assuming you're using a Google Charts component)
@@ -102,41 +101,43 @@ const ExperienceBlock = (props: Props) => {
             <Row className="flex-grow-1">
                 <Col>
                     <div className="h-100 b-tertiary px-4 py-3">
-                        <Row className="d-flex align-items-center mb-3">
-                            <Col lg='4' className="d-flex align-items-center">
-                                <p className='fw-bold'>Education level</p>
+                        {/* Education level */}
+                        <Row className="align-items-center mb-3">
+                            <Col lg={4}>
+                                <p className="fw-bold mb-0">Education level</p>
                             </Col>
-                            <Col lg='8' className="d-flex align-items-center justify-content-center">
-                                <Row className="text-end">
-                                    {educationLevel.map((level) => (
-                                        <p key={level}>{level}</p>
-                                    ))}
-                                </Row>
-                            </Col>
-                        </Row>
-                        <Row className="d-flex align-items-center">
-                            <Col lg='4' className='d-flex align-items-center'>
-                                <p className='fw-bold'>Employment status</p>
-                            </Col>
-                            <Col lg='8' className='d-flex align-items-center justify-content-center'>
-                                <Row className="text-end">
-                                    {employmentType.map((employment) => (
-                                        <p key={employment}>{employment}</p>
-                                    ))}
-                                </Row>
+                            <Col lg={8} className="text-center">
+                                {educationLevel.map((level) => (
+                                    <p className="mb-0" key={level}>{level}</p>
+                                ))}
                             </Col>
                         </Row>
-                        <Row className="d-flex align-items-center">
-                            <Col className="d-flex align-items-center">
-                                <p className='fw-bold'>Years of experience</p>
+
+                        {/* Employment status */}
+                        <Row className="align-items-center mb-3">
+                            <Col lg={4}>
+                                <p className="fw-bold mb-0">Employment status</p>
                             </Col>
-                            <Col lg='auto' className="d-flex align-items-center overflow-hidden">
-                                <Chart
-                                    chartType="BarChart"
-                                    width="100%"
-                                    data={data}
-                                    options={options}
-                                />                          
+                            <Col lg={8} className="text-center">
+                                {employmentType.map((employment) => (
+                                    <p className="mb-0" key={employment}>{employment}</p>
+                                ))}
+                            </Col>
+                        </Row>
+
+                        {/* Years of experience */}
+                        <Row className="align-items-center">
+                            <Col lg={4}>
+                                <p className="fw-bold mb-0">Years of experience</p>
+                            </Col>
+                            <Col lg={8} className="d-flex justify-content-center">
+                                <div className="w-100" style={{ maxWidth: '25rem' }}>
+                                    <Chart
+                                        chartType="BarChart"
+                                        data={data}
+                                        options={options}
+                                    />
+                                </div>
                             </Col>
                         </Row>
                     </div>

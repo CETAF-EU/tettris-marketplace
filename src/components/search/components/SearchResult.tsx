@@ -1,5 +1,5 @@
 /* Import Dependencies */
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { format } from 'date-fns';
 import { Row, Col } from 'react-bootstrap';
@@ -38,24 +38,31 @@ const SearchResult = (props: Props) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
+    const id = taxonomicService?.taxonomicService['@id'].replace(import.meta.env.VITE_HANDLE_URL as string, '') ?? taxonomicExpert?.taxonomicExpert['@id'].replace(import.meta.env.VITE_HANDLE_URL as string, '');
+    const url = taxonomicService ? `/ts/${id}` : `/te/${id}`;
+    
+    const handleClick = (
+        e: React.MouseEvent<HTMLAnchorElement>,
+        data: TaxonomicService | TaxonomicExpert
+    ) => {
+        if (
+            e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0
+        ) return; // laisses le comportement natif (nouvel onglet, etc.)
+
+        e.preventDefault();
+        if (taxonomicService) {
+            dispatch(setTaxonomicService(data as TaxonomicService));
+        } else {
+            dispatch(setTaxonomicExpert(data as TaxonomicExpert));
+        }
+        navigate(url);
+    }
   
 
     if (taxonomicService)
     {
         /* Base variables */
         const logoImage: string | undefined = taxonomicService?.taxonomicService['schema:service']['schema:logo'];
-
-        /**
-         * Function for selecting a taxonomic service
-         * @param taxonomicService The selected taxonomic service
-         */
-        const SelectTaxonomicService = (taxonomicService: TaxonomicService) => {
-            /* Dispatch taxonomic service to store */
-            dispatch(setTaxonomicService(taxonomicService));
-
-            /* Navigate to the taxonomic service page */
-            navigate(`/ts/${taxonomicService.taxonomicService['@id'].replace(import.meta.env.VITE_HANDLE_URL as string, '')}`);
-        }
 
         /* ClassNames */
         const imageColClass = classNames({
@@ -68,9 +75,9 @@ const SearchResult = (props: Props) => {
 
         return (
             <div className={`${styles.searchResult} w-100 bgc-white mt-lg-1 pt-3 pb-2 px-3`}>
-                <button type="button"
-                    className="button-no-style"
-                    onClick={() => SelectTaxonomicService(taxonomicService)}
+                <Link
+                    to={url}
+                    onClick={(e) => handleClick(e, taxonomicService)}
                 >
                     <Row className="h-100">
                         {/* Basic column with all the details */}
@@ -147,26 +154,13 @@ const SearchResult = (props: Props) => {
                             </Row>
                         </Col>
                     </Row>
-                </button>
+                </Link>
             </div >
         );
     }
     else if (taxonomicExpert) {
         /* Base variables */
         const logoImage = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:ProfilePicture'] as string || 'https://i.pinimg.com/236x/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg';
-
-        /**
-         * Function for selecting a taxonomic Expert
-         * @param taxonomicExpert The selected taxonomic Expert
-         */
-        const SelectTaxonomicExpert = (taxonomicExpert: TaxonomicExpert) => {
-            /* Dispatch taxonomic expert to store */
-            dispatch(setTaxonomicExpert(taxonomicExpert));
-
-            /* Navigate to the taxonomic expert page */
-            navigate(`/te/${taxonomicExpert.taxonomicExpert['@id'].replace(import.meta.env.VITE_HANDLE_URL as string, '')}`);
-        }
-
         const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] ?? '';
         const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] ?? '';
         const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] ?? '';
@@ -175,9 +169,9 @@ const SearchResult = (props: Props) => {
         const subDiscipline = taxonomicExpert?.taxonomicExpert?.['schema:Taxon']?.['schema:additionalType'] || [];
         return (
             <div className={`${styles.searchResult} w-100 bgc-white mt-lg-1 pt-3 pb-2 px-3`}>
-                <button type="button"
-                    className="button-no-style"
-                    onClick={() => SelectTaxonomicExpert(taxonomicExpert)}
+               <Link
+                    to={url}
+                    onClick={(e) => handleClick(e, taxonomicExpert)}
                 >
                     <Col className="h-100 d-flex flex-column">
                         {/* Title, Headline */}
@@ -232,7 +226,7 @@ const SearchResult = (props: Props) => {
                             </Col>
                         </Row>
                     </Col>
-                </button>
+                </Link>
             </div >
             
         );
