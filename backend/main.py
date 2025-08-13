@@ -1,4 +1,9 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, UploadFile, File, HTTPException, Query, status, Depends, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pathlib import Path
+import shutil
+import uuid
 from pydantic import BaseModel
 import httpx
 import os
@@ -13,20 +18,60 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # or ["http://localhost:3000"] for specific origin
+    allow_origins=["https://marketplace.cetaf.org", "https://sandbox.cetaf.org"],
     allow_credentials=True,
-    allow_methods=["*"],  # or ["GET", "POST", "OPTIONS"]
+    allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve static files from /app/uploads
+UPLOAD_DIR = Path("./uploads")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
+MAX_PROFILE_PIC_SIZE = 2 * 1024 * 1024  # 2 MB
 
 ORCID_CLIENT_ID = os.getenv("VITE_ORCID_CLIENT_ID")
 ORCID_CLIENT_SECRET = os.getenv("VITE_ORCID_CLIENT_SECRET")
 ORCID_REDIRECT_URI = os.getenv("VITE_ORCID_REDIRECT_URI")
-
+IMAGE_API = os.getenv("VITE_IMAGE_API")
 
 class ORCIDCode(BaseModel):
     code: str
 
+security = HTTPBearer()
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    if token != IMAGE_API:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid token"
+        )
+
+# Size Limit
+async def limit_profile_picture(request: Request):
+    content_length = request.headers.get("content-length")
+    if content_length and int(content_length) > MAX_PROFILE_PIC_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="Profile picture too large (max 2 MB)."
+        )
+
+# Upload Endpoint
+@app.post("/api/upload-image")
+async def upload_image(
+    file: UploadFile = File(...),
+    _: None = Depends(limit_profile_picture),
+    __: None = Depends(verify_token)
+):
+    suffix = Path(file.filename).suffix.lower()
+    filename = f"{uuid.uuid4()}{suffix}"
+    file_path = UPLOAD_DIR / filename
+
+    with open(file_path, "wb") as f:
+        shutil.copyfileobj(file.file, f)
+
+    return {"url": f"https://sandbox.cetaf.org/uploads/{filename}"}
 @app.get("/api/orcid/search")
 async def search_orcid(q: str = Query(..., min_length=1)):
     safe_query = quote_plus(q)
@@ -62,8 +107,6 @@ async def search_orcid(q: str = Query(..., min_length=1)):
                 })
 
         return output
-
-
 
 @app.post("/api/orcid/token")
 async def orcid_login(payload: ORCIDCode):
@@ -121,7 +164,7 @@ async def orcid_login(payload: ORCIDCode):
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the ORCID API"}
+    return {"message": "Welcome to the TETTRIs Marketplace API"}
 
 
 def main():

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
+import checkIfOrcidExists from './checkIfOrcidExists';
 
 interface OrcidUserData {
     orcid: string;
@@ -14,11 +15,23 @@ export function useOrcidCallback() {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
 
-    if (code) {
-        loginWithOrcid(code)
-            .then((data) => setUserData(data))
-            .catch((err) => setError(err.message));
-    }
+    useEffect(() => {
+        if (!code) return;
+
+        (async () => {
+            try {
+                const data = await loginWithOrcid(code);
+                setUserData(data);
+            } catch (err: any) {
+                setError(err.message);
+            }
+
+            // Remove 'code' param from URL
+            const url = new URL(window.location.href);
+            url.searchParams.delete('code');
+            window.history.replaceState({}, document.title, url.pathname + url.search);
+        })();
+    }, [code]);
 
     async function loginWithOrcid(code: string): Promise<OrcidUserData> {
         try {
@@ -28,13 +41,25 @@ export function useOrcidCallback() {
                 throw new Error('Failed to login with ORCID');
             }
 
-            return response.data;
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                console.error('Backend error:', error.response?.data ?? error.message);
-            } else {
-                console.error('Unknown error:', error);
+            const orcid = response.data.orcid;
+            const exists = await checkIfOrcidExists(orcid);
+
+            if (exists) {
+                throw new Error('ORCID already exists in the system');
             }
+
+            return response.data;
+        } catch (error: any) {
+            if (axios.isAxiosError(error)) {
+                throw new Error(error.response?.data?.message ?? 'Failed to login with ORCID');
+            }
+
+            // Re-throw known handled error
+            if (error instanceof Error && error.message === 'ORCID already exists in the system') {
+                throw error;
+            }
+
+            console.error('Unexpected ORCID login error:', error);
             throw new Error('Failed to login with ORCID');
         }
     }

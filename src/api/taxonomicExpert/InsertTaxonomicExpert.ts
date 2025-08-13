@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { TaxonomicExpert, CordraResult, Dict } from 'app/Types';
 import SendEmail from 'api/email/SendEmail';
 import InsertDashboardData from 'api/dashboardData/InsertDashboardData';
+import { postImage } from 'api/image/PostImage';
 /**
  * Function that sends a POST request to the API in order to insert a new taxonomic expert
  * @param taxonomicExpert The taxonomic expert to insert
@@ -15,6 +16,17 @@ const InsertTaxonomicExpert = async ({ taxonomicExpertRecord }: { taxonomicExper
     let taxonomicExpert: TaxonomicExpert | undefined;
 
     if (taxonomicExpertRecord) {
+        const imageValue = taxonomicExpertRecord['schema:person']['schema:ProfilePicture'];
+
+        if (imageValue) {
+            try {
+                const pictureUrl = await postImage(imageValue);
+                taxonomicExpertRecord['schema:person']['schema:ProfilePicture'] = pictureUrl.url;
+            } catch (error) {
+                console.error(error);
+                throw (error);
+            }
+        }
         /* Craft taxonomic expert object */
         const newTaxonomicExpert = {
             type: 'TaxonomicExpert',
@@ -28,7 +40,6 @@ const InsertTaxonomicExpert = async ({ taxonomicExpertRecord }: { taxonomicExper
                 }
             }
         };
-
         try {
             const result = await axios({
                 method: 'post',

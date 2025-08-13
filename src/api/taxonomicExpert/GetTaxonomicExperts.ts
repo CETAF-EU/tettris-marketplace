@@ -19,37 +19,41 @@ const GetTaxonomicExperts = async ({ pageNumber, pageSize, searchFilters }: { pa
     let metadata: Dict = {};
 
     /* Filter for the object type to be a taxonomic expert */
-    let filters: string = ''
-    filters = filters.concat('/taxonomicExpert/@type:TaxonomicExpert');
-    /* Filter for state to be accepted */
-    filters = filters.concat(' AND /taxonomicExpert/schema\\:status:accepted');
+    let filters: string = '';
+    filters += '/taxonomicExpert/@type:TaxonomicExpert';
+    filters += ' AND /taxonomicExpert/schema\\:status:accepted';
 
     if (!isEmpty(searchFilters)) {
         Object.entries(searchFilters).forEach(([key, value]) => {
+            if (!value) return;
+
             if (key === 'query') {
-                /* Set query to name search */
-                filters = filters.concat(` AND ` + `(` + `/taxonomicExpert/schema\\:person/schema\\:name:` + `${value}*`
-                    + `)`
-                );
+                const escaped = value.replace(/([*?\\:])/g, '\\$1');
+                filters += ` AND ((/taxonomicExpert/schema\\:person/schema\\:name:${escaped}*) OR ` +
+                        `(/taxonomicExpert/schema\\:person/schema\\:name:${escaped}~10) OR ` +
+                        `(/taxonomicExpert/schema\\:Taxon/schema\\:spatialCoverage/_:${escaped}*) OR ` +
+                        `(/taxonomicExpert/schema\\:Taxon/schema\\:spatialCoverage/_:${escaped}~) OR ` +
+                        `(/taxonomicExpert/schema\\:occupation/schema\\:educationalLevel/_:${escaped}~) OR ` +
+                        `(/taxonomicExpert/schema\\:occupation/schema\\:educationalLevel/_:${escaped}*))`;
+            }
+            if (key === 'location') {
+                filters += ` AND /taxonomicExpert/schema\\:person/schema\\:location:${value}`;
             }
             if (key === 'language') {
-                /* Set array search for language */
-                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:person/schema\\:language/_:` + `${value}`);
-            }
-            if (key === 'country') {
-                /* Set array search for country */
-                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:person/schema\\:location:` + `${value}`);
+                filters += ` AND /taxonomicExpert/schema\\:person/schema\\:language/_:${value}`;
             }
             if (key === 'taxonomicGroup') {
-                /* Set taxonomic range search */
-                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:Taxon/schema\\:discipline/_:` + `${value}`);
+                filters += ` AND /taxonomicExpert/schema\\:Taxon/schema\\:discipline/_:${value}`;
+            }
+            if (key === 'subTaxonomicGroup') {
+                filters += ` AND /taxonomicExpert/schema\\:Taxon/schema\\:additionalType/_:${value}`;
             }
             if (key === 'appliedResearch') {
-                /* Set array search for Research Project */
-                filters = filters.concat(` AND ` + `/taxonomicExpert/schema\\:Taxon/schema\\:ResearchProject/_:` + `${value}`);
+                filters += ` AND /taxonomicExpert/schema\\:Taxon/schema\\:ResearchProject/_:${value}`;
             }
         });
-    };
+    }
+
 
     try {
         const result = await axios({

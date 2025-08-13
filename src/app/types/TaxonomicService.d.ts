@@ -383,24 +383,24 @@ export interface TaxonomicService {
        * A description of the service's grant
        */
       "schema:description"?: string;
+      /**
+       * An organization that supports (sponsors) something through some kind of financial contribution.
+       */
+      "schema:funder"?: {
+        /**
+         * The type of funder
+         */
+        "@type": "schema:Organization";
+        /**
+         * A unique identifier to identify the funder organisation; ROR identifiers are valid
+         */
+        "schema:identifier": string;
+        /**
+         * The name of the funder (funding program)
+         */
+        "schema:name"?: string;
+      };
     };
-    /**
-     * An organization that supports (sponsors) something through some kind of financial contribution.
-     */
-    "schema:funder"?: {
-      /**
-       * The type of funder
-       */
-      "@type": "schema:Organization";
-      /**
-       * A unique identifier to identify the funder organisation; ROR identifiers are valid
-       */
-      "schema:identifier": string;
-      /**
-       * The name of the funder (funding program)
-       */
-      "schema:name"?: string;
-    }[];
     [k: string]: unknown;
   }[];
   /**

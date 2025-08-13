@@ -78,7 +78,9 @@ function displayPublicationChart(taxonomicExpert: TaxonomicExpert) {
         pieSliceText: 'none',
         colors: ['#7BC1DC', '#5DA9C7', '#3F91B2', '#21799D'],
     };
-    
+    if (data[1][1] === 0 && data[2][1] === 0 && data[3][1] === 0 && data[4][1] === 0) {
+        return DisplayRowData("Publication Number", "N/A");
+    }
     return <Row>
         <Col>
             <p className='fw-bold'>Publication Number</p>
@@ -99,12 +101,15 @@ function displayGeographicContent(geographicRegion: Array<string>) {
         <Col lg='3'>
             <p className='fw-bold'>Geographic region</p>
         </Col>
-        <Col lg='3'>
+       <Col lg="3">
             {geographicRegion.length > 0 ? (
                 <p>
-                    {geographicRegion.map((region) => (
-                        region
-                    ))}
+                {geographicRegion.map((region) => (
+                    <span key={region}>
+                    {region}
+                    <br />
+                    </span>
+                ))}
                 </p>
             ) : (
                 <p>N/A</p>

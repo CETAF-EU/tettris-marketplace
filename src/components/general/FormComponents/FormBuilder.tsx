@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Row, Col } from 'react-bootstrap';
 
 /* Import Types */
-import { FormField, Dict } from "app/Types";
+import { FormField, Dict, TaxonomicExpert } from "app/Types";
 
 /* Import API */
 import InsertTaxonomicService from "api/taxonomicService/InsertTaxonomicService";
@@ -29,6 +29,7 @@ import { Button, Spinner } from "components/general/CustomComponents";
 import { Color, getColor } from "components/general/ColorPage";
 import ORCIDField from "./ORCIDField";
 import ImageField from "./ImageField";
+import MultiRORField from "./MultiRORField";
 
 
 /* Props Type */
@@ -47,6 +48,8 @@ type Props = {
         name?: string;
         email?: string;
     },
+    TaxonomicExpert : TaxonomicExpert | null,
+    Email: string | null,
     SetCompleted: Function
 };
 
@@ -57,8 +60,9 @@ type Props = {
  * @returns JSX Component
  */
 const FormBuilder = (props: Props) => {
-    const { formTemplate,OrcidData, SetCompleted } = props;
+    const { formTemplate,OrcidData, TaxonomicExpert, Email, SetCompleted } = props;
 
+    console.log('taxonomicExpert', TaxonomicExpert);
     /* Hooks */
     const captchaHook = useCaptchaHook({
         siteKey: import.meta.env.VITE_FRIENDLY_CAPTCHA_SITEKEY,
@@ -103,6 +107,51 @@ const FormBuilder = (props: Props) => {
         return jsonPath.replaceAll('[', '_').replaceAll(']', '').replaceAll("'", '');
     };
 
+    // const populateInitialValuesFromTaxonomicExpert = (
+    //     TaxonomicExpert: TaxonomicExpert,
+    //     initialFormValues: Dict,
+    //     formTemplate: any
+    //     ) => {
+    //     const isFormEmpty = isEmpty(initialFormValues);
+    //     if (!TaxonomicExpert || !isFormEmpty) return;
+
+    //     console.log('🔄 Constructing initial form values from existing TaxonomicExpert');
+
+    //     Object.entries(formTemplate).forEach(([_key, formSection]: any) => {
+    //         const isArray = formSection.type === 'array';
+
+    //         // Initialize empty array for repeatable sections
+    //         if (isArray) {
+    //         jp.value(initialFormValues, formSection.jsonPath ?? '', []);
+    //         }
+
+    //         formSection.fields.forEach((field: any) => {
+    //         let targetPath = '';
+
+    //         if (isArray) {
+    //             const pathSuffix = FlattenJSONPath(field.jsonPath).split('_').at(-1) as string;
+    //             targetPath = `${formSection.jsonPath ?? ''}[0]['${pathSuffix}']`;
+    //         } else {
+    //             targetPath = field.jsonPath;
+    //         }
+
+    //         // Attempt to extract value from TaxonomicExpert
+    //         const value = jp.value(TaxonomicExpert.taxonomicExpert, targetPath);
+    //         console.log(`[🔍] Looking for value at: ${targetPath} →`, value);
+    //         if (value !== undefined && value !== null) {
+    //             jp.value(initialFormValues, targetPath, value);
+    //             console.log(`[✔] Set from expert: ${targetPath} →`, value);
+    //         } else {
+    //             const defaultValue = DetermineInitialFormValue(field.type, field.const);
+    //             jp.value(initialFormValues, targetPath, defaultValue);
+    //             console.log(`[❌] Fallback: ${targetPath} →`, defaultValue);
+    //         }
+    //         });
+    //     });
+    // };
+
+
+
     /**
      * Function to determine the initial form field type 
      * @param fieldType
@@ -116,16 +165,16 @@ const FormBuilder = (props: Props) => {
             case 'multi-string':
                 return [''];
             case 'ror':
-                return {
-                    "@type": "schema:Organization",
-                    "schema:identifier": '',
-                    "schema:name": ''
-                };
+                return '';
             default:
                 return fieldConst ?? '';
         };
     };
 
+    /* Construct initial form values from existing taxonomic expert */
+    // if (TaxonomicExpert !== null && isEmpty(initialFormValues)) {
+    //     populateInitialValuesFromTaxonomicExpert(TaxonomicExpert, initialFormValues, formTemplate);
+    // }
     /* Construct initial form values */
     if (isEmpty(initialFormValues)) {
         Object.entries(formTemplate).forEach(([_key, formSection]) => {
@@ -146,7 +195,10 @@ const FormBuilder = (props: Props) => {
                 }
                 else if (field.jsonPath === "$['schema:person']['schema:email']" &&  OrcidData?.email) {
                     jp.value(initialFormValues, field.jsonPath, OrcidData.email);
-                } else if (field.jsonPath === "$['schema:person']['schema:identifier']" &&  OrcidData?.orcid) {
+                }
+                else if (field.jsonPath === "$['schema:person']['schema:email']" &&  Email) {
+                    jp.value(initialFormValues, field.jsonPath, Email);
+                } else if (field.jsonPath === "$['schema:person']['schema:orcid']" &&  OrcidData?.orcid) {
                     jp.value(initialFormValues, field.jsonPath, OrcidData.orcid);
                 } else {
                     jp.value(initialFormValues, field.jsonPath, DetermineInitialFormValue(field.type, field.const));
@@ -154,7 +206,7 @@ const FormBuilder = (props: Props) => {
             });
         });
     }
-
+    
     /* Construct form sections */
     Object.entries(formTemplate).forEach(([_key, formSection]) => {
         if ((serviceTypes && formSection.applicableToServiceTypes?.some(type => serviceTypes.includes(type))) || !formSection.applicableToServiceTypes || !serviceTypes) {
@@ -227,7 +279,6 @@ const FormBuilder = (props: Props) => {
                             }
                         });
                     };
-
                     const ValidateArrayComponent = (field: Dict) => {
                         Object.values(field).forEach(value => {
                             if (Array.isArray(value) && isEmpty(value)) {
@@ -297,7 +348,13 @@ const FormBuilder = (props: Props) => {
                             } finally {
                                 setLoading(false);
                             };
-                        } else if (window.location.pathname.includes('/te')) {  
+                        } else if (window.location.pathname.includes('/te')) {
+                            if (OrcidData?.orcid) {
+                                jp.value(values, "$['schema:person']['schema:orcid']", OrcidData.orcid);
+                            }
+                            if (Email) {
+                                jp.value(values, "$['schema:person']['schema:email']", Email);
+                            }
                             let taxonomicExpertRecord = cloneDeep(values);
 
                             RemoveEmptyProperties(taxonomicExpertRecord);
@@ -333,7 +390,7 @@ const FormBuilder = (props: Props) => {
 
                                                     {section.fields.map(field => (
                                                         <Row key={field.jsonPath}
-                                                            className="mt-3 mt-lg-2"
+                                                            className="mt-3 mt-lg-3"
                                                         >
                                                             <Col>
                                                                 {ConstructFormField(field, values, setFieldValue, jp.value(values, field.jsonPath))}
@@ -370,7 +427,39 @@ const FormBuilder = (props: Props) => {
                                 </Col>
                             </Row>
                         }
-                        <Row className="mt-5">
+                        {!window.location.pathname.includes('/ts') && (<Row className="mt-3">
+                            <Col>
+                                <div className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="policyCheck"
+                                        required
+                                    />
+                                    <label className="form-check-label" htmlFor="policyCheck">
+                                        I agree to the <a href="https://cetaf.org/privacy/" target="_blank" rel="noopener noreferrer">policy</a>
+                                    </label>
+                                </div>
+                            </Col>
+                        </Row>)}
+                        {!window.location.pathname.includes('/ts') && (
+                            <Row className="mt-3">
+                                <Col>
+                                    <div className="form-check">
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            id="submitOnceCheck"
+                                            required
+                                        />
+                                        <label className="form-check-label" htmlFor="submitOnceCheck">
+                                            I understand that I can only submit this form once.
+                                        </label>
+                                    </div>
+                                </Col>
+                            </Row>
+                        )}
+                        <Row className="mt-3">
                             <Col>
                                 <Row>
                                     <Col lg="auto">
@@ -427,10 +516,95 @@ function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValu
                 values={values}
                 SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)} />;
         } case 'multi-select': {
-            return <MultiSelectField field={field}
-                values={values}
-                SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
-                SetServiceTypes={field.title === 'Service Type' ? (serviceTypes: string[]) => setServiceTypes(serviceTypes) : undefined} />;
+            if (field.title === 'Taxonomic sub-discipline') {
+
+                // Define sub-disciplines for each main discipline
+                const disciplineSubgroups = {
+                    "botany": [
+                        "Algae",
+                        "Bryophytes",
+                        "Macrofungi, Lichens & Myxomycetes (Mycology)",
+                        "Plant Genetic Resources",
+                        "Pteridophytes",
+                        "Seed plants"
+                    ],
+                    
+                    "invertebrates": [
+                        "Arachnids",
+                        "Cnidaria (jellyfish, coral, anemones)",
+                        "Crustaceans & Myriapods",
+                        "Echinodermata (starfish, sea urchins, sea cucumbers)",
+                        "Insects",
+                        "Invertebrates Genetic Resources",
+                        "Mollusca (bivalves, gastropods, cephalopods)",
+                        "Porifera (Sponges)",
+                        "Other Invertebrate Zoology"
+                    ],
+                    
+                    "vertebrates": [
+                        "Amphibians",
+                        "Birds",
+                        "Fishes",
+                        "Mammals",
+                        "Reptiles",
+                        "Vertebrates Genetic Resources",
+                        "Other Vertebrate Zoology"
+                    ],
+                    
+                    "palaeontology": [
+                        "Fossil Invertebrates",
+                        "Fossil Plants & Fungi",
+                        "Fossil Vertebrates",
+                        "Other Palaeontology"
+                    ],
+                    
+                    "microbiology": [
+                        "Algae (in microbiology collection)",
+                        "Bacteria & Archaea",
+                        "Eukaryotic Microorganisms",
+                        "Microfungi (including moulds, yeasts)",
+                        "Phages",
+                        "Plasmids",
+                        "Protozoa",
+                        "Viruses",
+                        "Other Microbiology Objects (e.g. mixed or other kinds of microorganisms)"
+                    ],
+                    
+                    "ecoEnvDNA": [
+                        "ECO-DNA (environmental DNA)",
+                        "ECO-OTH"
+                    ]
+                };
+                
+                // Initialize empty options array
+                field.options = [];
+                
+                // Get the selected disciplines
+                const selectedDisciplines = Array.isArray(values['schema:Taxon']['schema:discipline']) 
+                  ? values['schema:Taxon']['schema:discipline'] 
+                  : [values['schema:Taxon']['schema:discipline']];
+                
+                // Add sub-disciplines for each selected discipline
+                selectedDisciplines.forEach(discipline => {
+                  const key = discipline as keyof typeof disciplineSubgroups;
+                  if (disciplineSubgroups[key]) {
+                    // Add the sub-disciplines to the options array
+                    disciplineSubgroups[key].forEach(subgroup => {
+                        field.options?.push(`${subgroup}`);
+                    });
+                  }
+                });
+                return <MultiSelectField field={field}
+                    values={values}
+                    SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
+                />;
+            }
+            else { 
+                return <MultiSelectField field={field}
+                    values={values}
+                    SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)}
+                    SetServiceTypes={field.title === 'Service Type' ? (serviceTypes: string[]) => setServiceTypes(serviceTypes) : undefined} />;
+            }
         } case 'orcid': {
             return <ORCIDField field={field}
                 fieldValue={fieldValues as Dict}
@@ -441,6 +615,13 @@ function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValu
         } case 'ror': {
             return <RORField field={field}
                 fieldValue={fieldValues as Dict}
+                values={values}
+                SetFieldValue={(fieldName: string, value: Dict) => {
+                    SetFieldValue?.(fieldName, value);
+                } } />;
+        } case 'multi-ror': {
+            return <MultiRORField field={field}
+                fieldValue={fieldValues as Dict[]}
                 values={values}
                 SetFieldValue={(fieldName: string, value: Dict) => {
                     SetFieldValue?.(fieldName, value);

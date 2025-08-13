@@ -62,21 +62,20 @@ const Home = () => {
                     }
                 }
             },
-            ...(import.meta.env.VITE_DEV === 'true' ? 
-            [{
+            {
                 alias: 'taxonomicExpertise',
                 Method: GetTaxonomicExperts,
                 params: {
                     pageSize: 1,
                     pageNumber: 0
                 }
-            }] : [])
+            }
         ],
         Handler: (results: { [alias: string]: { metadata: Dict } }) => {
             setCounts({
                 taxonomicServices: results.taxonomicServices.metadata.totalRecords,
                 referenceCollections: 0,
-                taxonomicExpertise:  import.meta.env.VITE_DEV === 'true' ? results.taxonomicExpertise.metadata.totalRecords : 0,
+                taxonomicExpertise: results.taxonomicExpertise.metadata.totalRecords,
             });
             dispatch(setIsApiOnline(true))
         },
@@ -166,10 +165,10 @@ const Home = () => {
                                         <Col xs={{ span: 4 }}
                                             lg={{ span: 4 }}
                                         >
-                                            <HomeCategory title="Expertise Taxonomists"
+                                            <HomeCategory title="Taxonomic Experts"
                                                 subTitle="Go engage"
                                                 count={counts.taxonomicExpertise}
-                                                link={import.meta.env.VITE_DEV === 'true' ? "/search?serviceType=taxonomicExpert" : "/taxonomicExpert"}
+                                                link="/search?serviceType=taxonomicExpert"
                                                 color="tertiary"
                                             />
                                         </Col>

@@ -521,31 +521,24 @@
                 }
               },
               "schema:funder": {
-                "type": "array",
+                "type": "object",
                 "description": "An organization that supports (sponsors) something through some kind of financial contribution.",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "@type": {
-                      "type": "string",
-                      "title": "Funder type",
-                      "description": "The type of funder"
-                    },
-                    "schema:identifier": {
-                      "type": "string",
-                      "title": "Funder identifier",
-                      "description": "A unique identifier to identify the funder organisation; ROR identifiers are valid"
-                    },
-                    "schema:name": {
-                      "type": "string",
-                      "title": "Funder name",
-                      "description": "The name of the funder (funding program)"
-                    }
+                "properties": {
+                  "@type": {
+                    "type": "string",
+                    "title": "Funder type",
+                    "description": "The type of funder"
                   },
-                  "required": [
-                    "@type",
-                    "schema:identifier"
-                  ]
+                  "schema:identifier": {
+                    "type": "string",
+                    "title": "Funder identifier",
+                    "description": "A unique identifier to identify the funder organisation; ROR identifiers are valid"
+                  },
+                  "schema:name": {
+                    "type": "string",
+                    "title": "Funder name",
+                    "description": "The name of the funder (funding program)"
+                  }
                 }
               }
             }

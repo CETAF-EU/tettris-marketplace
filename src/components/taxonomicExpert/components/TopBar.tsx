@@ -53,7 +53,7 @@ const TopBar = (props: Props) => {
     const { taxonomicExpert } = props;
     
     const name = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] as string || 'Any name provided';
-    const orcidID = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:identifier'] as string || null;
+    const orcidID = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:orcid'] as string || null;
     const headline = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:headline'] as string || 'Any headline provided';
     const location = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:location'] as string || 'Any location provided';
     const language = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:language']?.join(' / ').toUpperCase() ?? 'Any languages provided';
@@ -65,6 +65,7 @@ const TopBar = (props: Props) => {
     const personalLinks = Array.isArray(taxonomicExpert?.taxonomicExpert?.['schema:person']?.["schema:links"])
         ? taxonomicExpert.taxonomicExpert['schema:person']["schema:links"].flat()
         : null;
+    const datePublished = taxonomicExpert?.taxonomicExpert?.['schema:datePublished'] as string || null;
     return (<>
         <Col lg='auto' className="mb-3">
             <Row className="text-center">
@@ -79,7 +80,7 @@ const TopBar = (props: Props) => {
                 <Col xs={12} md="auto"> 
                     {orcidID ? (
                     <a href={"https://orcid.org/" + orcidID} target="_blank" rel="noopener noreferrer">
-                        <p className="fw-lightBold bi bi-link-45deg"> {orcidID}</p>
+                        <p className="fw-lightBold bi bi-link-45deg"> ORCID number</p>
                     </a>
                     ) : (
                     <p className="fw-lightBold bi bi-link-45deg"> Any orcid ID provided</p>
@@ -92,36 +93,39 @@ const TopBar = (props: Props) => {
                     <p className="fw-lightBold bi bi-globe2"> {language}</p>
                 </Col>
             </Row>
-            <Row className="justify-content-center text-center text-md-start">
-                <Row className='mt-5 d-none d-md-flex'></Row>
-                <Row className='mt-1 mb-3'>
-                    <Col xs={12} md="auto">
-                        <p className="fs-3 fw-bold">{headline}</p>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col xs={12} md="auto">
-                        <p className="fw-lightBold">{affiliationName}</p>
-                    </Col>
-                    <Col xs={12} md="auto">
-                        {affiliationURLText ? (
+            <Row className="justify-content-center text-center custom-justify">
+                <Col xs={12}>
+                    <Row className="mt-5 d-none d-md-flex custom-top" />
+
+                    <Row className="mt-1 mb-3 justify-content-center custom-justify">
+                        <Col xs="auto">
+                            <p className="fs-3 fw-bold text-center">{headline}</p>
+                        </Col>
+                    </Row>
+                    <Row className="justify-content-center text-center custom-justify">
+                        <Col xs={12} md="auto">
+                            <p className="fw-lightBold mb-1">{affiliationName}</p>
+                        </Col>
+                        <Col xs={12} md="auto">
+                            {affiliationURLText ? (
                             <a href={affiliationURLText} target="_blank" rel="noopener noreferrer">
                                 <i className="fw-lightBold bi bi-link-45deg"></i> URL
                             </a>
-                        ) : (
+                            ) : (
                             <i className="fw-lightBold bi bi-link-45deg">No URL provided</i>
-                        )}
-                    </Col>
-                    <Col xs={12} md="auto">
-                        {affiliationURL ? (
+                            )}
+                        </Col>
+                        <Col xs={12} md="auto">
+                            {affiliationURL ? (
                             <a href={affiliationURL} target="_blank" rel="noopener noreferrer">
                                 <i className="fw-lightBold bi bi-link-45deg"> ROR ID</i>
                             </a>
-                        ) : (
+                            ) : (
                             <i className="fw-lightBold bi bi-link-45deg">No ROR ID provided</i>
-                        )}
-                    </Col>
-                </Row>
+                            )}
+                        </Col>
+                    </Row>
+                </Col>
             </Row>
         </Col>
         <Col lg="2" className="d-none d-lg-block"></Col>
@@ -150,6 +154,15 @@ const TopBar = (props: Props) => {
                             ) : null
                         ))
                     ) : null}
+                </Col>
+            </Row>
+            <Row className="mt-5 d-none d-md-flex custom-top" />
+            <Row className="justify-content-center text-center mb-3">
+                <Col xs="auto" className='text-center'>
+                    {datePublished ? (
+                        <p className="fw-lightBold">Last update on {new Date(datePublished).toLocaleDateString()}</p>
+                    ) : (
+                        <p className="fw-lightBold">No update date provided</p>)}
                 </Col>
             </Row>
         </Col>

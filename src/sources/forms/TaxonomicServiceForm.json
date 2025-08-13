@@ -437,7 +437,7 @@
                 "jsonPath": "$['schema:fundingScheme']['index']['schema:funding']['schema:funder']",
                 "title": "Funding Organisation",
                 "description": "An organization that supports (sponsors) something through some kind of financial contribution",
-                "type": "ror",
+                "type": "multi-ror",
                 "required": false
             }
         ],
