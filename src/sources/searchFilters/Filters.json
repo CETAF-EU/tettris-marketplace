@@ -9,6 +9,10 @@
                 {
                     "label": "Taxonomic Service",
                     "value": "taxonomicService"
+                },
+                {
+                    "label": "Taxonomic Expert",
+                    "value": "taxonomicExpert"
                 }
             ]
         }
