@@ -427,7 +427,7 @@ const FormBuilder = (props: Props) => {
                                 </Col>
                             </Row>
                         }
-                        {!window.location.pathname.includes('/ts') && (<Row className="mt-3">
+                        {/* {!window.location.pathname.includes('/ts') && (<Row className="mt-3">
                             <Col>
                                 <div className="form-check">
                                     <input
@@ -441,7 +441,7 @@ const FormBuilder = (props: Props) => {
                                     </label>
                                 </div>
                             </Col>
-                        </Row>)}
+                        </Row>)} */}
                         {!window.location.pathname.includes('/ts') && (
                             <Row className="mt-3">
                                 <Col>

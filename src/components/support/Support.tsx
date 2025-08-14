@@ -70,7 +70,7 @@ const Support = () => {
                         }
                         {!fetch.loading && !errorMessage &&
                             <Col>
-                                <Row className="mt-5 mb-4">
+                                <Row className="mt-3 mb-4">
                                     <Col lg={{ span: 10, offset: 1 }} className="p-4 bg-light rounded shadow-sm">
                                         <h3 className="fw-bold mb-4">About the Taxonomic Marketplace</h3>
                                         <p>
