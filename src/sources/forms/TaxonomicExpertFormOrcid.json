@@ -753,7 +753,7 @@
             {
                 "jsonPath": "$['schema:educationAndTrainingProvision']['index']['schema:EducationalOccupationalProgram']",
                 "title": "DEST URL",
-                "description": "The URL of the training course",
+                "description": "The URL of the training course, DEST is a platform for promoting and advertising training courses in taxonomy across Europe.",
                 "type": "string",
                 "required": false
             }
