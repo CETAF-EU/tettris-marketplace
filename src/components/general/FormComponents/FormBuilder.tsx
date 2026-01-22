@@ -5,6 +5,7 @@ import jp from 'jsonpath';
 import { cloneDeep, isEmpty } from "lodash";
 import { useState } from "react";
 import { Row, Col } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 /* Import Types */
 import { FormField, Dict, TaxonomicExpert } from "app/Types";
@@ -427,21 +428,55 @@ const FormBuilder = (props: Props) => {
                                 </Col>
                             </Row>
                         }
-                        {!window.location.pathname.includes('/ts') && (<Row className="mt-3">
-                            <Col>
-                                <div className="form-check">
-                                    <input
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        id="policyCheck"
-                                        required
-                                    />
-                                    <label className="form-check-label" htmlFor="policyCheck">
-                                        I agree to the <a href="https://cetaf.org/privacy/" target="_blank" rel="noopener noreferrer">policy</a>
-                                    </label>
-                                </div>
-                            </Col>
-                        </Row>)}
+                        {!window.location.pathname.includes('/ts') && (
+                            <Row className="mt-3">
+                                <Col>
+                                    <div>
+                                        <p className="fw-lightBold mb-2">Consent and data publication</p>
+                                        <p className="mb-2">By submitting this form, you confirm that:</p>
+                                        <ul className="mb-3">
+                                            <li>You voluntarily provide the information for inclusion in the CETAF Taxonomic e-Services and Expertise Marketplace.</li>
+                                            <li>Your profile information will be publicly visible in the Marketplace after a short verification process carried out by CETAF.</li>
+                                            <li>Your email address will not be shared publicly. It will be protected behind a contact mechanism to reduce spam, and used only to enable contact related to your expertise.</li>
+                                            <li>You consent to being contacted in relation to your registered expertise or services.</li>
+                                        </ul>
+                                        <p className="mb-2">You understand that:</p>
+                                        <ul className="mb-3">
+                                            <li>The Marketplace is a discovery and contact platform. CETAF does not evaluate, certify or endorse individual experts or services.</li>
+                                            <li>You may request access, correction, or deletion of your data at any time by contacting CETAF.</li>
+                                        </ul>
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id="consentCheck"
+                                                required
+                                            />
+                                            <label className="form-check-label" htmlFor="consentCheck">
+                                                I have read and agree to the consent and data publication terms above and the <Link to="/policy" className="tc-tertiary" target="_blank" rel="noopener noreferrer">policy</Link>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </Col>
+                            </Row>
+                        )}
+                        {!window.location.pathname.includes('/te') && (
+                            <Row className="mt-3">
+                                <Col>
+                                    <div className="form-check">
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            id="policyCheck"
+                                            required
+                                        />
+                                        <label className="form-check-label" htmlFor="policyCheck">
+                                            I agree to the <Link to="/policy" className="tc-tertiary" target="_blank" rel="noopener noreferrer">policy</Link>
+                                        </label>
+                                    </div>
+                                </Col>
+                            </Row>
+                        )}
                         {!window.location.pathname.includes('/ts') && (
                             <Row className="mt-3">
                                 <Col>

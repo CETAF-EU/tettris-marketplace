@@ -33,7 +33,7 @@ const TaxonomicForm = () => {
         : 'Suggest a new taxonomic e-service';
 
     const description = isExpertForm
-        ? 'Use this form to register as a new expert to be listed in the CETAF Marketplace.\nPlease fill in the required fields and provide as much additional information as possible.\nThe CETAF Secretariat will review and curate your submission before publishing it in the marketplace.\nTo be accepted, your profile must reflect taxonomic expertise and demonstrate sufficient relevance and quality.'
+        ? 'Welcome to the Taxonomic Expert form. This registration form allows you to create a public profile in the CETAF Taxonomic e-Service and Expertise Marketplace.\n\nFor each field, we explain why the information is requested and how it will be used. The information you provide is intended to help others discover, understand and contact taxonomic experts and service providers.\n\nParticipation is voluntary. You will be asked to give explicit consent before submitting your profile.'
         : 'Use this form to suggest new taxonomic e-services or tools that should be listed in the CETAF Marketplace.\nPlease fill in the required fields and add as much additional information as you can.\nThe CETAF secretariat will review and curate your submission before adding it to the marketplace.\nTo be accepted it needs to be a taxonomic tool or service and it needs to be of sufficient quality\nPlease propose only services that are in production and maintained.';
 
     const sended = isExpertForm
