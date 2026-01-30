@@ -88,12 +88,16 @@ function TrainingCard({ data }: { readonly data: any }) {
                     )}
                 </Card.Text>
                 <div className="fs-4 fw-bold d-flex justify-content-between m-3">
-                    <Card.Link href={url} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center">
-                        <i className="bi bi-link-45deg me-2"></i> URL
-                    </Card.Link>
-                    <Card.Link href={availableThrough} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center">
-                        <i className="bi bi-link-45deg me-2"></i> Available through DEST
-                    </Card.Link>
+                    {typeof url === 'string' && url.trim() !== '' && (
+                        <Card.Link href={url} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center">
+                            <i className="bi bi-link-45deg me-2"></i> URL
+                        </Card.Link>
+                    )}
+                    {typeof availableThrough === 'string' && availableThrough.trim() !== '' && (
+                        <Card.Link href={availableThrough} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center">
+                            <i className="bi bi-link-45deg me-2"></i> Available through DEST
+                        </Card.Link>
+                    )}
                 </div>
             </Card.Body>
         </Card>

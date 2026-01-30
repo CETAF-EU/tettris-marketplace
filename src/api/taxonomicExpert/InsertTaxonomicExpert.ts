@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 /* Import Types */
 import { TaxonomicExpert, CordraResult, Dict } from 'app/Types';
 import SendEmail from 'api/email/SendEmail';
-import InsertDashboardData from 'api/dashboardData/InsertDashboardData';
+// import InsertDashboardData from 'api/dashboardData/InsertDashboardData';
 import { postImage } from 'api/image/PostImage';
 /**
  * Function that sends a POST request to the API in order to insert a new taxonomic expert
@@ -68,21 +68,21 @@ const InsertTaxonomicExpert = async ({ taxonomicExpertRecord }: { taxonomicExper
             taxonomicExpert.taxonomicExpert['schema:dateCreated'] = format(new Date(data.attributes.metadata.createdOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
             taxonomicExpert.taxonomicExpert['schema:dateModified'] = format(new Date(data.attributes.metadata.modifiedOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
             
-            const newDashboardData = {
-                type: 'DashboardData',
-                attributes: {
-                    content: {
-                        dashboardData: {
-                            "@type": 'DashboardData',
-                            "schema:reference": taxonomicExpert.taxonomicExpert['@id'],
-                            "schema:gender": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:gender'],
-                            "schema:age": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:birthDate'],
-                        }
-                    }
-                }
-            };
-            /* Dashboard Data */                           
-            await InsertDashboardData({ DashboardDataRecord: newDashboardData });
+            // const newDashboardData = {
+            //     type: 'DashboardData',
+            //     attributes: {
+            //         content: {
+            //             dashboardData: {
+            //                 "@type": 'DashboardData',
+            //                 "schema:reference": taxonomicExpert.taxonomicExpert['@id'],
+            //                 "schema:gender": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:gender'],
+            //                 "schema:age": taxonomicExpert.taxonomicExpert['schema:person']?.['schema:birthDate'],
+            //             }
+            //         }
+            //     }
+            // };
+            // /* Dashboard Data */                           
+            // await InsertDashboardData({ DashboardDataRecord: newDashboardData });
 
             /* Send email */
             const url = "https://marketplace.cetaf.org/cordra/#objects/" + taxonomicExpert.taxonomicExpert['@id'];

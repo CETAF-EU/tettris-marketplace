@@ -67,37 +67,46 @@ const TaxonomicForm = () => {
                             </Col>
                         </Row>
                         {isExpertForm && !isLoggedIn && (
-                            <Row>
-                                <Col>
-                                    <Card className="w-100 px-4 py-3 mt-3">
-                                        <Row>
-                                            <Col>
-                                                <h2 className="fs-4">Login with ORCID</h2>
-                                                <p className="mt-2">
-                                                    To proceed, please log in using your ORCID account. This ensures that your submission is linked to your professional profile.
-                                                </p>
-                                                <div className="d-flex justify-content-between align-items-center mt-3">
-                                                    <button
-                                                        className="btn btn-primary"
-                                                        onClick={redirectToOrcidAuth}
-                                                    >
-                                                        Login with ORCID
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-link p-0 ms-2"
-                                                        style={{ fontSize: '0.95rem' }}
-                                                        onClick={() => setMoreLogin(m => !m)}
-                                                        type="button"
-                                                    >
-                                                        more
-                                                    </button>
-                                                </div>
-                                                {error && <p className="text-danger mt-3">{error}</p>}
-                                            </Col>
-                                        </Row>
-                                    </Card>
-                                </Col>
-                            </Row>
+                            <Col>
+                                <Row>
+                                    <Col>
+                                        <p className="fs-4 mt-3">
+                                            Use this form to register as a taxonomic expert for the Marketplace. You can submit only once per entry. To update or delete your data later, contact the administrator via the <a href="/support" className="link-primary">support page</a>.
+                                        </p>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        <Card className="w-100 px-4 py-3 mt-3">
+                                            <Row>
+                                                <Col>
+                                                    <h2 className="fs-4">Login with ORCID</h2>
+                                                    <p className="mt-2">
+                                                        To proceed, please log in using your ORCID account. This ensures that your submission is linked to your professional profile.
+                                                    </p>
+                                                    <div className="d-flex justify-content-between align-items-center mt-3">
+                                                        <button
+                                                            className="btn btn-primary"
+                                                            onClick={redirectToOrcidAuth}
+                                                        >
+                                                            Login with ORCID
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-link p-0 ms-2"
+                                                            style={{ fontSize: '0.95rem' }}
+                                                            onClick={() => setMoreLogin(m => !m)}
+                                                            type="button"
+                                                        >
+                                                            more
+                                                        </button>
+                                                    </div>
+                                                    {error && <p className="text-danger mt-3">{error}</p>}
+                                                </Col>
+                                            </Row>
+                                        </Card>
+                                    </Col>
+                                </Row>
+                            </Col>
                         )}
                         {moreLogin && isExpertForm && !isLoggedIn && (
                             <Row className="my-3">
