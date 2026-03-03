@@ -68,21 +68,6 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build Docker image backend
-      run: |
-        docker build \
-          --build-arg VITE_ORCID_CLIENT_ID=${{ env.VITE_ORCID_CLIENT_ID }} \
-          --build-arg VITE_ORCID_CLIENT_SECRET=${{ env.VITE_ORCID_CLIENT_SECRET }} \
-          --build-arg VITE_ORCID_REDIRECT_URI=${{ env.VITE_ORCID_REDIRECT_URI }} \
-          --build-arg VITE_IMAGE_API=${{ env.VITE_IMAGE_API }} \
-          -f backend/Dockerfile \
-          -t ${{ env.DOCKERHUB_REPOSITORY }}:backend-${{ env.DOCKER_IMAGE_TAG }} .
-
-    - name: Tag Docker image with 'backend'        
-      run: |
-        docker tag ${{ env.DOCKERHUB_REPOSITORY }}:backend-${{ env.DOCKER_IMAGE_TAG }} \
-          ${{ env.DOCKERHUB_REPOSITORY }}:backend
-         
     - name: Build Docker image frontend
       run: |
         docker build \
@@ -106,7 +91,5 @@ jobs:
 
     - name: Push Docker images to Docker Hub
       run: |
-        docker push ${{ env.DOCKERHUB_REPOSITORY }}:backend-${{ env.DOCKER_IMAGE_TAG }}
-        docker push ${{ env.DOCKERHUB_REPOSITORY }}:backend
         docker push ${{ env.DOCKERHUB_REPOSITORY }}:frontend-${{ env.DOCKER_IMAGE_TAG }}
         docker push ${{ env.DOCKERHUB_REPOSITORY }}:test
