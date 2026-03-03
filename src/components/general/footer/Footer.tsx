@@ -49,7 +49,10 @@ const Footer = () => {
                                                         <a href="https://marketplace.cetaf.org/cordra/#urls/openapi/index.html">
                                                             API Docs
                                                         </a>
-                                                        <p>Privacy policy</p>
+                                                        <span className="px-2">|</span>
+                                                        <a href="/policy">
+                                                            Privacy policy
+                                                        </a>
                                                     </div>
                                                 </Col>
                                             </Row>
@@ -87,10 +90,7 @@ const Footer = () => {
                                 </span>
                                 <span className="px-2">|</span>
                                 <span>
-                                    <a href="https://cetaf.org/privacy/"
-                                        target="_blank"
-                                        rel="noreferer"
-                                    >
+                                    <a href="/policy">
                                         Privacy policy
                                     </a>
                                 </span>
