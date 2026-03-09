@@ -2,7 +2,7 @@
 import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 /* Import Hooks */
 import { usePaginator, useAppDispatch } from 'app/Hooks';
@@ -144,8 +144,22 @@ const Search = () => {
                                 <FiltersBar />
                             </Col>
                         </Row>
+                        {/* link to pollinator collections data */}
+                        {!searchParams.get('serviceType') && (
+                            <Row className="mt-3">
+                                <Col>
+                                    <p className="mb-0 fs-4 fw-lightBold">
+                                        Looking for linked pollinator collection descriptors and the EuSurvey model used to collect them ?{' '}
+                                        <Link to="/pollinator-collections" className="tc-secondary">
+                                            Open the dedicated page
+                                        </Link>.
+                                    </p>
+                                </Col>
+                            </Row>
+                        )}
+                        {!searchParams.get('serviceType') && <div className="mt-2" />}
                         {/* Results Count */}
-                        <Row className="mt-4">
+                        <Row className="mt-2">
                             <Col>
                                 <p className="fs-4 fw-lightBold">{`${paginator.totalRecords ?? 0} results`}</p>
                             </Col>
