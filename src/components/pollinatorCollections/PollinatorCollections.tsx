@@ -6,6 +6,20 @@ import Header from 'components/general/header/Header';
 import Footer from 'components/general/footer/Footer';
 import { pollinatorCollections } from './pollinatorCollectionsData';
 
+const renderDataCoverage = (text: string) => {
+    return (
+        <p className="mb-0">
+            {text.split(/(\([^)]*\))/).map((part, index) =>
+                part.startsWith('(') ? (
+                    <i key={`italic-${index}-${part}`}>{part}</i>
+                ) : (
+                    <span key={`span-${index}-${part}`}>{part}</span>
+                )
+            )}
+        </p>
+    );
+};
+
 const PollinatorCollections = () => {
     return (
         <div className="h-100 d-flex flex-column">
@@ -65,7 +79,7 @@ const PollinatorCollections = () => {
                                                             <p className="mb-0 text-muted">{collection.project}</p>
                                                         )}
                                                     </td>
-                                                    <td>{collection.dataCoverage}</td>
+                                                    <td>{renderDataCoverage(collection.dataCoverage)}</td>
                                                     <td>
                                                         <ul className="mb-0 ps-3">
                                                             {collection.links.map((link) => (
