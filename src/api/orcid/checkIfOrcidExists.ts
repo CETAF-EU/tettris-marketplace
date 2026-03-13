@@ -10,7 +10,7 @@ const checkIfOrcidExists = async (orcid: string): Promise<TaxonomicExpert | null
     console.log('Checking if orcid exists:', orcid);
 
     let taxonomicExperts: TaxonomicExpert[] = [];
-    const filters = `/taxonomicExpert/@type:TaxonomicExpert AND (/taxonomicExpert/schema\\:person/schema\\:orcid:"${orcid}")`;
+    const filters = String.raw`/taxonomicExpert/@type:TaxonomicExpert AND (/taxonomicExpert/schema\:person/schema\:orcid:"${orcid}")`;
     
     try {
         const response = await axios.get('/Op.Search', {
@@ -33,7 +33,7 @@ const checkIfOrcidExists = async (orcid: string): Promise<TaxonomicExpert | null
             taxonomicExperts.push(taxonomicExpert);
         });
 
-        const orcidExist = taxonomicExperts[0].taxonomicExpert?.['schema:person']?.['schema:orcid'] as string || null;
+        const orcidExist = taxonomicExperts[0]?.taxonomicExpert?.['schema:person']?.['schema:orcid'] as string | null;
         if (orcidExist === orcid)
         {
             console.log('Orcid exists:', orcidExist);

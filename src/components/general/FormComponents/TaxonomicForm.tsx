@@ -14,6 +14,8 @@ import FormBuilder from 'components/general/FormComponents/FormBuilder';
 import { Color, getColor } from '../ColorPage';
 import { useOrcidCallback } from 'api/orcid/auth';
 import checkIfEmailExists from 'api/email/checkIfEmailExists';
+import requestUserToken from 'api/email/UserToken';
+import verifyUserToken from 'api/email/VerifyUserToken.ts';
 import { TaxonomicExpert } from 'app/Types';
 
 const TaxonomicForm = () => {
@@ -23,6 +25,10 @@ const TaxonomicForm = () => {
     const [email, setEmail] = useState<string>('');
     const [expertExists, setExpertExists] = useState<TaxonomicExpert | null>(null);
     const [loginError, setLoginError] = useState<string>('');
+    const [loginInfo, setLoginInfo] = useState<string>('');
+    const [pendingEmail, setPendingEmail] = useState<string>('');
+    const [tokenRequested, setTokenRequested] = useState<boolean>(false);
+    const [isResendingToken, setIsResendingToken] = useState<boolean>(false);
 
     const { userData, error } = useOrcidCallback();
 
@@ -52,6 +58,25 @@ const TaxonomicForm = () => {
     const redirectToOrcidAuth = () => {
         const orcidAuthUrl = `https://orcid.org/oauth/authorize?client_id=${import.meta.env.VITE_ORCID_CLIENT_ID}&response_type=code&scope=/authenticate&redirect_uri=${import.meta.env.VITE_ORCID_REDIRECT_URI}`;
         window.location.href = orcidAuthUrl;
+    };
+
+    const handleResendToken = async () => {
+        if (!pendingEmail) {
+            setLoginError('No email available to resend the token.');
+            return;
+        }
+
+        setIsResendingToken(true);
+        const tokenRequestSucceeded = await requestUserToken(pendingEmail);
+        setIsResendingToken(false);
+
+        if (!tokenRequestSucceeded) {
+            setLoginError('Unable to resend verification token. Please try again later.');
+            return;
+        }
+
+        setLoginError('');
+        setLoginInfo('A new verification token has been sent. Check your email inbox.');
     };
 
     return (
@@ -147,9 +172,31 @@ const TaxonomicForm = () => {
                                                             const form = e.currentTarget as HTMLFormElement;
                                                             const email = form.elements.namedItem('email') as HTMLInputElement;
                                                             const emailConfirm = form.elements.namedItem('emailConfirm') as HTMLInputElement;
+                                                            const tokenInput = form.elements.namedItem('token') as HTMLInputElement | null;
                                                             const emailValue = email.value.trim();
                                                             const emailConfirmValue = emailConfirm.value.trim();
                                                             const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
+
+                                                            if (tokenRequested) {
+                                                                const tokenValue = tokenInput?.value.trim() || '';
+                                                                if (!tokenValue) {
+                                                                    setLoginError('Please enter the verification token.');
+                                                                    return;
+                                                                }
+
+                                                                const isTokenValid = await verifyUserToken(pendingEmail, tokenValue);
+                                                                if (!isTokenValid) {
+                                                                    setLoginError('Invalid or expired token. Please try again.');
+                                                                    return;
+                                                                }
+
+                                                                setEmail(pendingEmail);
+                                                                setIsLoggedIn(true);
+                                                                setLoginError('');
+                                                                setLoginInfo('');
+                                                                return;
+                                                            }
+
                                                             if (!emailValid) {
                                                                 setLoginError('Invalid email.');
                                                                 return;
@@ -166,15 +213,23 @@ const TaxonomicForm = () => {
                                                                 setLoginError('Email already registered. Please send a ticket to the Marketplace helpdesk to update your profile.');
                                                                 return;
                                                             }
-                                                            setEmail(emailValue);
-                                                            setIsLoggedIn(true);
+
+                                                            const tokenRequestSucceeded = await requestUserToken(emailValue);
+                                                            if (!tokenRequestSucceeded) {
+                                                                setLoginError('Unable to send verification token. Please try again later.');
+                                                                return;
+                                                            }
+
+                                                            setPendingEmail(emailValue);
+                                                            setTokenRequested(true);
                                                             setLoginError('');
+                                                            setLoginInfo('Verification token sent. Check your email and enter the token below.');
                                                         }}
 
                                                     >
                                                         <div className="mb-3">
                                                             <label htmlFor="email" className="form-label">Email address</label>
-                                                            <input type="email" className={`form-control${loginError ? ' is-invalid' : ''}`} id="email" name="email" required />
+                                                            <input type="email" className={`form-control${loginError ? ' is-invalid' : ''}`} id="email" name="email" disabled={tokenRequested} required />
                                                         </div>
                                                         <div className="mb-3">
                                                             <label htmlFor="emailConfirm" className="form-label">Confirm Email address</label>
@@ -183,12 +238,54 @@ const TaxonomicForm = () => {
                                                                 className={`form-control${loginError ? ' is-invalid' : ''}`}
                                                                 id="emailConfirm"
                                                                 name="emailConfirm"
+                                                                disabled={tokenRequested}
                                                                 required
                                                             />
                                                         </div>
+
+                                                        {tokenRequested && (
+                                                            <div className="mb-3">
+                                                                <label htmlFor="token" className="form-label">Verification token</label>
+                                                                <input
+                                                                    type="text"
+                                                                    className={`form-control${loginError ? ' is-invalid' : ''}`}
+                                                                    id="token"
+                                                                    name="token"
+                                                                    autoComplete="one-time-code"
+                                                                    required
+                                                                />
+                                                            </div>
+                                                        )}
+
                                                         <button type="submit" className="btn btn-primary mt-2">
-                                                            {'Register'}
+                                                            {tokenRequested ? 'Verify token' : 'Register'}
                                                         </button>
+                                                        {tokenRequested && (
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-link mt-2 ms-2"
+                                                                onClick={handleResendToken}
+                                                                disabled={isResendingToken}
+                                                            >
+                                                                {isResendingToken ? 'Resending...' : 'Resend token'}
+                                                            </button>
+                                                        )}
+                                                        {tokenRequested && (
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-link mt-2 ms-2"
+                                                                onClick={() => {
+                                                                    setTokenRequested(false);
+                                                                    setPendingEmail('');
+                                                                    setLoginError('');
+                                                                    setLoginInfo('');
+                                                                    setIsResendingToken(false);
+                                                                }}
+                                                            >
+                                                                Use another email
+                                                            </button>
+                                                        )}
+                                                        {loginInfo && <div className="text-success mt-2">{loginInfo}</div>}
                                                         {loginError && <div className="text-danger mt-2">{loginError}</div>}
                                                     </form>
                                                 </div>

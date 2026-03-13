@@ -20,7 +20,7 @@ const GetRORsByName = async ({ query }: { query?: string }) => {
         for(let index = 0; index < query.length; index++) {
             const character = query.at(index) as string;
 
-            escapedQuery = escapedQuery.concat(character?.replace(/[^\w]/g, `\\${character}`));
+            escapedQuery = escapedQuery.concat(character?.replaceAll(/[^\w]/g, `\\${character}`));
         };
 
         try {

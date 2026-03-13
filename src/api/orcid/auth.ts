@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import checkIfOrcidExists from './checkIfOrcidExists';
 
+const ORCID_TOKEN_URL = `${import.meta.env.VITE_API_URL}/orcid/token`;
+const MARKETPLACE_API_TOKEN = import.meta.env.VITE_MARKETPLACE_API_TOKEN;
+
 interface OrcidUserData {
     orcid: string;
     name: string;
@@ -12,7 +15,7 @@ export function useOrcidCallback() {
     const [userData, setUserData] = useState<OrcidUserData | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(globalThis.location.search);
     const code = urlParams.get('code');
 
     useEffect(() => {
@@ -27,15 +30,23 @@ export function useOrcidCallback() {
             }
 
             // Remove 'code' param from URL
-            const url = new URL(window.location.href);
+            const url = new URL(globalThis.location.href);
             url.searchParams.delete('code');
-            window.history.replaceState({}, document.title, url.pathname + url.search);
+            globalThis.history.replaceState({}, document.title, url.pathname + url.search);
         })();
     }, [code]);
 
     async function loginWithOrcid(code: string): Promise<OrcidUserData> {
         try {
-            const response = await axios.post('https://sandbox.cetaf.org/orcid/api/orcid/token', { code });
+            const response = await axios.post(
+                ORCID_TOKEN_URL,
+                { code },
+                {
+                    headers: MARKETPLACE_API_TOKEN
+                        ? { 'x-marketplace-token': MARKETPLACE_API_TOKEN }
+                        : undefined
+                }
+            );
 
             if (response.status !== 200) {
                 throw new Error('Failed to login with ORCID');
