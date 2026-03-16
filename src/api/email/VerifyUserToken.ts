@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clearStoredAuthToken, extractAuthToken, storeAuthToken } from 'api/auth/session';
 
 /**
  * Verifies a login token for the provided email.
@@ -8,6 +9,8 @@ import axios from 'axios';
  */
 const verifyUserToken = async (email: string, code: string): Promise<boolean> => {
     try {
+        clearStoredAuthToken();
+
         const response = await axios.post(
             `${import.meta.env.VITE_API_URL}/auth/login`,
             { email, code },
@@ -22,12 +25,18 @@ const verifyUserToken = async (email: string, code: string): Promise<boolean> =>
             return response.data;
         }
 
+        const authToken = extractAuthToken(response.data);
+        if (authToken) {
+            storeAuthToken(authToken);
+        }
+
         if (response.data && typeof response.data.success === 'boolean') {
             return response.data.success;
         }
 
-        return Boolean(response.data);
+        return Boolean(response.data || authToken);
     } catch (error) {
+        clearStoredAuthToken();
         console.error('Email token verification failed:', error);
         return false;
     }

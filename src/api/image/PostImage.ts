@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getStoredAuthToken } from 'api/auth/session';
 
 export async function postImage(file: File | string): Promise<{ url: string }> {
     const formData = new FormData();
@@ -19,6 +20,7 @@ export async function postImage(file: File | string): Promise<{ url: string }> {
         formData.append('file', file);
     }
 
+    const authToken = getStoredAuthToken();
     const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/uploads/upload-image`,
         formData,
@@ -26,6 +28,7 @@ export async function postImage(file: File | string): Promise<{ url: string }> {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+                ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
             },
         }
     );

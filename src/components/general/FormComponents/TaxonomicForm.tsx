@@ -17,6 +17,7 @@ import checkIfEmailExists from 'api/email/checkIfEmailExists';
 import requestUserToken from 'api/email/UserToken';
 import verifyUserToken from 'api/email/VerifyUserToken.ts';
 import { TaxonomicExpert } from 'app/Types';
+import { clearStoredAuthToken } from 'api/auth/session';
 
 const TaxonomicForm = () => {
     const [completed, setCompleted] = useState<boolean>(false);
@@ -159,6 +160,7 @@ const TaxonomicForm = () => {
                                                             className="btn btn-link p-0"
                                                             style={{ fontSize: '1rem' }}
                                                             onClick={() => {
+                                                                clearStoredAuthToken();
                                                                 setLoginError('');
                                                             }}
                                                             type="button"
@@ -275,6 +277,7 @@ const TaxonomicForm = () => {
                                                                 type="button"
                                                                 className="btn btn-link mt-2 ms-2"
                                                                 onClick={() => {
+                                                                    clearStoredAuthToken();
                                                                     setTokenRequested(false);
                                                                     setPendingEmail('');
                                                                     setLoginError('');

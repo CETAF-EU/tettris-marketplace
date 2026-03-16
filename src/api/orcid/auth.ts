@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import checkIfOrcidExists from './checkIfOrcidExists';
+import { clearStoredAuthToken, extractAuthToken, storeAuthToken } from 'api/auth/session';
 
 const ORCID_TOKEN_URL = `${import.meta.env.VITE_API_URL}/orcid/token`;
 const MARKETPLACE_API_TOKEN = import.meta.env.VITE_MARKETPLACE_API_TOKEN;
@@ -38,6 +39,8 @@ export function useOrcidCallback() {
 
     async function loginWithOrcid(code: string): Promise<OrcidUserData> {
         try {
+            clearStoredAuthToken();
+
             const response = await axios.post(
                 ORCID_TOKEN_URL,
                 { code },
@@ -52,15 +55,22 @@ export function useOrcidCallback() {
                 throw new Error('Failed to login with ORCID');
             }
 
+            const authToken = extractAuthToken(response.data);
+            if (authToken) {
+                storeAuthToken(authToken);
+            }
+
             const orcid = response.data.orcid;
             const exists = await checkIfOrcidExists(orcid);
 
             if (exists) {
+                clearStoredAuthToken();
                 throw new Error('ORCID already exists in the system');
             }
 
             return response.data;
         } catch (error: any) {
+            clearStoredAuthToken();
             if (axios.isAxiosError(error)) {
                 throw new Error(error.response?.data?.message ?? 'Failed to login with ORCID');
             }
