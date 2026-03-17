@@ -3,7 +3,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 
 /* Import Types */
-import { TaxonomicExpert, CordraResult, Dict } from 'app/Types';
+import { TaxonomicExpert, Dict } from 'app/Types';
 import InsertDashboardData from 'api/dashboardData/InsertDashboardData';
 import SendEmail from 'api/email/SendEmail';
 
@@ -18,47 +18,45 @@ const UpdateTaxonomicExpert = async ({ id, updatedData }: { id: string; updatedD
 
     if (!id || !updatedData) return;
 
-    /* Prepare object for update */
-    const updatePayload = {
-        id: id,
-        type: 'TaxonomicExpert',
-        attributes: {
-            content: {
-                taxonomicExpert: {
-                    "@type": 'TaxonomicExpert',
-                    "schema:status": 'proposed',
-                    ...updatedData
-                }
-            }
-        }
+    const taxonomicExpertRecord = {
+        'schema:status': 'proposed',
+        ...updatedData,
     };
 
     try {
-        const result = await axios({
-            method: 'post',
-            url: '/Op.Update',
-            params: {
-                targetId: 'service'
+        const response = await axios.put(
+            `${import.meta.env.VITE_API_URL}/cordra/experts/${encodeURIComponent(id)}`,
+            {
+                taxonomic_expert_record: taxonomicExpertRecord,
             },
-            data: updatePayload,
-            headers: {
-                'Content-type': 'application/json'
-            },
-            auth: {
-                username: 'TaxonomicMarketplace',
-                password: import.meta.env.VITE_CORDRA_PASSWORD
-            },
-            responseType: 'json'
-        });
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+                },
+            }
+        );
 
-        const data: CordraResult = result.data;
-        updatedExpert = data.attributes.content as TaxonomicExpert;
+        const data: Dict = response.data;
+        updatedExpert = (
+            data.taxonomicExpert ??
+            data.taxonomic_expert ??
+            data.attributes?.content
+        ) as TaxonomicExpert;
+
+        if (!updatedExpert?.taxonomicExpert) {
+            throw new Error('Failed to update taxonomic expert record.');
+        }
+
+        const metadata = data.metadata ?? data.attributes?.metadata;
 
         // Timestamps
-        updatedExpert.taxonomicExpert['schema:dateModified'] = format(
-            new Date(data.attributes.metadata.modifiedOn),
-            "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-        );
+        if (metadata?.modifiedOn) {
+            updatedExpert.taxonomicExpert['schema:dateModified'] = format(
+                new Date(metadata.modifiedOn),
+                "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+            );
+        }
 
         // Update dashboard data
         const updatedDashboardData = {

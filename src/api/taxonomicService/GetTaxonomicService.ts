@@ -3,7 +3,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 
 /* Import Types */
-import { TaxonomicService, CordraResult } from 'app/Types';
+import { TaxonomicService, Dict } from 'app/Types';
 
 
 /**
@@ -18,29 +18,36 @@ const GetTaxonomicService = async ({ handle }: { handle?: string }) => {
         const taxonomicServiceID: string = handle.replace(import.meta.env.VITE_HANDLE_URL as string, '');
 
         try {
-            const result = await axios({
-                method: 'get',
-                url: '/Op.Retrieve',
-                params: {
-                    targetId: taxonomicServiceID
-                },
-                responseType: 'json'
-            });
+            const response = await axios.get(
+                `${import.meta.env.VITE_API_URL}/cordra/services/${encodeURIComponent(taxonomicServiceID)}`,
+                {
+                    headers: {
+                        'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+                    },
+                }
+            );
 
-            /* Get result data from JSON */
-            const data: CordraResult = result.data;
-
-            /* Set Taxonomic Service */
-            taxonomicService = data.attributes.content as TaxonomicService;
+            const data: Dict = response.data;
+            taxonomicService = (
+                data.taxonomicService ??
+                data.taxonomic_service ??
+                data.attributes?.content
+            ) as TaxonomicService;
 
             /* Check if Taxonomic Service is published, otherwise throw error */
             if (taxonomicService.taxonomicService['schema:status'] !== 'accepted') {
                 throw (new Error('This Taxonomic Service has not been published yet', { cause: 200 }));
             };
 
-            /* Set created and modified */
-            taxonomicService.taxonomicService['schema:dateCreated'] = format(new Date(data.attributes.metadata.createdOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-            taxonomicService.taxonomicService['schema:dateModified'] = format(new Date(data.attributes.metadata.modifiedOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+            const metadata = data.metadata ?? data.attributes?.metadata;
+
+            if (metadata?.createdOn) {
+                taxonomicService.taxonomicService['schema:dateCreated'] = format(new Date(metadata.createdOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+            }
+
+            if (metadata?.modifiedOn) {
+                taxonomicService.taxonomicService['schema:dateModified'] = format(new Date(metadata.modifiedOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+            }
         } catch (error) {
             console.error(error);
 

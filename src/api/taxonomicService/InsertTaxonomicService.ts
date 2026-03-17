@@ -3,7 +3,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 
 /* Import Types */
-import { TaxonomicService, CordraResult, Dict } from 'app/Types';
+import { TaxonomicService, Dict } from 'app/Types';
 import SendEmail from 'api/email/SendEmail';
 
 
@@ -16,53 +16,49 @@ const InsertTaxonomicService = async ({ taxonomicServiceRecord }: { taxonomicSer
     let taxonomicService: TaxonomicService | undefined;
 
     if (taxonomicServiceRecord) {
-        /* Craft taxonomic service object */
-        const newTaxonomicService = {
-            type: 'TaxonomicService',
-            attributes: {
-                content: {
-                    taxonomicService: {
-                        "@type": 'TaxonomicService',
-                        "schema:status": 'proposed',
-                        "schema:ratingValue": 0,
-                        ...taxonomicServiceRecord
-                    }
-                }
-            }
+        const normalizedTaxonomicServiceRecord = {
+            'schema:status': 'proposed',
+            'schema:ratingValue': 0,
+            ...taxonomicServiceRecord,
         };
 
         try {
-            const result = await axios({
-                method: 'post',
-                url: '/Op.Create',
-                params: {
-                    targetId: 'service'
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}/cordra/services`,
+                {
+                    taxonomic_service_record: normalizedTaxonomicServiceRecord,
                 },
-                data: newTaxonomicService,
-                headers: {
-                    'Content-type': 'application/json'
-                },
-                auth: {
-                    username: 'TaxonomicMarketplace',
-                    password: import.meta.env.VITE_CORDRA_PASSWORD
-                },
-                responseType: 'json'
-            });
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+                    },
+                }
+            );
 
-            /* Get result data from JSON */
-            const data: CordraResult = result.data;
+            const data: Dict = response.data;
+            taxonomicService = (
+                data.taxonomicService ??
+                data.taxonomic_service ??
+                data.attributes?.content
+            ) as TaxonomicService;
 
-            /* Set Taxonomic Service */
-            taxonomicService = data.attributes.content as TaxonomicService;
+            const metadata = data.metadata ?? data.attributes?.metadata;
 
-            /* Set created and modified */
-            taxonomicService.taxonomicService['schema:dateCreated'] = format(new Date(data.attributes.metadata.createdOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-            taxonomicService.taxonomicService['schema:dateModified'] = format(new Date(data.attributes.metadata.modifiedOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+            if (metadata?.createdOn && taxonomicService?.taxonomicService) {
+                taxonomicService.taxonomicService['schema:dateCreated'] = format(new Date(metadata.createdOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+            }
+
+            if (metadata?.modifiedOn && taxonomicService?.taxonomicService) {
+                taxonomicService.taxonomicService['schema:dateModified'] = format(new Date(metadata.modifiedOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+            }
 
             /* Send email */
-            const url = "https://marketplace.cetaf.org/cordra/#objects/" + taxonomicService.taxonomicService['@id'];
-            const name = taxonomicService.taxonomicService['schema:service']['schema:name'] ? taxonomicService.taxonomicService['schema:service']['schema:name'] : "Taxonomic Service";
-            SendEmail(name, url);
+            if (taxonomicService?.taxonomicService) {
+                const url = "https://marketplace.cetaf.org/cordra/#objects/" + taxonomicService.taxonomicService['@id'];
+                const name = taxonomicService.taxonomicService['schema:service']['schema:name'] ? taxonomicService.taxonomicService['schema:service']['schema:name'] : "Taxonomic Service";
+                SendEmail(name, url);
+            }
         } catch (error) {
             console.error(error);
 

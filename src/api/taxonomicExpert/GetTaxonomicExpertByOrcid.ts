@@ -3,7 +3,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 
 /* Import Types */
-import { TaxonomicExpert, CordraResultArray } from 'app/Types';
+import { TaxonomicExpert, CordraResultArray, Dict } from 'app/Types';
 
 /* Import Sources */
 
@@ -21,42 +21,43 @@ const GetTaxonomicExpertByOrcid = async ({ orcidId }: { orcidId?: string }) => {
     filters = filters.concat('/taxonomicExpert/@type:TaxonomicExpert');
     /* Filter for retreive the orcid */
     if (orcidId) {
-        filters = filters.concat(` AND /taxonomicExpert/schema\\:person/schema\\:orcid:"${orcidId}"`);
+        filters = filters.concat(String.raw` AND /taxonomicExpert/schema\:person/schema\:orcid:"${orcidId}"`);
     }
+
     try {
-        const result = await axios({
-            method: 'get',
-            url: `/Op.Search`,
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/cordra/experts`, {
             params: {
-                targetId: 'service',
                 query: filters
             },
-            auth: {
-                username: 'TaxonomicMarketplace',
-                password: import.meta.env.VITE_CORDRA_PASSWORD
+            headers: {
+                'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
             },
-            responseType: 'json'
         });
-        /* Get result data from JSON */
-        const data: CordraResultArray = result.data;
 
-        /* Set Taxonomic Expert */
-        data.results.forEach((dataFragment) => {
-            const taxonomicExpert = dataFragment.attributes.content as TaxonomicExpert;
+        const data: Dict = response.data;
 
-            /* Set created and modified */
-            taxonomicExpert.taxonomicExpert['schema:dateCreated'] = format(new Date(dataFragment.attributes.metadata.createdOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-            taxonomicExpert.taxonomicExpert['schema:dateModified'] = format(new Date(dataFragment.attributes.metadata.modifiedOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+        if (Array.isArray(data.taxonomicExperts)) {
+            taxonomicExperts = data.taxonomicExperts as TaxonomicExpert[];
+        } else if (Array.isArray(data.taxonomic_experts)) {
+            taxonomicExperts = data.taxonomic_experts as TaxonomicExpert[];
+        } else {
+            const fallbackData: CordraResultArray = data as CordraResultArray;
 
-            /* Push to taxonomic services array */
-            taxonomicExperts.push(taxonomicExpert);
-        });
+            fallbackData.results?.forEach((dataFragment) => {
+                const taxonomicExpert = dataFragment.attributes.content as TaxonomicExpert;
+
+                taxonomicExpert.taxonomicExpert['schema:dateCreated'] = format(new Date(dataFragment.attributes.metadata.createdOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+                taxonomicExpert.taxonomicExpert['schema:dateModified'] = format(new Date(dataFragment.attributes.metadata.modifiedOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+
+                taxonomicExperts.push(taxonomicExpert);
+            });
+        }
     } catch (error) {
         console.error(error);
 
         throw (error);
     };
-    console.log('taxonomicExperts', taxonomicExperts);
+
     return taxonomicExperts;
 }
 
