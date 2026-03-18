@@ -1,5 +1,6 @@
 /* Import Dependencies */
 import axios from 'axios';
+import { getStoredAuthToken } from 'api/auth/session';
 
 /* Import Types */
 import { TaxonomicExpert, Dict } from 'app/Types';
@@ -25,6 +26,7 @@ const InsertTaxonomicExpert = async ({
         }
 
         try {
+            const authToken = getStoredAuthToken();
             const response = await axios.post(
                 `${import.meta.env.VITE_API_URL}/cordra/experts`,
                 {
@@ -34,6 +36,7 @@ const InsertTaxonomicExpert = async ({
                     headers: {
                         'Content-Type': 'application/json',
                         'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+                        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
                     },
                 }
             );
