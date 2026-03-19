@@ -1,11 +1,11 @@
 /* Import Dependencies */
 import axios from 'axios';
 import { format } from 'date-fns';
+import { getStoredAuthToken } from 'api/auth/session';
 
 /* Import Types */
-import { TaxonomicExpert, CordraResult, Dict } from 'app/Types';
-import InsertDashboardData from 'api/dashboardData/InsertDashboardData';
-import SendEmail from 'api/email/SendEmail';
+import { TaxonomicExpert, Dict } from 'app/Types';
+import { postImage } from 'api/image/PostImage';
 
 /**
  * Function to update an existing taxonomic expert object in Cordra.
@@ -18,68 +18,58 @@ const UpdateTaxonomicExpert = async ({ id, updatedData }: { id: string; updatedD
 
     if (!id || !updatedData) return;
 
-    /* Prepare object for update */
-    const updatePayload = {
-        id: id,
-        type: 'TaxonomicExpert',
-        attributes: {
-            content: {
-                taxonomicExpert: {
-                    "@type": 'TaxonomicExpert',
-                    "schema:status": 'proposed',
-                    ...updatedData
-                }
-            }
-        }
+    const taxonomicExpertRecord: Dict = {
+        'schema:status': 'proposed',
+        ...updatedData,
     };
 
+    const imageValue = taxonomicExpertRecord?.['schema:person']?.['schema:ProfilePicture'];
+    const shouldUploadImage =
+        imageValue instanceof File ||
+        (typeof imageValue === 'string' && imageValue.startsWith('data:'));
+
+    if (shouldUploadImage) {
+        const pictureUrl = await postImage(imageValue);
+        taxonomicExpertRecord['schema:person']['schema:ProfilePicture'] = pictureUrl.url;
+    }
+
     try {
-        const result = await axios({
-            method: 'post',
-            url: '/Op.Update',
-            params: {
-                targetId: 'service'
-            },
-            data: updatePayload,
-            headers: {
-                'Content-type': 'application/json'
-            },
-            auth: {
-                username: 'TaxonomicMarketplace',
-                password: import.meta.env.VITE_CORDRA_PASSWORD
-            },
-            responseType: 'json'
-        });
+        const authToken = getStoredAuthToken();
 
-        const data: CordraResult = result.data;
-        updatedExpert = data.attributes.content as TaxonomicExpert;
-
-        // Timestamps
-        updatedExpert.taxonomicExpert['schema:dateModified'] = format(
-            new Date(data.attributes.metadata.modifiedOn),
-            "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+        const response = await axios.put(
+            `${import.meta.env.VITE_API_URL}/cordra/experts/${encodeURIComponent(id)}`,
+            {
+                taxonomic_expert_record: taxonomicExpertRecord,
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+                    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+                },
+            }
         );
 
-        // Update dashboard data
-        const updatedDashboardData = {
-            type: 'DashboardData',
-            attributes: {
-                content: {
-                    dashboardData: {
-                        "@type": 'DashboardData',
-                        "schema:reference": updatedExpert.taxonomicExpert['@id'],
-                        "schema:gender": updatedExpert.taxonomicExpert['schema:person']?.['schema:gender'],
-                        "schema:age": updatedExpert.taxonomicExpert['schema:person']?.['schema:birthDate']
-                    }
-                }
-            }
-        };
-        await InsertDashboardData({ DashboardDataRecord: updatedDashboardData });
+        const data: Dict = response.data;
+        updatedExpert = (
+            data.taxonomicExpert ??
+            data.taxonomic_expert ??
+            data.attributes?.content
+        ) as TaxonomicExpert;
 
-        /* Send email */
-        const url = "https://marketplace.cetaf.org/cordra/#objects/" + updatedExpert.taxonomicExpert['@id'];
-        const name = updatedExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] ?? "Taxonomic Expert";
-        SendEmail(name, url);
+        if (!updatedExpert?.taxonomicExpert) {
+            throw new Error('Failed to update taxonomic expert record.');
+        }
+
+        const metadata = data.metadata ?? data.attributes?.metadata;
+
+        // Timestamps
+        if (metadata?.modifiedOn) {
+            updatedExpert.taxonomicExpert['schema:dateModified'] = format(
+                new Date(metadata.modifiedOn),
+                "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+            );
+        }
 
     } catch (error) {
         console.error('UpdateTaxonomicExpert error:', error);

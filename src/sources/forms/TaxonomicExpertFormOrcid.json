@@ -697,28 +697,28 @@
                 "jsonPath": "$['schema:publicationNumber']['identifier']",
                 "title": "Identification keys",
                 "description": "The number of identification keys",
-                "type": "string",
+                "type": "int",
                 "required": false
             },
             {
                 "jsonPath": "$['schema:publicationNumber']['scholarlyArticle']",
                 "title": "Research papers",
                 "description": "The number of scientific papers",
-                "type": "string",
+                "type": "int",
                 "required": false
             },
             {
                 "jsonPath": "$['schema:publicationNumber']['book']",
                 "title": "Books",
                 "description": "The number of books",
-                "type": "string",
+                "type": "int",
                 "required": false
             },
             {
                 "jsonPath": "$['schema:publicationNumber']['creativeWork']",
                 "title": "Other",
                 "description": "The number of other publications",
-                "type": "string",
+                "type": "int",
                 "required": false
             }
         ]

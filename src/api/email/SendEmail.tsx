@@ -1,19 +1,24 @@
-import emailjs from "emailjs-com";
+import axios from 'axios';
 
-const SendEmail = (serviceName: string, message: string) => {
-  try {
-    emailjs
-      .send(
-          import.meta.env.VITE_EMAILJS_ID,
-          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-          { service_name: serviceName, message: message },
-          import.meta.env.VITE_EMAILJS_USER_ID
-      )
-  } catch (error) {
-        console.error(error);
-
-        throw (error);
-    };
+const SendEmail = async (serviceName: string, message: string) => {
+    try {
+        const response = await axios.post(
+            `${import.meta.env.VITE_API_URL}/email/send`,
+            {
+                service_name: serviceName,
+                service_url: message
+            },
+            {
+                headers: {
+                    "x-marketplace-token": import.meta.env.VITE_MARKETPLACE_API_TOKEN
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Email send failed:", error);
+        return false;
+    }
 };
 
 export default SendEmail;

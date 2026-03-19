@@ -1,44 +1,55 @@
 import axios from 'axios';
 import { TaxonomicExpert, CordraResultArray } from 'app/Types';
 /**
- * Checks if an expert with the given email already exists.
- * @param email - The email to check.
- * @returns True if the email exists, false otherwise.
+ * Checks if an expert with the given ORCID already exists.
+ * @param orcid - The ORCID to check.
+ * @returns Existing expert if found, otherwise null.
  */
 const checkIfOrcidExists = async (orcid: string): Promise<TaxonomicExpert | null> => {
 
     console.log('Checking if orcid exists:', orcid);
 
     let taxonomicExperts: TaxonomicExpert[] = [];
-    const filters = `/taxonomicExpert/@type:TaxonomicExpert AND (/taxonomicExpert/schema\\:person/schema\\:orcid:"${orcid}")`;
+    const filters = String.raw`/taxonomicExpert/@type:TaxonomicExpert AND (/taxonomicExpert/schema\:person/schema\:orcid:"${orcid}")`;
     
     try {
-        const response = await axios.get('/Op.Search', {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/cordra/experts`, {
             params: {
-                targetId: 'service',
                 query: filters,
                 size: 1
             },
-            auth: {
-                username: 'TaxonomicMarketplace',
-                password: import.meta.env.VITE_CORDRA_PASSWORD
+            headers: {
+                'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
             }
         });
 
-        const data: CordraResultArray = response.data;
-        /* Set Taxonomic Expert */
-        data.results.forEach((dataFragment) => {
-            const taxonomicExpert = dataFragment.attributes.content as TaxonomicExpert;        
-            /* Push to taxonomic services array */
-            taxonomicExperts.push(taxonomicExpert);
-        });
+        const data = response.data as {
+            taxonomicExperts?: TaxonomicExpert[];
+            taxonomic_experts?: TaxonomicExpert[];
+        } & Partial<CordraResultArray>;
 
-        const orcidExist = taxonomicExperts[0].taxonomicExpert?.['schema:person']?.['schema:orcid'] as string || null;
-        if (orcidExist === orcid)
-        {
-            console.log('Orcid exists:', orcidExist);
-            return taxonomicExperts[0];
+        if (Array.isArray(data.taxonomicExperts)) {
+            taxonomicExperts = data.taxonomicExperts;
+        } else if (Array.isArray(data.taxonomic_experts)) {
+            taxonomicExperts = data.taxonomic_experts;
+        } else if (Array.isArray(data.results)) {
+            data.results.forEach((dataFragment) => {
+                const taxonomicExpert = dataFragment.attributes.content as TaxonomicExpert;
+                taxonomicExperts.push(taxonomicExpert);
+            });
         }
+
+        const normalizedOrcid = orcid.trim().toUpperCase();
+        const existingExpert = taxonomicExperts.find((expert) => {
+            const expertOrcid = expert?.taxonomicExpert?.['schema:person']?.['schema:orcid'];
+            return typeof expertOrcid === 'string' && expertOrcid.trim().toUpperCase() === normalizedOrcid;
+        }) || null;
+
+        if (existingExpert) {
+            console.log('Orcid exists:', existingExpert.taxonomicExpert?.['schema:person']?.['schema:orcid']);
+            return existingExpert;
+        }
+
         console.log('Orcid does not match:', orcid);
         return null;
     } catch (error) {

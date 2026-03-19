@@ -3,7 +3,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 
 /* Import Types */
-import { TaxonomicExpert, CordraResult } from 'app/Types';
+import { TaxonomicExpert, Dict } from 'app/Types';
 
 
 /**
@@ -18,28 +18,31 @@ const GetTaxonomicExpert = async ({ handle }: { handle?: string }) => {
         const taxonomicExpertID: string = handle.replace(import.meta.env.VITE_HANDLE_URL as string, '');
 
         try {
-            const result = await axios({
-                method: 'get',
-                url: '/Op.Retrieve',
-                params: {
-                    targetId: taxonomicExpertID
-                },
-                auth: {
-                    username: 'TaxonomicMarketplace',
-                    password: import.meta.env.VITE_CORDRA_PASSWORD
-                },
-                responseType: 'json'
-            });
+            const response = await axios.get(
+                `${import.meta.env.VITE_API_URL}/cordra/experts/${encodeURIComponent(taxonomicExpertID)}`,
+                {
+                    headers: {
+                        'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+                    },
+                }
+            );
 
-            /* Get result data from JSON */
-            const data: CordraResult = result.data;
+            const data: Dict = response.data;
+            taxonomicExpert = (
+                data.taxonomicExpert ??
+                data.taxonomic_expert ??
+                data.attributes?.content
+            ) as TaxonomicExpert;
 
-            /* Set Taxonomic Service */
-            taxonomicExpert = data.attributes.content as TaxonomicExpert;
+            const metadata = data.metadata ?? data.attributes?.metadata;
 
-            /* Set created and modified */
-            taxonomicExpert.taxonomicExpert['schema:dateCreated'] = format(new Date(data.attributes.metadata.createdOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-            taxonomicExpert.taxonomicExpert['schema:dateModified'] = format(new Date(data.attributes.metadata.modifiedOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+            if (metadata?.createdOn && taxonomicExpert?.taxonomicExpert) {
+                taxonomicExpert.taxonomicExpert['schema:dateCreated'] = format(new Date(metadata.createdOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+            }
+
+            if (metadata?.modifiedOn && taxonomicExpert?.taxonomicExpert) {
+                taxonomicExpert.taxonomicExpert['schema:dateModified'] = format(new Date(metadata.modifiedOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+            }
         } catch (error) {
             console.error(error);
 

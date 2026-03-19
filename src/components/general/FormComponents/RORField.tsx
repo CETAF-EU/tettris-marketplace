@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { Field } from "formik";
 import jp from 'jsonpath';
 import { isEmpty } from "lodash";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Select from "react-select";
 
@@ -43,8 +43,69 @@ const RORField = (props: Props) => {
     const [dropdownOptions, setDropdownOptions] = useState<DropdownItem[] | undefined>();
     const [NoAffiliation, setNoAffiliation] = useState<boolean>(false);
 
+    let formikJsonPath: string = '';
+    field.jsonPath.split('][').forEach(pathSegment => {
+        const localPathSegment = pathSegment.replaceAll(/[^a-zA-Z0-9:_@-]/g, '');
+
+        if (Number.isNaN(Number(localPathSegment))) {
+            formikJsonPath = formikJsonPath.concat(`['${localPathSegment}']`);
+        } else {
+            formikJsonPath = formikJsonPath.concat(`[${localPathSegment}]`);
+        }
+    });
+
     /* Determine variant */
-    const variant: Color = getColor(window.location) as Color;
+    const variant: Color = getColor(globalThis.location) as Color;
+    const rawRorValue = jp.value(values, field.jsonPath);
+    const currentRorIdentifier = (typeof rawRorValue === 'object' && rawRorValue !== null
+        ? rawRorValue['schema:identifier']
+        : undefined) as string | undefined;
+    const currentRorName = (typeof rawRorValue === 'object' && rawRorValue !== null
+        ? rawRorValue['schema:name']
+        : undefined) as string | undefined;
+    const currentRorUrl = (typeof rawRorValue === 'object' && rawRorValue !== null
+        ? rawRorValue['schema:url']
+        : undefined) as string | undefined;
+    const noAffiliationJsonPath = "$['schema:person']['schema:noAffiliation']";
+
+    useEffect(() => {
+        const identifier = fieldValue?.['schema:identifier'];
+        const name = fieldValue?.['schema:name'];
+        const url = fieldValue?.['schema:url'];
+        const explicitNoAffiliation = jp.value(values, noAffiliationJsonPath) === true;
+        const isNoAffiliationValue = (typeof fieldValue === 'object'
+            && fieldValue !== null
+            && identifier === ''
+            && name === ''
+            && url === '');
+
+        setNoAffiliation(explicitNoAffiliation || isNoAffiliationValue);
+    }, [fieldValue, noAffiliationJsonPath, values]);
+
+    useEffect(() => {
+        if (!currentRorIdentifier || NoAffiliation) {
+            return;
+        }
+
+        const fallbackLabel = currentRorName
+            ? `${currentRorName} - ${currentRorIdentifier}`
+            : currentRorIdentifier;
+
+        const fallbackOption: DropdownItem = {
+            label: fallbackLabel,
+            value: currentRorIdentifier,
+            url: currentRorUrl ?? '',
+        };
+
+        setDropdownOptions(previous => {
+            const options = previous ?? [];
+            if (options.some(option => option.value === currentRorIdentifier)) {
+                return options;
+            }
+
+            return [fallbackOption, ...options];
+        });
+    }, [NoAffiliation, currentRorIdentifier, currentRorName, currentRorUrl]);
     /**
      * Function to search for RORs and fill the dropdown with options
      */
@@ -95,7 +156,7 @@ const RORField = (props: Props) => {
                         {field.title}
                     </p>
                 </Col>
-                {(field.required && !isEmpty(values) && isEmpty(jp.value(values, field.jsonPath)?.['schema:identifier'])) &&
+                {(field.required && !isEmpty(values) && isEmpty(jp.value(values, field.jsonPath)?.['schema:identifier']) && !NoAffiliation) &&
                     <Col className="d-flex align-items-center">
                         <p className="fs-5 fs-lg-4 tc-error">
                             This field is required
@@ -140,32 +201,26 @@ const RORField = (props: Props) => {
                         </p>
                     </Button>
                 </Col>
-                {window.location.href.includes('/te/') && (
+                {globalThis.location.href.includes('/te/') && (
                     <Col xs="auto" lg="auto">
                         <Button type="button"
                             variant={NoAffiliation ? 'primary' : variant}
                             className="fs-5 fs-lg-4 mt-2 mt-lg-0"
                             OnClick={() => {
-                                let jsonPath: string = '';
-                                
-                                /* Format JSON path */
-                                field.jsonPath.split('][').forEach(pathSegment => {
-                                    const localPathSegment = pathSegment.replace('$', '').replace('[', '').replace(']', '').replaceAll("'", '');
-                                    
-                                    if (!isNaN(Number(localPathSegment))) {
-                                        jsonPath = jsonPath.concat(`[${localPathSegment}]`);
-                                    } else {
-                                        jsonPath = jsonPath.concat(`['${localPathSegment}']`);
-                                    }
-                                });
-                                console.log('Setting ROR field to no affiliation', jsonPath);
-                                SetFieldValue(jsonPath, {
-                                    "@type": "schema:Organization",
-                                    "schema:identifier": '',
-                                    "schema:name": '',
-                                    "schema:url": ''
-                                });
-                                setNoAffiliation(!NoAffiliation);
+                                if (NoAffiliation) {
+                                    setNoAffiliation(false);
+                                    SetFieldValue(noAffiliationJsonPath.replace('$', ''), false);
+                                    SetFieldValue(formikJsonPath, '');
+                                } else {
+                                    setNoAffiliation(true);
+                                    SetFieldValue(noAffiliationJsonPath.replace('$', ''), true);
+                                    SetFieldValue(formikJsonPath, {
+                                        "@type": "schema:Organization",
+                                        "schema:identifier": '',
+                                        "schema:name": '',
+                                        "schema:url": ''
+                                    });
+                                }
                             }}
                         >
                             <p>
@@ -176,41 +231,32 @@ const RORField = (props: Props) => {
                 )}
             </Row>
             {/* Display ROR selection dropdown if dropdown options is not undefiend */}
-            {dropdownOptions &&
+            {(dropdownOptions || currentRorIdentifier) &&
                 <Row className="mt-2">
                     <Col>
                         <Select
-                            options={dropdownOptions as { label: any; value: any; url: any; }[]}
-                            value={fieldValue['schema:identifier'] ? {
-                                label: fieldValue['schema:name'],
-                                value: fieldValue['schema:identifier'],
-                                url: fieldValue['schema:url']
+                            options={(dropdownOptions ?? []) as { label: any; value: any; url: any; }[]}
+                            value={currentRorIdentifier ? {
+                                label: currentRorName ? `${currentRorName} - ${currentRorIdentifier}` : currentRorIdentifier,
+                                value: currentRorIdentifier,
+                                url: currentRorUrl ?? ''
                             } : undefined}
                             placeholder="Select an option"
                             className={formFieldClass}
                             onChange={(dropdownOption) => {
-                                let jsonPath: string = '';
+                                SetFieldValue(noAffiliationJsonPath.replace('$', ''), false);
 
-                                /* Format JSON path */
-                                field.jsonPath.split('][').forEach(pathSegment => {
-                                    const localPathSegment = pathSegment.replace('$', '').replace('[', '').replace(']', '').replaceAll("'", '');
-
-                                    if (!isNaN(Number(localPathSegment))) {
-                                        jsonPath = jsonPath.concat(`[${localPathSegment}]`);
-                                    } else {
-                                        jsonPath = jsonPath.concat(`['${localPathSegment}']`);
-                                    }
-                                });
                                 if (dropdownOption?.value === '') {
-                                    SetFieldValue(jsonPath, '');
+                                    SetFieldValue(formikJsonPath, '');
+                                    setNoAffiliation(false);
                                 } else {
-                                    console.log('Setting ROR field', jsonPath, dropdownOption);
-                                    SetFieldValue(jsonPath, {
+                                    SetFieldValue(formikJsonPath, {
                                         "@type": "schema:Organization",
                                         "schema:identifier": dropdownOption?.value,
                                         "schema:name": dropdownOption?.label.split(" - ")[0].trim(),
                                         "schema:url": dropdownOption?.url
                                     });
+                                    setNoAffiliation(false);
                                 }
                             }}
                         />

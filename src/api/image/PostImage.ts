@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getStoredAuthToken } from 'api/auth/session';
 
 export async function postImage(file: File | string): Promise<{ url: string }> {
     const formData = new FormData();
@@ -19,14 +20,15 @@ export async function postImage(file: File | string): Promise<{ url: string }> {
         formData.append('file', file);
     }
 
-    const token = "Bearer " + import.meta.env.VITE_IMAGE_API;
+    const authToken = getStoredAuthToken();
     const response = await axios.post(
-        'https://sandbox.cetaf.org/api/upload-image',
+        `${import.meta.env.VITE_API_URL}/uploads/upload-image`,
         formData,
         {
             headers: {
                 'Content-Type': 'multipart/form-data',
-                'Authorization': token,
+                'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+                ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
             },
         }
     );

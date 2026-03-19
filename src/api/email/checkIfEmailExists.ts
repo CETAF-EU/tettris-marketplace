@@ -3,58 +3,59 @@ import { TaxonomicExpert, CordraResultArray } from 'app/Types';
 /**
  * Checks if an expert with the given email already exists.
  * @param email - The email to check.
- * @returns True if the email exists, false otherwise.
+ * @returns Existing expert if found, otherwise null.
  */
-const checkIfEmailExists = async (email: string, password?: string): Promise<TaxonomicExpert | boolean> => {
+const checkIfEmailExists = async (email: string): Promise<TaxonomicExpert | null> => {
 
     console.log('Checking if email exists:', email);
 
     let taxonomicExperts: TaxonomicExpert[] = [];
-    const filters = `/taxonomicExpert/@type:TaxonomicExpert AND (/taxonomicExpert/schema\\:person/schema\\:email:"${email}")`;
+    const filters = String.raw`/taxonomicExpert/@type:TaxonomicExpert AND (/taxonomicExpert/schema\:person/schema\:email:"${email}")`;
     
     try {
-        const response = await axios.get('/Op.Search', {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/cordra/experts`, {
             params: {
-                targetId: 'service',
+                size:1,
                 query: filters,
-                size: 1
             },
-            auth: {
-                username: 'TaxonomicMarketplace',
-                password: import.meta.env.VITE_CORDRA_PASSWORD
-            }
+            headers: {
+                'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+            },
         });
 
-        const data: CordraResultArray = response.data;
-        /* Set Taxonomic Expert */
-        data.results.forEach((dataFragment) => {
-            const taxonomicExpert = dataFragment.attributes.content as TaxonomicExpert;        
-            /* Push to taxonomic services array */
-            taxonomicExperts.push(taxonomicExpert);
-        });
 
-        const emailExist = taxonomicExperts[0].taxonomicExpert?.['schema:person']?.['schema:email'] as string || null;
-        if (emailExist === email)
-        {
-            console.log('Email exists:', emailExist);
-            if (password !== undefined) {
-                return true;
-            }
+        const data = response.data as {
+            taxonomicExperts?: TaxonomicExpert[];
+            taxonomic_experts?: TaxonomicExpert[];
+        } & Partial<CordraResultArray>;
+
+        if (Array.isArray(data.taxonomicExperts)) {
+            taxonomicExperts = data.taxonomicExperts;
+        } else if (Array.isArray(data.taxonomic_experts)) {
+            taxonomicExperts = data.taxonomic_experts;
+        } else if (Array.isArray(data.results)) {
+            data.results.forEach((dataFragment) => {
+                const taxonomicExpert = dataFragment.attributes.content as TaxonomicExpert;
+                taxonomicExperts.push(taxonomicExpert);
+            });
         }
-        else {
-            console.log('Email does not match:', emailExist);
-            return false;
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const existingExpert = taxonomicExperts.find((expert) => {
+            const expertEmail = expert?.taxonomicExpert?.['schema:person']?.['schema:email'];
+            return typeof expertEmail === 'string' && expertEmail.trim().toLowerCase() === normalizedEmail;
+        }) || null;
+
+        if (existingExpert) {
+            console.log('Email exists:', existingExpert.taxonomicExpert?.['schema:person']?.['schema:email']);
+            return existingExpert;
         }
-        // const passwpordExist = taxonomicExperts[0].taxonomicExpert?.['schema:person']?.['schema:password'] as string || null;
-        // if (password && passwpordExist === password) {
-        //     console.log('Password matches for email:', email);
-        //     return true;
-        // }
-        // console.log('Password does not match for email:', email);
-        return true;
+
+        console.log('Email does not match:', email);
+        return null;
     } catch (error) {
         console.error('Email existence check failed:', error);
-        return false;
+        return null;
     }
 };
 
