@@ -62,6 +62,11 @@ const MultiSelectField = (props: Props) => {
         'b-error': (field.required && !isEmpty(values) && isEmpty(jp.value(values, field.jsonPath)))
     });
 
+    const currentValues = jp.value(values, field.jsonPath);
+    const selectedOptions = Array.isArray(currentValues)
+        ? selectItems.filter(option => currentValues.includes(option.value))
+        : [];
+
     return (
         <div>
             <FormFieldTitle field={field}
@@ -71,6 +76,7 @@ const MultiSelectField = (props: Props) => {
                 placeholder="Select an option"
                 options={selectItems}
                 isMulti={true}
+                value={selectedOptions}
                 className={`${formFieldClass} mt-2`}
                 onChange={(dropdownOptions) => {
                     // Remove the first option if the max selections is reached

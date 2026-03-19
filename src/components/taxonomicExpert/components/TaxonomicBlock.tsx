@@ -20,14 +20,16 @@ type Props = {
  */
 const TaxonomicBlock = (props: Props) => {
     const { name, taxonomicExpert } = props;
+    const expertRecord = (taxonomicExpert.taxonomicExpert ?? taxonomicExpert) as Record<string, unknown>;
 
-    const discipline = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:discipline']?.join(', ') ?? "N/A";
-    const subDiscipline = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:additionalType']?.join(', ') ?? "N/A";
-    const taxonomicScope = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:about'] ?? "N/A";
-    const geographicRegion = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:spatialCoverage'] ?? [];
-    const methodologies = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:measurementTechnique']?.join(', ') ?? "N/A";
-    const appliedResearch = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:ResearchProject']?.join(', ') ?? "N/A";
-    const stratigraphicAge = taxonomicExpert.taxonomicExpert?.['schema:Taxon']?.['schema:temporalCoverage'] ?? "N/A";
+    const taxon = expertRecord?.['schema:Taxon'] as Record<string, unknown> | undefined;
+    const discipline = (taxon?.['schema:discipline'] as string[] | undefined)?.join(', ') ?? "N/A";
+    const subDiscipline = (taxon?.['schema:additionalType'] as string[] | undefined)?.join(', ') ?? "N/A";
+    const taxonomicScope = (taxon?.['schema:about'] as string | undefined) ?? "N/A";
+    const geographicRegion = (taxon?.['schema:spatialCoverage'] as string[] | undefined) ?? [];
+    const methodologies = (taxon?.['schema:measurementTechnique'] as string[] | undefined)?.join(', ') ?? "N/A";
+    const appliedResearch = (taxon?.['schema:ResearchProject'] as string[] | undefined)?.join(', ') ?? "N/A";
+    const stratigraphicAge = (taxon?.['schema:temporalCoverage'] as string | undefined) ?? "N/A";
 
     return (
         <div className=" d-flex flex-column">
@@ -61,12 +63,22 @@ const TaxonomicBlock = (props: Props) => {
 export default TaxonomicBlock;
 
 function displayPublicationChart(taxonomicExpert: TaxonomicExpert) {
+    const expertRecord = (taxonomicExpert.taxonomicExpert ?? taxonomicExpert) as Record<string, unknown>;
+    const publicationNumber = (
+        expertRecord?.['schema:publicationNumber']
+        ?? expertRecord?.['publicationNumber']
+    ) as Record<string, unknown> | undefined;
+    const identificationKeys = getPublicationValue(publicationNumber, 'schema:identifier', 'identifier');
+    const papers = getPublicationValue(publicationNumber, 'schema:scholarlyArticle', 'scholarlyArticle');
+    const books = getPublicationValue(publicationNumber, 'schema:book', 'book');
+    const other = getPublicationValue(publicationNumber, 'schema:creativeWork', 'creativeWork');
+
     const data = [
         ["Type", "Number"],
-        ["Identification Keys", taxonomicExpert.taxonomicExpert?.['schema:publicationNumber']?.['schema:identifier'] ?? 0],
-        ["Papers", taxonomicExpert.taxonomicExpert?.['schema:publicationNumber']?.['schema:scholarlyArticle'] ?? 0],
-        ["Books", taxonomicExpert.taxonomicExpert?.['schema:publicationNumber']?.['schema:book'] ?? 0],
-        ["Other", taxonomicExpert.taxonomicExpert?.['schema:publicationNumber']?.['schema:creativeWork'] ?? 0],
+        ["Identification Keys", identificationKeys],
+        ["Papers", papers],
+        ["Books", books],
+        ["Other", other],
     ];
     const options = {
         width: 400,
@@ -78,7 +90,7 @@ function displayPublicationChart(taxonomicExpert: TaxonomicExpert) {
         pieSliceText: 'none',
         colors: ['#7BC1DC', '#5DA9C7', '#3F91B2', '#21799D'],
     };
-    if (data[1][1] === 0 && data[2][1] === 0 && data[3][1] === 0 && data[4][1] === 0) {
+    if (identificationKeys === 0 && papers === 0 && books === 0 && other === 0) {
         return DisplayRowData("Publication Number", "N/A");
     }
     return <Row>
@@ -94,6 +106,54 @@ function displayPublicationChart(taxonomicExpert: TaxonomicExpert) {
                 options={options} />
         </Col>
     </Row>;
+}
+
+function getPublicationValue(
+    publicationNumber: Record<string, unknown> | undefined,
+    schemaKey: string,
+    fallbackKey: string,
+): number {
+    if (!publicationNumber) {
+        return 0;
+    }
+
+    let normalizedPublicationNumber: Record<string, unknown> | undefined = publicationNumber;
+
+    if (Array.isArray(publicationNumber)) {
+        const firstItem = publicationNumber[0];
+        if (firstItem && typeof firstItem === 'object') {
+            normalizedPublicationNumber = firstItem as Record<string, unknown>;
+        }
+    }
+
+    if (!normalizedPublicationNumber) {
+        return 0;
+    }
+
+    const nestedPublicationNumber = (
+        normalizedPublicationNumber['schema:publicationNumber']
+        ?? normalizedPublicationNumber['publicationNumber']
+    ) as Record<string, unknown> | undefined;
+
+    const source = nestedPublicationNumber && typeof nestedPublicationNumber === 'object'
+        ? nestedPublicationNumber
+        : normalizedPublicationNumber;
+
+    const rawValue = source[schemaKey]
+        ?? source[fallbackKey]
+        ?? normalizedPublicationNumber[schemaKey]
+        ?? normalizedPublicationNumber[fallbackKey];
+
+    if (typeof rawValue === 'number') {
+        return Number.isFinite(rawValue) ? rawValue : 0;
+    }
+
+    if (typeof rawValue === 'string') {
+        const parsed = Number(rawValue);
+        return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    return 0;
 }
 
 function displayGeographicContent(geographicRegion: Array<string>) {
