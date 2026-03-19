@@ -1,11 +1,11 @@
 /* Import Dependencies */
 import axios from 'axios';
 import { format } from 'date-fns';
+import { getStoredAuthToken } from 'api/auth/session';
 
 /* Import Types */
 import { TaxonomicExpert, Dict } from 'app/Types';
-import InsertDashboardData from 'api/dashboardData/InsertDashboardData';
-import SendEmail from 'api/email/SendEmail';
+import { postImage } from 'api/image/PostImage';
 
 /**
  * Function to update an existing taxonomic expert object in Cordra.
@@ -18,12 +18,24 @@ const UpdateTaxonomicExpert = async ({ id, updatedData }: { id: string; updatedD
 
     if (!id || !updatedData) return;
 
-    const taxonomicExpertRecord = {
+    const taxonomicExpertRecord: Dict = {
         'schema:status': 'proposed',
         ...updatedData,
     };
 
+    const imageValue = taxonomicExpertRecord?.['schema:person']?.['schema:ProfilePicture'];
+    const shouldUploadImage =
+        imageValue instanceof File ||
+        (typeof imageValue === 'string' && imageValue.startsWith('data:'));
+
+    if (shouldUploadImage) {
+        const pictureUrl = await postImage(imageValue);
+        taxonomicExpertRecord['schema:person']['schema:ProfilePicture'] = pictureUrl.url;
+    }
+
     try {
+        const authToken = getStoredAuthToken();
+
         const response = await axios.put(
             `${import.meta.env.VITE_API_URL}/cordra/experts/${encodeURIComponent(id)}`,
             {
@@ -33,6 +45,7 @@ const UpdateTaxonomicExpert = async ({ id, updatedData }: { id: string; updatedD
                 headers: {
                     'Content-Type': 'application/json',
                     'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+                    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
                 },
             }
         );
@@ -57,27 +70,6 @@ const UpdateTaxonomicExpert = async ({ id, updatedData }: { id: string; updatedD
                 "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
             );
         }
-
-        // Update dashboard data
-        const updatedDashboardData = {
-            type: 'DashboardData',
-            attributes: {
-                content: {
-                    dashboardData: {
-                        "@type": 'DashboardData',
-                        "schema:reference": updatedExpert.taxonomicExpert['@id'],
-                        "schema:gender": updatedExpert.taxonomicExpert['schema:person']?.['schema:gender'],
-                        "schema:age": updatedExpert.taxonomicExpert['schema:person']?.['schema:birthDate']
-                    }
-                }
-            }
-        };
-        await InsertDashboardData({ DashboardDataRecord: updatedDashboardData });
-
-        /* Send email */
-        const url = "https://marketplace.cetaf.org/cordra/#objects/" + updatedExpert.taxonomicExpert['@id'];
-        const name = updatedExpert?.taxonomicExpert?.['schema:person']?.['schema:name'] ?? "Taxonomic Expert";
-        SendEmail(name, url);
 
     } catch (error) {
         console.error('UpdateTaxonomicExpert error:', error);

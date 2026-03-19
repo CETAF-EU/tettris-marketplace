@@ -65,6 +65,9 @@ const SelectField = (props: Props) => {
         'b-error': (field.required && !isEmpty(values) && isEmpty(jp.value(values, field.jsonPath)))
     });
 
+    const currentValue = jp.value(values, field.jsonPath);
+    const selectedOption = selectItems.find(option => option.value === currentValue) ?? null;
+
     return (
         <div>
             <FormFieldTitle field={field}
@@ -72,6 +75,7 @@ const SelectField = (props: Props) => {
             />
             <Select placeholder="Select an option"
                 options={selectItems.toSorted((a, b) => a.label > b.label ? 1 : 0)}
+                value={selectedOption}
                 className={`${formFieldClass} mt-1`}
                 onChange={(dropdownOption) => SetFieldValue(jsonPath, dropdownOption?.value)}
             />

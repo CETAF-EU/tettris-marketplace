@@ -1,6 +1,8 @@
 import classNames from 'classnames';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useField, useFormikContext } from "formik";
 import jp from 'jsonpath';
+import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 
 /* Types */
 import { FormField, Dict } from "app/Types";
@@ -22,6 +24,7 @@ const ImageField = ({ field, values }: Props) => {
 
     const fieldValue = jp.value(values, field.jsonPath);
     const isRequiredAndEmpty = field.required && (!fieldValue || typeof fieldValue !== 'string');
+    const currentImageSrc = typeof fieldValue === 'string' && fieldValue.trim() !== '' ? fieldValue : null;
 
     const formFieldClass = classNames({
         'b-error': isRequiredAndEmpty || error,
@@ -43,9 +46,33 @@ const ImageField = ({ field, values }: Props) => {
         }
     };
 
+    const handleRemoveImage = () => {
+        setFieldValue(formikField.name, '');
+        setError(null);
+    };
+
     return (
         <div>
             <FormFieldTitle field={field} values={values} />
+            {currentImageSrc && (
+                <div className="mt-2 mb-2">
+                    <img
+                        src={currentImageSrc}
+                        alt="Current profile"
+                        style={{ maxWidth: '12rem', maxHeight: '12rem', objectFit: 'contain' }}
+                    />
+                    <div className="mt-2">
+                        <button
+                            type="button"
+                            className="btn btn-link p-0"
+                            onClick={handleRemoveImage}
+                            aria-label="Remove image"
+                        >
+                            <FontAwesomeIcon icon={faTrashCan} size="lg" />
+                        </button>
+                    </div>
+                </div>
+            )}
             <input
                 name={formikField.name}
                 type="file"

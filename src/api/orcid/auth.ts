@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import checkIfOrcidExists from './checkIfOrcidExists';
 import { clearStoredAuthToken, extractAuthToken, storeAuthToken } from 'api/auth/session';
+import { TaxonomicExpert } from 'app/Types';
 
 const ORCID_TOKEN_URL = `${import.meta.env.VITE_API_URL}/orcid/token`;
 const MARKETPLACE_API_TOKEN = import.meta.env.VITE_MARKETPLACE_API_TOKEN;
@@ -12,8 +13,14 @@ interface OrcidUserData {
     email?: string;
 }
 
+interface OrcidLoginResult {
+    userData: OrcidUserData;
+    existingExpert: TaxonomicExpert | null;
+}
+
 export function useOrcidCallback() {
     const [userData, setUserData] = useState<OrcidUserData | null>(null);
+    const [existingExpert, setExistingExpert] = useState<TaxonomicExpert | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     const urlParams = new URLSearchParams(globalThis.location.search);
@@ -25,7 +32,8 @@ export function useOrcidCallback() {
         (async () => {
             try {
                 const data = await loginWithOrcid(code);
-                setUserData(data);
+                setUserData(data.userData);
+                setExistingExpert(data.existingExpert);
             } catch (err: any) {
                 setError(err.message);
             }
@@ -37,7 +45,7 @@ export function useOrcidCallback() {
         })();
     }, [code]);
 
-    async function loginWithOrcid(code: string): Promise<OrcidUserData> {
+    async function loginWithOrcid(code: string): Promise<OrcidLoginResult> {
         try {
             clearStoredAuthToken();
 
@@ -60,24 +68,17 @@ export function useOrcidCallback() {
                 storeAuthToken(authToken);
             }
 
-            const orcid = response.data.orcid;
-            const exists = await checkIfOrcidExists(orcid);
+            const userData = response.data as OrcidUserData;
+            const existingExpert = await checkIfOrcidExists(userData.orcid);
 
-            if (exists) {
-                clearStoredAuthToken();
-                throw new Error('ORCID already exists in the system');
-            }
-
-            return response.data;
+            return {
+                userData,
+                existingExpert
+            };
         } catch (error: any) {
             clearStoredAuthToken();
             if (axios.isAxiosError(error)) {
                 throw new Error(error.response?.data?.message ?? 'Failed to login with ORCID');
-            }
-
-            // Re-throw known handled error
-            if (error instanceof Error && error.message === 'ORCID already exists in the system') {
-                throw error;
             }
 
             console.error('Unexpected ORCID login error:', error);
@@ -85,5 +86,5 @@ export function useOrcidCallback() {
         }
     }
 
-    return { userData, error };
+    return { userData, existingExpert, error };
 }

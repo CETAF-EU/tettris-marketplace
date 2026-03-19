@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { Field } from "formik";
 import jp from 'jsonpath';
 import { isEmpty } from "lodash";
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Select from "react-select";
 
@@ -12,6 +12,7 @@ import { FormField, Dict, DropdownItem } from "app/Types";
 
 /* Import API */
 import { GetOrcidByName } from 'api/orcid/GetOrcidByName';
+import { getOrcidById } from 'api/orcid/GetOrcidById';
 
 /* Import Components */
 import { Button, Spinner } from 'components/general/CustomComponents';
@@ -43,41 +44,122 @@ const ORCIDField = (props: Props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [dropdownOptions, setDropdownOptions] = useState<DropdownItem[] | undefined>();
     const [orcidExists, setOrcidExists] = useState<boolean>(false);
+    const [noOrcid, setNoOrcid] = useState<boolean>(false);
+    const lastResolvedOrcidRef = useRef<string | null>(null);
+
+    let formikJsonPath: string = '';
+    field.jsonPath.split('][').forEach(pathSegment => {
+        const localPathSegment = pathSegment.replace('$', '').replace('[', '').replace(']', '').replaceAll("'", '');
+
+        if (Number.isNaN(Number(localPathSegment))) {
+            formikJsonPath = formikJsonPath.concat(`['${localPathSegment}']`);
+        } else {
+            formikJsonPath = formikJsonPath.concat(`[${localPathSegment}]`);
+        }
+    });
+
+    const noOrcidJsonPath = "$['schema:person']['schema:noOrcid']";
+    const currentOrcid = (jp.value(values, field.jsonPath) as string | undefined)
+        ?? (typeof fieldValue?.['schema:identifier'] === 'string' ? fieldValue['schema:identifier'] : undefined);
     /* Determine variant */
-    const variant: Color = getColor(window.location) as Color;
+    const variant: Color = getColor(globalThis.location) as Color;
     /**
      * Function to search for RORs and fill the dropdown with options
      */
 
     useEffect(() => {
+        setNoOrcid(jp.value(values, noOrcidJsonPath) === true);
     }, [values]);
 
-    const validateOrcid = async (orcid: string) => {
-        let jsonPath: string = '';
+    useEffect(() => {
+        if (!currentOrcid || noOrcid) {
+            return;
+        }
 
-        /* Format JSON path */
-        field.jsonPath.split('][').forEach(pathSegment => {
-            const localPathSegment = pathSegment.replace('$', '').replace('[', '').replace(']', '').replaceAll("'", '');
+        const fallbackOption: DropdownItem = {
+            label: currentOrcid,
+            value: currentOrcid,
+            url: `https://orcid.org/${currentOrcid}`,
+        };
 
-            if (!isNaN(Number(localPathSegment))) {
-                jsonPath = jsonPath.concat(`[${localPathSegment}]`);
-            } else {
-                jsonPath = jsonPath.concat(`['${localPathSegment}']`);
+        setDropdownOptions(previous => {
+            const existingOptions = previous ?? [];
+            if (existingOptions.some(option => option.value === currentOrcid)) {
+                return existingOptions;
             }
+            return [fallbackOption, ...existingOptions];
         });
-        if (typeof orcid === 'string' && orcid.trim() !== '') {
-            const exists = window.location.href.includes('/ts/') ? null : await checkIfOrcidExists(orcid.trim());
-            if (exists !== null) {
-                setOrcidExists(true);
-                SetFieldValue(jsonPath, '');
+
+        if (lastResolvedOrcidRef.current === currentOrcid) {
+            return;
+        }
+
+        lastResolvedOrcidRef.current = currentOrcid;
+
+        let isDisposed = false;
+
+        getOrcidById(currentOrcid).then(orcidData => {
+            if (!orcidData || isDisposed) {
+                return;
             }
-            else {
+
+            const resolvedOption: DropdownItem = {
+                label: orcidData.name,
+                value: orcidData.orcid,
+                url: `https://orcid.org/${orcidData.orcid}`,
+            };
+
+            setDropdownOptions(previous => {
+                const resolvedOptions: DropdownItem[] = [];
+                const existingOptions = previous ?? [];
+
+                for (const option of existingOptions) {
+                    if (option.value !== currentOrcid) {
+                        resolvedOptions.push(option);
+                    }
+                }
+
+                return [resolvedOption, ...resolvedOptions];
+            });
+        });
+
+        return () => {
+            isDisposed = true;
+        };
+    }, [currentOrcid, noOrcid]);
+
+    const validateOrcid = async (orcid: string) => {
+        if (noOrcid) {
+            setOrcidExists(false);
+            SetFieldValue(formikJsonPath, '');
+            SetFieldValue(noOrcidJsonPath.replace('$', ''), true);
+            return;
+        }
+
+        if (typeof orcid === 'string' && orcid.trim() !== '') {
+            const normalizedSelectedOrcid = orcid.trim().toUpperCase();
+            const normalizedCurrentOrcid = (currentOrcid ?? '').trim().toUpperCase();
+
+            if (normalizedCurrentOrcid && normalizedSelectedOrcid === normalizedCurrentOrcid) {
                 setOrcidExists(false);
-                SetFieldValue(jsonPath, orcid.trim());
+                SetFieldValue(formikJsonPath, orcid.trim());
+                SetFieldValue(noOrcidJsonPath.replace('$', ''), false);
+                return;
+            }
+
+            const exists = globalThis.location.href.includes('/ts/') ? null : await checkIfOrcidExists(orcid.trim());
+            if (exists === null) {
+                setOrcidExists(false);
+                SetFieldValue(formikJsonPath, orcid.trim());
+                SetFieldValue(noOrcidJsonPath.replace('$', ''), false);
+            } else {
+                setOrcidExists(true);
+                SetFieldValue(formikJsonPath, '');
             }
         } else {
             setOrcidExists(false);
-            SetFieldValue(jsonPath, '');
+            SetFieldValue(formikJsonPath, '');
+            SetFieldValue(noOrcidJsonPath.replace('$', ''), false);
         }
     };
 
@@ -87,17 +169,12 @@ const SearchForOrcid = async () => {
     try {
         const orcids = await GetOrcidByName(query);
 
-        // Reset field value
-        SetFieldValue(field.jsonPath.replace('$', ''), {
-            "schema:identifier": '',
-            "schema:name": '',
-        });
-
         // Build dropdown options
         const dropdownOptions: DropdownItem[] = [
             {
                 label: 'Select an organisation',
                 value: '',
+                url: '',
             }
         ];
 
@@ -105,6 +182,7 @@ const SearchForOrcid = async () => {
             dropdownOptions.push({
                 label: orcid?.name,
                 value: orcid?.identifier,
+                url: `https://orcid.org/${orcid?.identifier}`,
             });
         });
 
@@ -121,7 +199,7 @@ const SearchForOrcid = async () => {
         'b-error': (
             (field.required && !isEmpty(values) &&
                 (typeof jp.value(values, field.jsonPath) !== 'string' ||
-                isEmpty(jp.value(values, field.jsonPath))))
+                isEmpty(jp.value(values, field.jsonPath))) && !noOrcid)
             || orcidExists
         )
     });
@@ -136,7 +214,7 @@ const SearchForOrcid = async () => {
                         {field.title}
                     </p>
                 </Col>
-                {((field.required && !isEmpty(values) && (typeof jp.value(values, field.jsonPath) !== 'string' || isEmpty(jp.value(values, field.jsonPath)))) || orcidExists) &&
+                {((field.required && !isEmpty(values) && (typeof jp.value(values, field.jsonPath) !== 'string' || isEmpty(jp.value(values, field.jsonPath))) && !noOrcid) || orcidExists) &&
                     <Col className="d-flex align-items-center">
                         <p className="fs-5 fs-lg-4 tc-error">
 
@@ -182,6 +260,29 @@ const SearchForOrcid = async () => {
                         </p>
                     </Button>
                 </Col>
+                {globalThis.location.href.includes('/te/') && (
+                    <Col xs="auto" lg="auto">
+                        <Button type="button"
+                            variant={noOrcid ? 'primary' : variant}
+                            className="fs-5 fs-lg-4 mt-2 mt-lg-0"
+                            OnClick={() => {
+                                const nextValue = !noOrcid;
+
+                                setNoOrcid(nextValue);
+                                setOrcidExists(false);
+                                SetFieldValue(noOrcidJsonPath.replace('$', ''), nextValue);
+
+                                if (nextValue) {
+                                    SetFieldValue(formikJsonPath, '');
+                                }
+                            }}
+                        >
+                            <p>
+                                {noOrcid ? '✓ No ORCID' : 'No ORCID'}
+                            </p>
+                        </Button>
+                    </Col>
+                )}
             </Row>
             {/* Display ROR selection dropdown if dropdown options is not undefiend */}
             {dropdownOptions &&
@@ -189,14 +290,21 @@ const SearchForOrcid = async () => {
                     <Col>
                         <Select
                             options={dropdownOptions as { label: any; value: any; url: any; }[]}
-                            value={fieldValue['schema:identifier'] ? {
-                                label: fieldValue['schema:name'],
-                                value: fieldValue['schema:identifier'],
-                            } : undefined}
+                            value={
+                                currentOrcid
+                                    ? (dropdownOptions.find(option => option.value === currentOrcid) ?? {
+                                        label: currentOrcid,
+                                        value: currentOrcid,
+                                        url: `https://orcid.org/${currentOrcid}`,
+                                    })
+                                    : undefined
+                            }
                             placeholder="Select an option"
                             className={formFieldClass}
                             onChange={(dropdownOption) => {
-                                validateOrcid(dropdownOption?.value)
+                                setNoOrcid(false);
+                                SetFieldValue(noOrcidJsonPath.replace('$', ''), false);
+                                validateOrcid(dropdownOption?.value ?? '')
                             }}
                         />
                     </Col>

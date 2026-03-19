@@ -146,9 +146,9 @@ const TopBar = (props: Props) => {
             <Row className="justify-content-center text-center mt-3 mb-3">
                 <Col xs="auto" className="d-flex justify-content-center gap-2">
                     {Array.isArray(personalLinks) && personalLinks.some(link => link !== null) ? (
-                        personalLinks.map((link) => (
+                        personalLinks.map((link, index) => (
                             link ? (
-                                <a key={link} href={link} target="_blank" rel="noopener noreferrer">
+                                <a key={`${link}-${index}`} href={link} target="_blank" rel="noopener noreferrer">
                                     <i className={getIconClass(link)}></i>
                                 </a>
                             ) : null

@@ -31,7 +31,7 @@ const TaxonomicForm = () => {
     const [tokenRequested, setTokenRequested] = useState<boolean>(false);
     const [isResendingToken, setIsResendingToken] = useState<boolean>(false);
 
-    const { userData, error } = useOrcidCallback();
+    const { userData, existingExpert, error } = useOrcidCallback();
 
     const isExpertForm = location.pathname.includes("/te");
 
@@ -55,6 +55,13 @@ const TaxonomicForm = () => {
             setIsLoggedIn(true);
         }
     }, [userData]);
+
+    useEffect(() => {
+        if (existingExpert) {
+            console.log('Existing expert found for email:', existingExpert);
+            setExpertExists(existingExpert);
+        }
+    }, [existingExpert]);
 
     const redirectToOrcidAuth = () => {
         const orcidAuthUrl = `https://orcid.org/oauth/authorize?client_id=${import.meta.env.VITE_ORCID_CLIENT_ID}&response_type=code&scope=/authenticate&redirect_uri=${import.meta.env.VITE_ORCID_REDIRECT_URI}`;
@@ -97,7 +104,7 @@ const TaxonomicForm = () => {
                                 <Row>
                                     <Col>
                                         <p className="fs-4 mt-3">
-                                            Use this form to register as a taxonomic expert for the Marketplace. You can submit only once per entry. To update or delete your data later, contact the administrator via the <a href="/support" className="link-primary">support page</a>.
+                                            Use this form to register as a taxonomic expert for the Marketplace. If your email or ORCID already exists, your previously submitted profile will be loaded so you can update it.
                                         </p>
                                     </Col>
                                 </Row>
@@ -209,11 +216,7 @@ const TaxonomicForm = () => {
                                                             }
                                                             const exist = await checkIfEmailExists(emailValue);
                                                             if (exist) {
-                                                                setExpertExists(exist as TaxonomicExpert);
-                                                            }
-                                                            if (exist) {
-                                                                setLoginError('Email already registered. Please send a ticket to the Marketplace helpdesk to update your profile.');
-                                                                return;
+                                                                setExpertExists(exist);
                                                             }
 
                                                             const tokenRequestSucceeded = await requestUserToken(emailValue);
