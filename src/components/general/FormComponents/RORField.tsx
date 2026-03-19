@@ -45,7 +45,7 @@ const RORField = (props: Props) => {
 
     let formikJsonPath: string = '';
     field.jsonPath.split('][').forEach(pathSegment => {
-        const localPathSegment = pathSegment.replace('$', '').replace('[', '').replace(']', '').replaceAll("'", '');
+        const localPathSegment = pathSegment.replaceAll(/[^a-zA-Z0-9:_@-]/g, '');
 
         if (Number.isNaN(Number(localPathSegment))) {
             formikJsonPath = formikJsonPath.concat(`['${localPathSegment}']`);
