@@ -46,14 +46,13 @@ jobs:
     - name: Build Docker image frontend
       run: |
         docker build \
-          -t ${{ env.DOCKERHUB_REPOSITORY }}:frontend-${{ env.DOCKER_IMAGE_TAG }} .
+          -t ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }} .
 
     - name: Tag Docker image with 'test'        
       run: |
-        docker tag ${{ env.DOCKERHUB_REPOSITORY }}:frontend-${{ env.DOCKER_IMAGE_TAG }} \
-          ${{ env.DOCKERHUB_REPOSITORY }}:test
+        docker tag ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }} ${{ env.DOCKERHUB_REPOSITORY }}:test-frontend
 
     - name: Push Docker images to Docker Hub
       run: |
-        docker push ${{ env.DOCKERHUB_REPOSITORY }}:frontend-${{ env.DOCKER_IMAGE_TAG }}
-        docker push ${{ env.DOCKERHUB_REPOSITORY }}:test
+        docker push ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }}
+        docker push ${{ env.DOCKERHUB_REPOSITORY }}:test-frontend
