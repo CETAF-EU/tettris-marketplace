@@ -24,14 +24,11 @@ RUN node 'src/app/GenerateTypes.cjs'
 # Setting app to production build
 RUN npm run build
 
-# Setting up NGINX
-FROM nginx:stable-alpine
-
-COPY --from=build /marketplace/build /usr/share/nginx/html
-COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+# Install serve to run the app
+RUN npm install -g serve
 
 # Expose port
 EXPOSE 3000
 
 # Start application
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["serve", "-s", "build", "-l", "3000"]
