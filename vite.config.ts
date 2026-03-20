@@ -34,14 +34,5 @@ export default defineConfig({
       exclude: [],
       provider: "v8"
     }
-  },
-  server:  (process.env.VITE_PROXY ?? 'true') === 'true' ? {
-    proxy: {
-      '/cordra/doip': {
-        target: 'https://marketplace.cetaf.org',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/cordra\/doip/, '/cordra/doip'),
-      }
-    }
-  } : undefined
+  }
 });
