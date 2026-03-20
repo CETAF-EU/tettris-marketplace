@@ -50,7 +50,7 @@ jobs:
 
     - name: Tag Docker image with 'test'        
       run: |
-        docker tag ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }}
+        docker tag ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }} ${{ env.DOCKERHUB_REPOSITORY }}:test-frontend
 
     - name: Push Docker images to Docker Hub
       run: |
