@@ -15,10 +15,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import App from './App';
 
 
-/* Define axios base url */
-axios.defaults.baseURL = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/cordra/doip/0.DOIP`;
-
-
 /**
  * Function for rendering the root of the application
  */
