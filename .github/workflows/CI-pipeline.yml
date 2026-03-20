@@ -46,6 +46,7 @@ jobs:
     - name: Build Docker image
       run: |
         docker build \
+          -f dockerfile \
           -t ${{ env.DOCKERHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }} .
 
     - name: Tag Docker image with 'latest'        
