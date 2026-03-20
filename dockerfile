@@ -1,37 +1,35 @@
-# Pull official node image as base
+# Build stage
 FROM node:20.15.1-alpine3.19 as build
 
-# Set working directory
-WORKDIR /marketplace
+WORKDIR /app
+
+# Copy only package files first (better caching)
+COPY package.json package-lock.json ./
 
 # Install dependencies
-COPY package.json ./
-COPY package-lock.json ./
+RUN npm ci
 
-RUN npm install npm@10.8.2
+# Copy source code
+COPY . .
 
-# Copy application
-COPY . ./
+# Generate Type Files and build
+RUN npx tsc 'src/app/GenerateTypes.ts' --outDir 'src/app' && \
+    cp 'src/app/GenerateTypes.js' 'src/app/GenerateTypes.cjs' && \
+    rm 'src/app/GenerateTypes.js' && \
+    node 'src/app/GenerateTypes.cjs' && \
+    npm run build
 
-# Generate Type Files
-RUN npm install typescript -g
+# Runtime stage - lightweight
+FROM node:20.15.1-alpine3.19
 
-RUN tsc 'src/app/GenerateTypes.ts' --outDir 'src/app'
-RUN cp 'src/app/GenerateTypes.js' 'src/app/GenerateTypes.cjs'
-RUN rm 'src/app/GenerateTypes.js'
-RUN node 'src/app/GenerateTypes.cjs'
+WORKDIR /app
 
-# Setting app to production build
-RUN npm run build
+# Install only serve
+RUN npm install -g serve
 
-# Setting up NGINX
-FROM nginx:stable-alpine
+# Copy only the built application
+COPY --from=build /app/build ./build
 
-COPY --from=build /marketplace/build /usr/share/nginx/html
-COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port
 EXPOSE 3000
 
-# Start application
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["serve", "-s", "build", "-l", "3000"]

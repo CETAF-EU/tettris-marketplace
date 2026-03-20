@@ -1,5 +1,4 @@
 /* Import Dependencies */
-import axios from 'axios';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 
@@ -13,10 +12,6 @@ import "react-datepicker/dist/react-datepicker.css";
 
 /* Import Components */
 import App from './App';
-
-
-/* Define axios base url */
-axios.defaults.baseURL = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/cordra/doip/0.DOIP`;
 
 
 /**
