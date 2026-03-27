@@ -13,7 +13,6 @@ import FormBuilder from 'components/general/FormComponents/FormBuilder';
 import { Color, getColor } from '../ColorPage';
 import { useOrcidCallback } from 'api/orcid/auth';
 import checkIfEmailExists from 'api/email/checkIfEmailExists';
-import checkIfOrcidExists from 'api/orcid/checkIfOrcidExists';
 import requestUserToken from 'api/email/UserToken';
 import verifyUserToken from 'api/email/VerifyUserToken.ts';
 import { Dict, TaxonomicExpert } from 'app/Types';
@@ -68,7 +67,7 @@ const TaxonomicForm = () => {
     const [isSessionHydrated, setIsSessionHydrated] = useState<boolean>(!globalThis.location.pathname.includes('/te'));
     const [isSessionSyncEnabled, setIsSessionSyncEnabled] = useState<boolean>(true);
 
-    const { userData, existingExpert: orcidCallbackExpert, error } = useOrcidCallback();
+    const { userData, existingExpert: orcidCallbackExpert, isLoading: isOrcidCallbackLoading, error } = useOrcidCallback();
 
     const isExpertForm = globalThis.location.pathname.includes('/te');
 
@@ -126,12 +125,12 @@ const TaxonomicForm = () => {
     }, [completed, email, expertExists, isExpertForm, isLoggedIn, isSessionHydrated, isSessionSyncEnabled, loginMethod, moreLogin, orcidUserData, pendingEmail, tokenRequested]);
 
     useEffect(() => {
-        if (!userData) {
+        if (!userData || isOrcidCallbackLoading) {
             return;
         }
 
         const applyValidatedOrcidLogin = async () => {
-            const existingOrcidExpert = orcidCallbackExpert ?? await checkIfOrcidExists(userData.orcid);
+            const existingOrcidExpert = orcidCallbackExpert;
             const draftValues = getExpertDraftValues(existingOrcidExpert);
 
             setOrcidUserData(userData);
@@ -159,7 +158,7 @@ const TaxonomicForm = () => {
         void applyValidatedOrcidLogin().catch(() => {
             setLoginError('Unable to validate ORCID profile. Please try again.');
         });
-    }, [orcidCallbackExpert, userData]);
+    }, [isOrcidCallbackLoading, orcidCallbackExpert, userData]);
 
     const redirectToOrcidAuth = () => {
         const orcidAuthUrl = `https://orcid.org/oauth/authorize?client_id=${import.meta.env.VITE_ORCID_CLIENT_ID}&response_type=code&scope=/authenticate&redirect_uri=${import.meta.env.VITE_ORCID_REDIRECT_URI}`;

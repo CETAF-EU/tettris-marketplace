@@ -83,6 +83,7 @@ const attachEmailToExpert = (expert: TaxonomicExpert | null, email: string | nul
 export function useOrcidCallback() {
     const [userData, setUserData] = useState<OrcidUserData | null>(null);
     const [existingExpert, setExistingExpert] = useState<TaxonomicExpert | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
     const urlParams = new URLSearchParams(globalThis.location.search);
@@ -92,12 +93,15 @@ export function useOrcidCallback() {
         if (!code) return;
 
         (async () => {
+            setIsLoading(true);
             try {
                 const data = await loginWithOrcid(code);
                 setUserData(data.userData);
                 setExistingExpert(data.existingExpert);
             } catch (err: any) {
                 setError(err.message);
+            } finally {
+                setIsLoading(false);
             }
 
             // Remove 'code' param from URL
@@ -246,5 +250,5 @@ export function useOrcidCallback() {
         }
     }
 
-    return { userData, existingExpert, error };
+    return { userData, existingExpert, isLoading, error };
 }
