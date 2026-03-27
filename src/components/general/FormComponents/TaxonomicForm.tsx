@@ -371,14 +371,6 @@ const TaxonomicForm = () => {
                                                         >
                                                             more
                                                         </button>
-                                                        <button
-                                                            className="btn btn-link p-0 ms-2"
-                                                            style={{ fontSize: '0.95rem' }}
-                                                            onClick={handleClearOrcidSession}
-                                                            type="button"
-                                                        >
-                                                            Clear session
-                                                        </button>
                                                     </div>
                                                     {error && <p className="text-danger mt-3">{error}</p>}
                                                 </Col>

@@ -68,7 +68,28 @@ export function useOrcidCallback() {
                 storeAuthToken(authToken);
             }
 
-            const userData = response.data as OrcidUserData;
+            // Extract ORCID data from nested person object or flat structure
+            const person = (response.data as Record<string, unknown>)['schema:person'] 
+                ?? (response.data as Record<string, unknown>).person 
+                ?? response.data;
+            const orcidValue = (person as Record<string, unknown>)['schema:orcid'] 
+                ?? (person as Record<string, unknown>).orcid;
+            const nameValue = (person as Record<string, unknown>)['schema:name'] 
+                ?? (person as Record<string, unknown>).name 
+                ?? '';
+            const emailValue = (person as Record<string, unknown>)['schema:email'] 
+                ?? (person as Record<string, unknown>).email;
+            
+            if (!orcidValue || typeof orcidValue !== 'string') {
+                throw new Error('ORCID not found in token response');
+            }
+
+            const userData: OrcidUserData = {
+                orcid: orcidValue,
+                name: typeof nameValue === 'string' ? nameValue : '',
+                ...(emailValue && typeof emailValue === 'string' ? { email: emailValue } : {}),
+            };
+            
             const existingExpert = await checkIfOrcidExists(userData.orcid);
 
             return {

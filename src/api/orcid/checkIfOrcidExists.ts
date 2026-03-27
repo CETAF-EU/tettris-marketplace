@@ -9,6 +9,11 @@ const checkIfOrcidExists = async (orcid: string): Promise<TaxonomicExpert | null
 
     console.log('Checking if orcid exists:', orcid);
 
+    if (!orcid || typeof orcid !== 'string') {
+        console.warn('ORCID is undefined or not a string:', orcid);
+        return null;
+    }
+
     let taxonomicExperts: TaxonomicExpert[] = [];
     const filters = String.raw`/taxonomicExpert/@type:TaxonomicExpert AND (/taxonomicExpert/schema\:person/schema\:orcid:"${orcid}")`;
 
