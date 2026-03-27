@@ -40,6 +40,7 @@ const StringField = (props: Props) => {
             <Field name={field.jsonPath.replace('$', '')}
                 className={`${formFieldClass} w-100 mt-1 py-1 px-2 br-corner`}
                 maxLength={field.maxChars}
+                disabled={field.disabled}
             />
         </div>
     );

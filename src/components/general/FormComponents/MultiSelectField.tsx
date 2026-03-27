@@ -78,7 +78,12 @@ const MultiSelectField = (props: Props) => {
                 isMulti={true}
                 value={selectedOptions}
                 className={`${formFieldClass} mt-2`}
+                isDisabled={field.disabled}
                 onChange={(dropdownOptions) => {
+                    if (field.disabled) {
+                        return;
+                    }
+
                     // Remove the first option if the max selections is reached
                     if (field.maxSelections && dropdownOptions.length > field.maxSelections) {
                         (dropdownOptions as Array<DropdownItem>).shift();
