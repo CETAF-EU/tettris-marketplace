@@ -17,6 +17,7 @@ import FormFieldTitle from './FormFieldTitle';
 /* Props Type */
 type Props = {
     field: FormField,
+    fieldValue?: string,
     values: Dict,
     SetFieldValue: Function
 };
@@ -30,7 +31,8 @@ type Props = {
  * @returns JSX Component
  */
 const TextField = (props: Props) => {
-    const { field, values, SetFieldValue } = props;
+    const { field, fieldValue, values, SetFieldValue } = props;
+    const initialMarkdown = typeof fieldValue === 'string' ? fieldValue : '';
 
     /* Class Names */
     const formFieldClass = classNames({
@@ -42,7 +44,8 @@ const TextField = (props: Props) => {
             <FormFieldTitle field={field}
                 values={values}
             />
-            <MDXEditor markdown=""
+            <MDXEditor key={`${field.jsonPath}-${initialMarkdown}`}
+                markdown={initialMarkdown}
                 className={`${formFieldClass} b-grey br-corner mt-1 z-0`}
                 
                 plugins={[

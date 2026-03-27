@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 
 /* Import Sources */
 import TaxonomicExpertFormJSON from 'sources/forms/TaxonomicExpertForm.json';
-import TaxonomicExpertFormOrcidJSON from 'sources/forms/TaxonomicExpertFormOrcid.json';
 import TaxonomicServiceFormJSON from 'sources/forms/TaxonomicServiceForm.json';
 
 /* Import Components */
@@ -14,10 +13,44 @@ import FormBuilder from 'components/general/FormComponents/FormBuilder';
 import { Color, getColor } from '../ColorPage';
 import { useOrcidCallback } from 'api/orcid/auth';
 import checkIfEmailExists from 'api/email/checkIfEmailExists';
+import checkIfOrcidExists from 'api/orcid/checkIfOrcidExists';
 import requestUserToken from 'api/email/UserToken';
 import verifyUserToken from 'api/email/VerifyUserToken.ts';
-import { TaxonomicExpert } from 'app/Types';
-import { clearStoredAuthToken } from 'api/auth/session';
+import { Dict, TaxonomicExpert } from 'app/Types';
+import { cloneDeep } from 'lodash';
+import {
+    clearRegistrationSession,
+    getRegistrationSession,
+    RegistrationLoginMethod,
+    RegistrationOrcidUserData,
+    updateRegistrationSession
+} from 'api/auth/registrationSession';
+
+const EMAIL_JSON_PATH = "$['schema:person']['schema:email']";
+const NAME_JSON_PATH = "$['schema:person']['schema:name']";
+const ORCID_JSON_PATH = "$['schema:person']['schema:orcid']";
+
+const getExpertDraftValues = (expert: TaxonomicExpert | null): Dict => {
+    if (!expert) {
+        return {};
+    }
+
+    const candidate = expert as unknown as Dict;
+    const expertRecord = (
+        candidate.taxonomicExpert
+        ?? candidate.taxonomic_expert
+        ?? candidate.attributes?.content?.taxonomicExpert
+        ?? candidate.attributes?.content?.taxonomic_expert
+        ?? candidate.attributes?.content
+        ?? candidate
+    ) as Dict | undefined;
+
+    if (!expertRecord || typeof expertRecord !== 'object') {
+        return {};
+    }
+
+    return cloneDeep(expertRecord);
+};
 
 const TaxonomicForm = () => {
     const [completed, setCompleted] = useState<boolean>(false);
@@ -30,10 +63,14 @@ const TaxonomicForm = () => {
     const [pendingEmail, setPendingEmail] = useState<string>('');
     const [tokenRequested, setTokenRequested] = useState<boolean>(false);
     const [isResendingToken, setIsResendingToken] = useState<boolean>(false);
+    const [loginMethod, setLoginMethod] = useState<RegistrationLoginMethod | null>(null);
+    const [orcidUserData, setOrcidUserData] = useState<RegistrationOrcidUserData | null>(null);
+    const [isSessionHydrated, setIsSessionHydrated] = useState<boolean>(!globalThis.location.pathname.includes('/te'));
+    const [isSessionSyncEnabled, setIsSessionSyncEnabled] = useState<boolean>(true);
 
-    const { userData, existingExpert, error } = useOrcidCallback();
+    const { userData, error } = useOrcidCallback();
 
-    const isExpertForm = location.pathname.includes("/te");
+    const isExpertForm = globalThis.location.pathname.includes('/te');
 
     const title = isExpertForm
         ? 'Register as a new taxonomic expert'
@@ -48,24 +85,100 @@ const TaxonomicForm = () => {
         : 'Your submission is received and will be processed by the Marketplace! A CETAF administrator will review and score the taxonomic service. When the score is sufficient, the service will be published in the Marketplace catalog.\nThank you for using the Taxonomic Marketplace!';
 
     const formTemplate = isExpertForm ? TaxonomicExpertFormJSON : TaxonomicServiceFormJSON;
-    const color = "fs-2 tc-" + getColor(window.location) as Color;
+    const color = `fs-2 tc-${getColor(globalThis.location)}` as Color;
+    const submissionHeading = completed ? 'Submission received' : title;
+    const submissionDescription = completed ? sended : description;
 
     useEffect(() => {
-        if (userData) {
+        if (!isExpertForm) {
+            return;
+        }
+
+        const sessionState = getRegistrationSession();
+        setCompleted(sessionState.completed === true);
+        setIsLoggedIn(sessionState.isLoggedIn === true);
+        setMoreLogin(sessionState.moreLogin === true);
+        setEmail(sessionState.verifiedEmail ?? '');
+        setExpertExists(sessionState.expertProfile ?? null);
+        setPendingEmail(sessionState.pendingEmail ?? '');
+        setTokenRequested(sessionState.tokenRequested === true);
+        setLoginMethod(sessionState.loginMethod ?? null);
+        setOrcidUserData(sessionState.orcidUserData ?? null);
+        setIsSessionHydrated(true);
+    }, [isExpertForm]);
+
+    useEffect(() => {
+        if (!isExpertForm || !isSessionHydrated || !isSessionSyncEnabled) {
+            return;
+        }
+
+        updateRegistrationSession({
+            completed,
+            expertProfile: expertExists,
+            isLoggedIn,
+            loginMethod: loginMethod ?? undefined,
+            moreLogin,
+            orcidUserData,
+            pendingEmail,
+            tokenRequested,
+            verifiedEmail: email,
+        });
+    }, [completed, email, expertExists, isExpertForm, isLoggedIn, isSessionHydrated, isSessionSyncEnabled, loginMethod, moreLogin, orcidUserData, pendingEmail, tokenRequested]);
+
+    useEffect(() => {
+        if (!userData) {
+            return;
+        }
+
+        const applyValidatedOrcidLogin = async () => {
+            const existingOrcidExpert = await checkIfOrcidExists(userData.orcid);
+            const draftValues = getExpertDraftValues(existingOrcidExpert);
+
+            setOrcidUserData(userData);
+            setExpertExists(existingOrcidExpert);
             setIsLoggedIn(true);
-        }
-    }, [userData]);
+            setLoginMethod('orcid');
+            setTokenRequested(false);
+            setPendingEmail('');
+            setLoginError('');
+            setLoginInfo('');
 
-    useEffect(() => {
-        if (existingExpert) {
-            console.log('Existing expert found for email:', existingExpert);
-            setExpertExists(existingExpert);
-        }
-    }, [existingExpert]);
+            updateRegistrationSession({
+                draftValues,
+                expertProfile: existingOrcidExpert,
+                isLoggedIn: true,
+                loginMethod: 'orcid',
+                orcidUserData: userData,
+                pendingEmail: '',
+                tokenRequested: false,
+                verifiedEmail: userData.email,
+            });
+        };
+
+        void applyValidatedOrcidLogin().catch(() => {
+            setLoginError('Unable to validate ORCID profile. Please try again.');
+        });
+    }, [userData]);
 
     const redirectToOrcidAuth = () => {
         const orcidAuthUrl = `https://orcid.org/oauth/authorize?client_id=${import.meta.env.VITE_ORCID_CLIENT_ID}&response_type=code&scope=/authenticate&redirect_uri=${import.meta.env.VITE_ORCID_REDIRECT_URI}`;
-        window.location.href = orcidAuthUrl;
+        globalThis.location.href = orcidAuthUrl;
+    };
+
+    const handleGoBackToExpertSearch = () => {
+        clearRegistrationSession();
+        globalThis.location.href = '/search?serviceType=taxonomicExpert';
+    };
+
+    const handleSubmissionCompleted = () => {
+        setCompleted(true);
+
+        if (!isExpertForm) {
+            return;
+        }
+
+        setIsSessionSyncEnabled(false);
+        clearRegistrationSession();
     };
 
     const handleResendToken = async () => {
@@ -85,6 +198,109 @@ const TaxonomicForm = () => {
 
         setLoginError('');
         setLoginInfo('A new verification token has been sent. Check your email inbox.');
+    };
+
+    const lockedFieldValues = useMemo<Record<string, unknown>>(() => {
+        const lockedValues: Record<string, unknown> = {};
+
+        if (loginMethod === 'email' && email) {
+            lockedValues[EMAIL_JSON_PATH] = email;
+        }
+
+        if (loginMethod === 'orcid') {
+            if (orcidUserData?.orcid) {
+                lockedValues[ORCID_JSON_PATH] = orcidUserData.orcid;
+            }
+            if (orcidUserData?.email) {
+                lockedValues[EMAIL_JSON_PATH] = orcidUserData.email;
+            }
+            if (orcidUserData?.name) {
+                lockedValues[NAME_JSON_PATH] = orcidUserData.name;
+            }
+        }
+
+        return lockedValues;
+    }, [email, loginMethod, orcidUserData]);
+
+    const currentOrcidEmail = orcidUserData?.email ?? email;
+    const hasVerifiedOrcidEmail = typeof currentOrcidEmail === 'string' && currentOrcidEmail.trim() !== '';
+    const requiresOrcidEmailVerification = isExpertForm && isLoggedIn && loginMethod === 'orcid' && !hasVerifiedOrcidEmail;
+
+    const handleOrcidEmailVerificationSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const form = event.currentTarget;
+        const emailInput = form.elements.namedItem('orcidEmail') as HTMLInputElement | null;
+        const emailConfirmInput = form.elements.namedItem('orcidEmailConfirm') as HTMLInputElement | null;
+        const tokenInput = form.elements.namedItem('orcidEmailToken') as HTMLInputElement | null;
+        const emailValue = emailInput?.value.trim() ?? '';
+        const emailConfirmValue = emailConfirmInput?.value.trim() ?? '';
+        const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
+
+        if (tokenRequested) {
+            const tokenValue = tokenInput?.value.trim() || '';
+            if (!tokenValue) {
+                setLoginError('Please enter the verification token.');
+                return;
+            }
+
+            const isTokenValid = await verifyUserToken(pendingEmail, tokenValue);
+            if (!isTokenValid) {
+                setLoginError('Invalid or expired token. Please try again.');
+                return;
+            }
+
+            const updatedOrcidUserData: RegistrationOrcidUserData = orcidUserData
+                ? { ...orcidUserData, email: pendingEmail }
+                : { email: pendingEmail };
+
+            setOrcidUserData(updatedOrcidUserData);
+            setEmail(pendingEmail);
+            setTokenRequested(false);
+            setPendingEmail('');
+            setLoginError('');
+            setLoginInfo('');
+
+            updateRegistrationSession({
+                orcidUserData: updatedOrcidUserData,
+                pendingEmail: '',
+                tokenRequested: false,
+                verifiedEmail: pendingEmail,
+            });
+            return;
+        }
+
+        if (!emailValid) {
+            setLoginError('Invalid email.');
+            return;
+        }
+
+        if (emailValue !== emailConfirmValue) {
+            setLoginError('Email addresses do not match.');
+            return;
+        }
+
+        const existingEmailExpert = await checkIfEmailExists(emailValue);
+        if (existingEmailExpert) {
+            setLoginError('This email is already registered in the Marketplace. Please use another email.');
+            return;
+        }
+
+        const tokenRequestSucceeded = await requestUserToken(emailValue);
+        if (!tokenRequestSucceeded) {
+            setLoginError('Unable to send verification token. Please try again later.');
+            return;
+        }
+
+        setPendingEmail(emailValue);
+        setTokenRequested(true);
+        setLoginError('');
+        setLoginInfo('Verification token sent. Check your email and enter the token below.');
+
+        updateRegistrationSession({
+            pendingEmail: emailValue,
+            tokenRequested: true,
+        });
     };
 
     return (
@@ -121,13 +337,14 @@ const TaxonomicForm = () => {
                                                         <button
                                                             className="btn btn-primary"
                                                             onClick={redirectToOrcidAuth}
+                                                            type="button"
                                                         >
                                                             Login with ORCID
                                                         </button>
                                                         <button
                                                             className="btn btn-link p-0 ms-2"
                                                             style={{ fontSize: '0.95rem' }}
-                                                            onClick={() => setMoreLogin(m => !m)}
+                                                            onClick={() => setMoreLogin((currentValue) => !currentValue)}
                                                             type="button"
                                                         >
                                                             more
@@ -152,9 +369,7 @@ const TaxonomicForm = () => {
                                 </Col>
                             </Row>
                         )}
-                        {
-                        moreLogin && isExpertForm && !isLoggedIn && 
-                        (
+                        {moreLogin && isExpertForm && !isLoggedIn && (
                             <Row className="mt-3">
                                 <Col>
                                     <Card className="w-100 px-4 py-3">
@@ -162,28 +377,18 @@ const TaxonomicForm = () => {
                                             <Col>
                                                 <div>
                                                     <div className="d-flex justify-content-between align-items-center mb-3">
-                                                        <h2 className="fs-4 mb-0">{'Register with an Email'}</h2>
-                                                        <button
-                                                            className="btn btn-link p-0"
-                                                            style={{ fontSize: '1rem' }}
-                                                            onClick={() => {
-                                                                clearStoredAuthToken();
-                                                                setLoginError('');
-                                                            }}
-                                                            type="button"
-                                                        >
-                                                        </button>
+                                                        <h2 className="fs-4 mb-0">Register with an Email</h2>
                                                     </div>
                                                     <form
-                                                        onSubmit={async e => {
-                                                            e.preventDefault();
+                                                        onSubmit={async (event) => {
+                                                            event.preventDefault();
 
-                                                            const form = e.currentTarget as HTMLFormElement;
-                                                            const email = form.elements.namedItem('email') as HTMLInputElement;
-                                                            const emailConfirm = form.elements.namedItem('emailConfirm') as HTMLInputElement;
+                                                            const form = event.currentTarget;
+                                                            const emailInput = form.elements.namedItem('email') as HTMLInputElement | null;
+                                                            const emailConfirmInput = form.elements.namedItem('emailConfirm') as HTMLInputElement | null;
                                                             const tokenInput = form.elements.namedItem('token') as HTMLInputElement | null;
-                                                            const emailValue = email.value.trim();
-                                                            const emailConfirmValue = emailConfirm.value.trim();
+                                                            const emailValue = emailInput?.value.trim() ?? '';
+                                                            const emailConfirmValue = emailConfirmInput?.value.trim() ?? '';
                                                             const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
 
                                                             if (tokenRequested) {
@@ -201,8 +406,19 @@ const TaxonomicForm = () => {
 
                                                                 setEmail(pendingEmail);
                                                                 setIsLoggedIn(true);
+                                                                setLoginMethod('email');
+                                                                setTokenRequested(false);
+                                                                setPendingEmail('');
                                                                 setLoginError('');
                                                                 setLoginInfo('');
+
+                                                                updateRegistrationSession({
+                                                                    isLoggedIn: true,
+                                                                    loginMethod: 'email',
+                                                                    pendingEmail: '',
+                                                                    tokenRequested: false,
+                                                                    verifiedEmail: pendingEmail,
+                                                                });
                                                                 return;
                                                             }
 
@@ -214,10 +430,19 @@ const TaxonomicForm = () => {
                                                                 setLoginError('Email addresses do not match.');
                                                                 return;
                                                             }
-                                                            const exist = await checkIfEmailExists(emailValue);
-                                                            if (exist) {
-                                                                setExpertExists(exist);
-                                                            }
+
+                                                            const existingEmailExpert = await checkIfEmailExists(emailValue);
+                                                            const draftValues = getExpertDraftValues(existingEmailExpert);
+                                                            setExpertExists(existingEmailExpert);
+
+                                                            updateRegistrationSession({
+                                                                draftValues,
+                                                                expertProfile: existingEmailExpert,
+                                                                loginMethod: 'email',
+                                                                pendingEmail: emailValue,
+                                                                tokenRequested: false,
+                                                                verifiedEmail: '',
+                                                            });
 
                                                             const tokenRequestSucceeded = await requestUserToken(emailValue);
                                                             if (!tokenRequestSucceeded) {
@@ -225,16 +450,30 @@ const TaxonomicForm = () => {
                                                                 return;
                                                             }
 
+                                                            setLoginMethod('email');
                                                             setPendingEmail(emailValue);
                                                             setTokenRequested(true);
                                                             setLoginError('');
                                                             setLoginInfo('Verification token sent. Check your email and enter the token below.');
-                                                        }}
 
+                                                            updateRegistrationSession({
+                                                                loginMethod: 'email',
+                                                                pendingEmail: emailValue,
+                                                                tokenRequested: true,
+                                                            });
+                                                        }}
                                                     >
                                                         <div className="mb-3">
                                                             <label htmlFor="email" className="form-label">Email address</label>
-                                                            <input type="email" className={`form-control${loginError ? ' is-invalid' : ''}`} id="email" name="email" disabled={tokenRequested} required />
+                                                            <input
+                                                                type="email"
+                                                                className={`form-control${loginError ? ' is-invalid' : ''}`}
+                                                                id="email"
+                                                                name="email"
+                                                                defaultValue={pendingEmail}
+                                                                disabled={tokenRequested}
+                                                                required
+                                                            />
                                                         </div>
                                                         <div className="mb-3">
                                                             <label htmlFor="emailConfirm" className="form-label">Confirm Email address</label>
@@ -243,6 +482,7 @@ const TaxonomicForm = () => {
                                                                 className={`form-control${loginError ? ' is-invalid' : ''}`}
                                                                 id="emailConfirm"
                                                                 name="emailConfirm"
+                                                                defaultValue={pendingEmail}
                                                                 disabled={tokenRequested}
                                                                 required
                                                             />
@@ -280,9 +520,9 @@ const TaxonomicForm = () => {
                                                                 type="button"
                                                                 className="btn btn-link mt-2 ms-2"
                                                                 onClick={() => {
-                                                                    clearStoredAuthToken();
                                                                     setTokenRequested(false);
                                                                     setPendingEmail('');
+                                                                    setExpertExists(null);
                                                                     setLoginError('');
                                                                     setLoginInfo('');
                                                                     setIsResendingToken(false);
@@ -291,6 +531,13 @@ const TaxonomicForm = () => {
                                                                 Use another email
                                                             </button>
                                                         )}
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-link mt-2 ms-2"
+                                                            onClick={handleGoBackToExpertSearch}
+                                                        >
+                                                            Go back to search expert
+                                                        </button>
                                                         {loginInfo && <div className="text-success mt-2">{loginInfo}</div>}
                                                         {loginError && <div className="text-danger mt-2">{loginError}</div>}
                                                     </form>
@@ -301,26 +548,63 @@ const TaxonomicForm = () => {
                                 </Col>
                             </Row>
                         )}
-                        {
-                        (!isExpertForm || isLoggedIn) &&
-                         (
+                        {(!isExpertForm || isLoggedIn) && (
                             <Row className="mt-3">
                                 <Col>
                                     <Card className="w-100 px-4 py-3">
                                         <Row>
                                             <Col>
                                                 <h1 className={color}>
-                                                    {!completed ? title : 'Submission received'}
+                                                    {submissionHeading}
                                                 </h1>
                                                 <p className="mt-3 fs-4" style={{ whiteSpace: 'pre-line' }}>
-                                                    {!completed ? description : sended}
+                                                    {submissionDescription}
                                                 </p>
                                             </Col>
                                         </Row>
-                                        {!completed && (
+                                        {!completed && requiresOrcidEmailVerification && (
+                                            <OrcidEmailVerificationCard
+                                                loginError={loginError}
+                                                loginInfo={loginInfo}
+                                                pendingEmail={pendingEmail}
+                                                tokenRequested={tokenRequested}
+                                                isResendingToken={isResendingToken}
+                                                onSubmit={handleOrcidEmailVerificationSubmit}
+                                                onResend={handleResendToken}
+                                                onResetEmailFlow={() => {
+                                                    setTokenRequested(false);
+                                                    setPendingEmail('');
+                                                    setLoginError('');
+                                                    setLoginInfo('');
+                                                    setIsResendingToken(false);
+                                                }}
+                                            />
+                                        )}
+                                        {!completed && !requiresOrcidEmailVerification && (
                                             <Row>
                                                 <Col>
-                                                    <FormBuilder formTemplate={userData ? TaxonomicExpertFormOrcidJSON : formTemplate} OrcidData={userData ?? {}} TaxonomicExpert={expertExists} Email={email} SetCompleted={() => setCompleted(true)} />
+                                                    <FormBuilder
+                                                        formTemplate={formTemplate}
+                                                        OrcidData={orcidUserData ?? {}}
+                                                        TaxonomicExpert={expertExists}
+                                                        Email={email}
+                                                        LockedFieldValues={lockedFieldValues}
+                                                        OnResetRegistration={isExpertForm ? handleGoBackToExpertSearch : undefined}
+                                                        SetCompleted={handleSubmissionCompleted}
+                                                    />
+                                                </Col>
+                                            </Row>
+                                        )}
+                                        {completed && isExpertForm && (
+                                            <Row className="mt-3">
+                                                <Col>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-link p-0"
+                                                        onClick={handleGoBackToExpertSearch}
+                                                    >
+                                                        Go back to search expert
+                                                    </button>
                                                 </Col>
                                             </Row>
                                         )}
@@ -338,3 +622,109 @@ const TaxonomicForm = () => {
 };
 
 export default TaxonomicForm;
+
+type OrcidEmailVerificationCardProps = {
+    loginError: string;
+    loginInfo: string;
+    pendingEmail: string;
+    tokenRequested: boolean;
+    isResendingToken: boolean;
+    onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
+    onResend: () => Promise<void>;
+    onResetEmailFlow: () => void;
+};
+
+const OrcidEmailVerificationCard = ({
+    loginError,
+    loginInfo,
+    pendingEmail,
+    tokenRequested,
+    isResendingToken,
+    onSubmit,
+    onResend,
+    onResetEmailFlow,
+}: OrcidEmailVerificationCardProps) => {
+    return (
+        <Row>
+            <Col>
+                <Card className="w-100 px-4 py-3 mt-3">
+                    <Row>
+                        <Col>
+                            <h2 className="fs-4">Add and verify your email</h2>
+                            <p className="mt-2">
+                                Your ORCID account does not provide an email. Please add an email, verify ownership with a login code, and then continue to the form.
+                            </p>
+                            <form onSubmit={onSubmit}>
+                                <div className="mb-3">
+                                    <label htmlFor="orcidEmail" className="form-label">Email address</label>
+                                    <input
+                                        type="email"
+                                        className={`form-control${loginError ? ' is-invalid' : ''}`}
+                                        id="orcidEmail"
+                                        name="orcidEmail"
+                                        defaultValue={pendingEmail}
+                                        disabled={tokenRequested}
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="orcidEmailConfirm" className="form-label">Confirm Email address</label>
+                                    <input
+                                        type="email"
+                                        className={`form-control${loginError ? ' is-invalid' : ''}`}
+                                        id="orcidEmailConfirm"
+                                        name="orcidEmailConfirm"
+                                        defaultValue={pendingEmail}
+                                        disabled={tokenRequested}
+                                        required
+                                    />
+                                </div>
+
+                                {tokenRequested && (
+                                    <div className="mb-3">
+                                        <label htmlFor="orcidEmailToken" className="form-label">Verification token</label>
+                                        <input
+                                            type="text"
+                                            className={`form-control${loginError ? ' is-invalid' : ''}`}
+                                            id="orcidEmailToken"
+                                            name="orcidEmailToken"
+                                            autoComplete="one-time-code"
+                                            required
+                                        />
+                                    </div>
+                                )}
+
+                                <button type="submit" className="btn btn-primary mt-2">
+                                    {tokenRequested ? 'Verify token' : 'Request verification code'}
+                                </button>
+                                {tokenRequested && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-link mt-2 ms-2"
+                                        onClick={() => {
+                                            void onResend();
+                                        }}
+                                        disabled={isResendingToken}
+                                    >
+                                        {isResendingToken ? 'Resending...' : 'Resend token'}
+                                    </button>
+                                )}
+                                {tokenRequested && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-link mt-2 ms-2"
+                                        onClick={onResetEmailFlow}
+                                    >
+                                        Use another email
+                                    </button>
+                                )}
+                                {loginInfo && <div className="text-success mt-2">{loginInfo}</div>}
+                                {loginError && <div className="text-danger mt-2">{loginError}</div>}
+                            </form>
+                        </Col>
+                    </Row>
+                </Card>
+            </Col>
+        </Row>
+    );
+};
