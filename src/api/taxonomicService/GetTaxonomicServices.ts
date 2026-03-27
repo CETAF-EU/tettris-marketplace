@@ -14,13 +14,24 @@ const GetTaxonomicServices = async ({
 }: {
     pageNumber: number;
     pageSize: number;
-    searchFilters: { [searchFilter: string]: string };
+    searchFilters: { [searchFilter: string]: string | string[] };
 }) => {
     let filters = '/taxonomicService/@type:TaxonomicService';
     filters += String.raw` AND /taxonomicService/schema\:status:accepted`;
 
+    const appendOrFilter = (clauses: string[]) => {
+        if (!clauses.length) return;
+
+        filters += clauses.length === 1
+            ? String.raw` AND ${clauses[0]}`
+            : ' AND (' + clauses.join(' OR ') + ')';
+    };
+
     if (!isEmpty(searchFilters)) {
         Object.entries(searchFilters).forEach(([key, value]) => {
+            const values = (Array.isArray(value) ? value : [value]).filter((item) => !!item);
+            if (!values.length) return;
+
             const alias =
                 TaxonomicServiceFilters.taxonomicServiceFilters.find(
                     taxonomicSearchFilter => taxonomicSearchFilter.name === key
@@ -30,24 +41,29 @@ const GetTaxonomicServices = async ({
             switch (key) {
                 case 'language':
                 case 'topicDiscipline':
-                    filters += String.raw` AND /taxonomicService/${escapedAlias}/_:${value}`;
+                    appendOrFilter(values.map((item) => String.raw`/taxonomicService/${escapedAlias}/_:${item}`));
                     break;
                 case 'query':
+                    {
+                        const firstValue = values[0];
+                        if (!firstValue) break;
+
                     filters +=
                         ` AND (` +
-                        String.raw`/taxonomicService/schema\:service/schema\:name:${value}*` +
-                        String.raw` OR /taxonomicService/schema\:taxonomicRange/_:${value}*` +
-                        String.raw` OR /taxonomicService/ods\:topicDiscipline/_:${value}*` +
+                        String.raw`/taxonomicService/schema\:service/schema\:name:${firstValue}*` +
+                        String.raw` OR /taxonomicService/schema\:taxonomicRange/_:${firstValue}*` +
+                        String.raw` OR /taxonomicService/ods\:topicDiscipline/_:${firstValue}*` +
                         `)`;
+                    }
                     break;
                 case 'taxonomicRange':
-                    filters += String.raw` AND /taxonomicService/schema\:taxonomicRange/_:${value}*`;
+                    appendOrFilter(values.map((item) => String.raw`/taxonomicService/schema\:taxonomicRange/_:${item}*`));
                     break;
                 case 'serviceType':
-                    filters += String.raw` AND /taxonomicService/schema\:Service/schema\:serviceType:${value}`;
+                    appendOrFilter(values.map((item) => String.raw`/taxonomicService/schema\:Service/schema\:serviceType:${item}`));
                     break;
                 default:
-                    filters += String.raw` AND /taxonomicService/${escapedAlias}:${value}`;
+                    appendOrFilter(values.map((item) => String.raw`/taxonomicService/${escapedAlias}:${item}`));
             }
         });
     }

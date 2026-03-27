@@ -138,11 +138,20 @@ const usePaginator = ({ Initiate, Method, Handler, ErrorHandler, pageSize, resul
 
     /* Get search filters from search params */
     const searchFilters = [...searchParams.entries()].reduce((filtersObject, [key, value]) => {
+        const previousValue = filtersObject[key];
+
+        if (!previousValue) {
+            return {
+                ...filtersObject,
+                [key]: value
+            };
+        }
+
         return {
             ...filtersObject,
-            [key]: value
-        }
-    }, {});
+            [key]: Array.isArray(previousValue) ? [...previousValue, value] : [previousValue, value]
+        };
+    }, {} as Dict);
     const [searchFiltersSave, setSearchFiltersSave] = useState<Dict>(
         searchFilters
     );

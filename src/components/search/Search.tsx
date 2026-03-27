@@ -73,11 +73,20 @@ const Search = () => {
     useEffect(() => {
         if (!noMoreResults) {
             const searchFilters = [...searchParams.entries()].reduce((filtersObject, [key, value]) => {
+                const previousValue = filtersObject[key];
+
+                if (!previousValue) {
+                    return {
+                        ...filtersObject,
+                        [key]: value
+                    }
+                }
+
                 return {
                     ...filtersObject,
-                    [key]: value
+                    [key]: Array.isArray(previousValue) ? [...previousValue, value] : [previousValue, value]
                 }
-            }, {});
+            }, {} as { [searchFilter: string]: string | string[] });
 
             if (searchParams.get('serviceType') === 'taxonomicExpert') {
                 GetTaxonomicExperts({
@@ -104,7 +113,7 @@ const Search = () => {
         }
     }, [paginator]);
 
-    const variant: Color = getColor(window.location) as Color;
+    const variant: Color = getColor(globalThis.location) as Color;
     
     /* ClassNames */
     const searchResultsClassScrollBlock = classNames({
