@@ -1,9 +1,9 @@
 /* Import Dependencies */
 import { useCaptchaHook } from "@aacn.eu/use-friendly-captcha";
-import { Formik, Form } from "formik";
+import { Formik, Form, useFormikContext } from "formik";
 import jp from 'jsonpath';
-import { cloneDeep, isEmpty } from "lodash";
-import { useMemo, useState } from "react";
+import { cloneDeep, isEmpty, merge } from "lodash";
+import { useEffect, useMemo, useState } from "react";
 import { Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
@@ -33,6 +33,7 @@ import { Color, getColor } from "components/general/ColorPage";
 import ORCIDField from "./ORCIDField";
 import ImageField from "./ImageField";
 import MultiRORField from "./MultiRORField";
+import { getRegistrationSession, updateRegistrationSession } from "api/auth/registrationSession";
 
 
 /* Props Type */
@@ -53,6 +54,8 @@ type Props = {
     },
     TaxonomicExpert : TaxonomicExpert | null,
     Email: string | null,
+    LockedFieldValues?: Record<string, unknown>,
+    OnResetRegistration?: Function,
     SetCompleted: Function
 };
 
@@ -63,9 +66,11 @@ type Props = {
  * @returns JSX Component
  */
 const FormBuilder = (props: Props) => {
-    const { formTemplate,OrcidData, TaxonomicExpert, Email, SetCompleted } = props;
+    const { formTemplate, OrcidData, TaxonomicExpert, Email, LockedFieldValues, OnResetRegistration, SetCompleted } = props;
 
     console.log('taxonomicExpert', TaxonomicExpert);
+
+    const isExpertForm = globalThis.location.pathname.includes('/te');
 
     const expertRecord: Dict | null = useMemo(() => {
         if (!TaxonomicExpert) {
@@ -99,7 +104,7 @@ const FormBuilder = (props: Props) => {
 
     /* Base variables */
     /* Determine color */
-    const color = getColor(window.location) as Color;
+    const color = getColor(globalThis.location) as Color;
 
 
     const [serviceTypes, setServiceTypes] = useState<string[] | undefined>();
@@ -151,6 +156,68 @@ const FormBuilder = (props: Props) => {
 
     const initialFormValues: Dict = useMemo(() => {
         const values: Dict = {};
+        const savedDraftValues = isExpertForm ? cloneDeep(getRegistrationSession().draftValues ?? {}) : {};
+
+        const applyLockedFieldValues = (targetValues: Dict) => {
+            Object.entries(LockedFieldValues ?? {}).forEach(([jsonPath, fieldValue]) => {
+                if (fieldValue !== undefined && fieldValue !== null && fieldValue !== '') {
+                    jp.value(targetValues, jsonPath, cloneDeep(fieldValue));
+                }
+            });
+        };
+
+        const ExtractPathSegments = (jsonPath: string): string[] => {
+            const matches = [...jsonPath.matchAll(/\['([^']+)'\]/g)];
+            return matches.map((match) => match[1]);
+        };
+
+        const AlternateSchemaKey = (key: string): string => {
+            return key.startsWith('schema:')
+                ? key.replace(/^schema:/, '')
+                : `schema:${key}`;
+        };
+
+        const ResolveNextNodes = (nodes: unknown[], keyCandidates: string[]): unknown[] => {
+            const nextNodes: unknown[] = [];
+
+            for (const node of nodes) {
+                if (!node || typeof node !== 'object') {
+                    continue;
+                }
+
+                const dictNode = node as Dict;
+
+                for (const candidateKey of keyCandidates) {
+                    if (Object.hasOwn(dictNode, candidateKey)) {
+                        nextNodes.push(dictNode[candidateKey]);
+                    }
+                }
+            }
+
+            return nextNodes;
+        };
+
+        const ResolvePathValue = (source: Dict, jsonPath: string): unknown => {
+            const pathSegments = ExtractPathSegments(jsonPath);
+            if (pathSegments.length === 0) {
+                return undefined;
+            }
+
+            let currentNodes: unknown[] = [source];
+
+            for (const pathSegment of pathSegments) {
+                const keyCandidates = [pathSegment, AlternateSchemaKey(pathSegment)];
+                const nextNodes = ResolveNextNodes(currentNodes, keyCandidates);
+
+                if (nextNodes.length === 0) {
+                    return undefined;
+                }
+
+                currentNodes = nextNodes;
+            }
+
+            return currentNodes.find((node) => node !== undefined && node !== null);
+        };
 
         const ResolveExistingValue = (jsonPath: string): unknown => {
             if (!expertRecord) {
@@ -162,24 +229,12 @@ const FormBuilder = (props: Props) => {
                 return directValue;
             }
 
-            const pathSegments = jsonPath.match(/\['[^']+'\]/g);
-            const lastSegment = pathSegments?.at(-1);
-            if (!lastSegment) {
-                return undefined;
-            }
-
-            const lastKey = lastSegment.slice(2, -2);
-            const alternateLastKey = lastKey.startsWith('schema:')
-                ? lastKey.replace(/^schema:/, '')
-                : `schema:${lastKey}`;
-
-            const alternatePath = `${jsonPath.slice(0, -lastSegment.length)}['${alternateLastKey}']`;
-            return jp.value(expertRecord, alternatePath);
+            return ResolvePathValue(expertRecord, jsonPath);
         };
 
         Object.entries(formTemplate).forEach(([_key, formSection]) => {
             const existingSectionValue = expertRecord
-                ? jp.value(expertRecord, formSection.jsonPath ?? '')
+                ? ResolveExistingValue(formSection.jsonPath ?? '')
                 : undefined;
 
             if (formSection.type === 'array') {
@@ -194,6 +249,25 @@ const FormBuilder = (props: Props) => {
                 let jsonPath: string = '';
                 const existingValue = ResolveExistingValue(field.jsonPath);
 
+                if (field.jsonPath === "$['schema:person']['schema:affiliation']" && expertRecord?.['@id']) {
+                    const existingAffiliation = existingValue as Dict | undefined;
+                    const affiliationIdentifier = typeof existingAffiliation === 'object' && existingAffiliation !== null
+                        ? (existingAffiliation['schema:identifier'] ?? existingAffiliation.identifier)
+                        : undefined;
+                    const hasValidAffiliation = typeof affiliationIdentifier === 'string' && affiliationIdentifier.trim() !== '';
+
+                    if (!hasValidAffiliation) {
+                        jp.value(values, "$['schema:person']['schema:noAffiliation']", true);
+                        jp.value(values, field.jsonPath, {
+                            '@type': 'schema:Organization',
+                            'schema:identifier': '',
+                            'schema:name': '',
+                            'schema:url': ''
+                        });
+                        return;
+                    }
+                }
+
                 if (formSection.type === 'array') {
                     let pathSuffix: string = FlattenJSONPath(field.jsonPath).split('_').at(-1) as string;
 
@@ -203,9 +277,6 @@ const FormBuilder = (props: Props) => {
                     }
                 } else if (existingValue !== undefined && existingValue !== null) {
                     jp.value(values, field.jsonPath, existingValue);
-                } else if (field.jsonPath === "$['schema:person']['schema:affiliation']" && expertRecord?.['@id']) {
-                    jp.value(values, "$['schema:person']['schema:noAffiliation']", true);
-                    jp.value(values, field.jsonPath, '');
                 } else if (field.jsonPath === "$['schema:person']['schema:orcid']" && expertRecord?.['@id']) {
                     jp.value(values, "$['schema:person']['schema:noOrcid']", true);
                     jp.value(values, field.jsonPath, '');
@@ -225,8 +296,11 @@ const FormBuilder = (props: Props) => {
             });
         });
 
-        return values;
-    }, [Email, OrcidData, expertRecord, formTemplate]);
+        const mergedValues = merge({}, values, savedDraftValues);
+        applyLockedFieldValues(mergedValues);
+
+        return mergedValues;
+    }, [Email, LockedFieldValues, OrcidData, expertRecord, formTemplate, isExpertForm]);
     
     /* Construct form sections */
     Object.entries(formTemplate).forEach(([_key, formSection]) => {
@@ -266,7 +340,12 @@ const FormBuilder = (props: Props) => {
      * @returns JSX Component of form field
      */
     const ConstructFormField = (field: FormField, values: Dict, SetFieldValue: Function, fieldValues?: any) => {
-        return generateFieldComponent(field, fieldValues, SetFieldValue, values, setServiceTypes);
+        const fieldWithState: FormField = {
+            ...field,
+            disabled: LockedFieldValues?.[field.jsonPath] !== undefined,
+        };
+
+        return generateFieldComponent(fieldWithState, fieldValues, SetFieldValue, values, setServiceTypes);
     };
 
     /**
@@ -275,7 +354,7 @@ const FormBuilder = (props: Props) => {
      */
     const CheckForIrrelevantClasses = (obj: Dict) => {
         Object.keys(obj).forEach(key => {
-            if (Object.values(inactiveFormSections).find(values => values.jsonPath === `$['${key}']`)) {
+            if (Object.values(inactiveFormSections).some(values => values.jsonPath === `$['${key}']`)) {
                 delete obj[key];
             }
         });
@@ -351,7 +430,7 @@ const FormBuilder = (props: Props) => {
                          */
                         const RemoveEmptyProperties = (obj: Dict) => {
                             for (const key in obj) {
-                                if (isEmpty(obj[key]) || (Array.isArray(obj[key]) && !obj[key].find((value: string) => !!value))) {
+                                if (isEmpty(obj[key]) || (Array.isArray(obj[key]) && !obj[key].some((value: string) => !!value))) {
                                     delete obj[key];
                                 } else if (typeof obj[key] === 'object') {
                                     RemoveEmptyProperties(obj[key]);
@@ -359,7 +438,7 @@ const FormBuilder = (props: Props) => {
                             };
                         };
 
-                        if (window.location.pathname.includes('/ts')) {
+                        if (globalThis.location.pathname.includes('/ts')) {
                             let taxonomicServiceRecord = cloneDeep(values);
 
                             RemoveEmptyProperties(taxonomicServiceRecord);
@@ -376,7 +455,13 @@ const FormBuilder = (props: Props) => {
                             } finally {
                                 setLoading(false);
                             };
-                        } else if (window.location.pathname.includes('/te')) {
+                        } else if (globalThis.location.pathname.includes('/te')) {
+                            Object.entries(LockedFieldValues ?? {}).forEach(([jsonPath, fieldValue]) => {
+                                if (fieldValue !== undefined && fieldValue !== null && fieldValue !== '') {
+                                    jp.value(values, jsonPath, cloneDeep(fieldValue));
+                                }
+                            });
+
                             if (OrcidData?.orcid) {
                                 jp.value(values, "$['schema:person']['schema:orcid']", OrcidData.orcid);
                             }
@@ -405,6 +490,10 @@ const FormBuilder = (props: Props) => {
                                     });
                                 }
 
+                                updateRegistrationSession({
+                                    completed: true,
+                                    draftValues: cloneDeep(values),
+                                });
                                 SetCompleted();
                             } catch {
                                 setErrorMessage('Something went wrong during the submission of the Taxonomic Expert, please try again');
@@ -419,6 +508,8 @@ const FormBuilder = (props: Props) => {
             >
                 {({ values, setFieldValue }) => (
                     <Form>
+                        <FormSessionSync enabled={isExpertForm} />
+                        <LockedFieldSync lockedFieldValues={LockedFieldValues} />
                         {Object.entries(formSections).map(([title, section]) => (
                             <div key={title}>
                                 {((serviceTypes && section.applicableToServiceTypes?.some(type => serviceTypes.includes(type))) || !section.applicableToServiceTypes) &&
@@ -467,7 +558,7 @@ const FormBuilder = (props: Props) => {
                                 </Col>
                             </Row>
                         }
-                        {!window.location.pathname.includes('/ts') && (
+                        {!globalThis.location.pathname.includes('/ts') && (
                             <Row className="mt-3">
                                 <Col>
                                     <div>
@@ -499,7 +590,7 @@ const FormBuilder = (props: Props) => {
                                 </Col>
                             </Row>
                         )}
-                        {!window.location.pathname.includes('/te') && (
+                        {!globalThis.location.pathname.includes('/te') && (
                             <Row className="mt-3">
                                 <Col>
                                     <div className="form-check">
@@ -534,6 +625,18 @@ const FormBuilder = (props: Props) => {
                                             <Spinner />
                                         </Col>
                                     }
+                                    {isExpertForm && OnResetRegistration &&
+                                        <Col lg="auto" className="mt-2 mt-lg-0">
+                                            <Button type="button"
+                                                variant="blank"
+                                                OnClick={() => OnResetRegistration()}
+                                            >
+                                                <p>
+                                                    Go back to search expert
+                                                </p>
+                                            </Button>
+                                        </Col>
+                                    }
                                 </Row>
                             </Col>
                         </Row>
@@ -545,6 +648,43 @@ const FormBuilder = (props: Props) => {
 };
 
 export default FormBuilder;
+
+const FormSessionSync = ({ enabled }: { enabled: boolean }) => {
+    const { values } = useFormikContext<Dict>();
+
+    useEffect(() => {
+        if (!enabled) {
+            return;
+        }
+
+        updateRegistrationSession({
+            draftValues: cloneDeep(values),
+        });
+    }, [enabled, values]);
+
+    return null;
+};
+
+const LockedFieldSync = ({ lockedFieldValues }: { lockedFieldValues?: Record<string, unknown> }) => {
+    const { values, setFieldValue } = useFormikContext<Dict>();
+
+    useEffect(() => {
+        Object.entries(lockedFieldValues ?? {}).forEach(([jsonPath, fieldValue]) => {
+            if (fieldValue === undefined || fieldValue === null || fieldValue === '') {
+                return;
+            }
+
+            const currentValue = jp.value(values, jsonPath);
+            if (currentValue === fieldValue) {
+                return;
+            }
+
+            setFieldValue(jsonPath.replace('$', ''), cloneDeep(fieldValue), false);
+        });
+    }, [lockedFieldValues, setFieldValue, values]);
+
+    return null;
+};
 
 function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValue: Function, values: Dict, setServiceTypes: (serviceTypes: string[]) => void) {
     switch (field.type) {
@@ -688,6 +828,7 @@ function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValu
                 SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)} />;
         } case 'text': {
             return <TextField field={field}
+                fieldValue={fieldValues as string}
                 values={values}
                 SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)} />;
         } case 'int': {

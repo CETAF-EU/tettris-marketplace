@@ -69,15 +69,21 @@ const RORField = (props: Props) => {
     const noAffiliationJsonPath = "$['schema:person']['schema:noAffiliation']";
 
     useEffect(() => {
-        const identifier = fieldValue?.['schema:identifier'];
-        const name = fieldValue?.['schema:name'];
-        const url = fieldValue?.['schema:url'];
         const explicitNoAffiliation = jp.value(values, noAffiliationJsonPath) === true;
-        const isNoAffiliationValue = (typeof fieldValue === 'object'
-            && fieldValue !== null
-            && identifier === ''
-            && name === ''
-            && url === '');
+        const isObjectFieldValue = typeof fieldValue === 'object' && fieldValue !== null;
+        const normalizedIdentifier = isObjectFieldValue
+            ? ((fieldValue['schema:identifier'] ?? fieldValue.identifier) as string | undefined)
+            : undefined;
+        const normalizedName = isObjectFieldValue
+            ? ((fieldValue['schema:name'] ?? fieldValue.name) as string | undefined)
+            : undefined;
+        const normalizedUrl = isObjectFieldValue
+            ? ((fieldValue['schema:url'] ?? fieldValue.url) as string | undefined)
+            : undefined;
+        const hasIdentifier = typeof normalizedIdentifier === 'string' && normalizedIdentifier.trim() !== '';
+        const hasName = typeof normalizedName === 'string' && normalizedName.trim() !== '';
+        const hasUrl = typeof normalizedUrl === 'string' && normalizedUrl.trim() !== '';
+        const isNoAffiliationValue = isObjectFieldValue && !hasIdentifier && !hasName && !hasUrl;
 
         setNoAffiliation(explicitNoAffiliation || isNoAffiliationValue);
     }, [fieldValue, noAffiliationJsonPath, values]);

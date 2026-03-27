@@ -77,7 +77,14 @@ const SelectField = (props: Props) => {
                 options={selectItems.toSorted((a, b) => a.label > b.label ? 1 : 0)}
                 value={selectedOption}
                 className={`${formFieldClass} mt-1`}
-                onChange={(dropdownOption) => SetFieldValue(jsonPath, dropdownOption?.value)}
+                isDisabled={field.disabled}
+                onChange={(dropdownOption) => {
+                    if (field.disabled) {
+                        return;
+                    }
+
+                    SetFieldValue(jsonPath, dropdownOption?.value);
+                }}
             />
         </div>
     );

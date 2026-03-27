@@ -61,6 +61,7 @@ const ORCIDField = (props: Props) => {
     const noOrcidJsonPath = "$['schema:person']['schema:noOrcid']";
     const currentOrcid = (jp.value(values, field.jsonPath) as string | undefined)
         ?? (typeof fieldValue?.['schema:identifier'] === 'string' ? fieldValue['schema:identifier'] : undefined);
+    const isDisabled = field.disabled === true;
     /* Determine variant */
     const variant: Color = getColor(globalThis.location) as Color;
     /**
@@ -129,6 +130,10 @@ const ORCIDField = (props: Props) => {
     }, [currentOrcid, noOrcid]);
 
     const validateOrcid = async (orcid: string) => {
+        if (isDisabled) {
+            return;
+        }
+
         if (noOrcid) {
             setOrcidExists(false);
             SetFieldValue(formikJsonPath, '');
@@ -242,6 +247,7 @@ const SearchForOrcid = async () => {
                     <Field name="orcidSearch"
                         className={`${formFieldClass} w-100 br-corner px-2 py-1`}
                         onChange={(field: Dict) => setQuery(field.target.value as string)}
+                        disabled={isDisabled}
                     />
                 </Col>
                 {loading &&
@@ -254,6 +260,7 @@ const SearchForOrcid = async () => {
                         variant={variant}
                         className="fs-5 fs-lg-4 mt-2 mt-lg-0"
                         OnClick={() => SearchForOrcid()}
+                        disabled={isDisabled}
                     >
                         <p>
                             Search for Orcid
@@ -266,6 +273,10 @@ const SearchForOrcid = async () => {
                             variant={noOrcid ? 'primary' : variant}
                             className="fs-5 fs-lg-4 mt-2 mt-lg-0"
                             OnClick={() => {
+                                if (isDisabled) {
+                                    return;
+                                }
+
                                 const nextValue = !noOrcid;
 
                                 setNoOrcid(nextValue);
@@ -290,7 +301,7 @@ const SearchForOrcid = async () => {
                     <Col>
                         <Select
                             options={dropdownOptions as { label: any; value: any; url: any; }[]}
-                            value={
+                        value={
                                 currentOrcid
                                     ? (dropdownOptions.find(option => option.value === currentOrcid) ?? {
                                         label: currentOrcid,
@@ -301,7 +312,12 @@ const SearchForOrcid = async () => {
                             }
                             placeholder="Select an option"
                             className={formFieldClass}
+                            isDisabled={isDisabled}
                             onChange={(dropdownOption) => {
+                                if (isDisabled) {
+                                    return;
+                                }
+
                                 setNoOrcid(false);
                                 SetFieldValue(noOrcidJsonPath.replace('$', ''), false);
                                 validateOrcid(dropdownOption?.value ?? '')
