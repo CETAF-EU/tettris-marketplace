@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import checkIfOrcidExists from './checkIfOrcidExists';
 import { clearStoredAuthToken, extractAuthToken, storeAuthToken } from 'api/auth/session';
-import { TaxonomicExpert } from 'app/Types';
+import { TaxonomicExpert, Dict } from 'app/Types';
 
 const ORCID_TOKEN_URL = `${import.meta.env.VITE_API_URL}/orcid/token`;
 const MARKETPLACE_API_TOKEN = import.meta.env.VITE_MARKETPLACE_API_TOKEN;
@@ -17,6 +17,10 @@ interface OrcidLoginResult {
     userData: OrcidUserData;
     existingExpert: TaxonomicExpert | null;
 }
+
+type ExpertEmailDataResponse = {
+    user_email?: string;
+};
 
 export function useOrcidCallback() {
     const [userData, setUserData] = useState<OrcidUserData | null>(null);
@@ -44,6 +48,55 @@ export function useOrcidCallback() {
             globalThis.history.replaceState({}, document.title, url.pathname + url.search);
         })();
     }, [code]);
+
+    const resolveExpertId = (expert: TaxonomicExpert | null): string | null => {
+        if (!expert) {
+            return null;
+        }
+
+        const candidate = expert as unknown as Dict;
+        const expertRecord = (
+            candidate.taxonomicExpert
+            ?? candidate.taxonomic_expert
+            ?? candidate.attributes?.content?.taxonomicExpert
+            ?? candidate.attributes?.content?.taxonomic_expert
+            ?? candidate.attributes?.content
+            ?? candidate
+        ) as Dict | undefined;
+
+        const resolvedId = (
+            expertRecord?.['@id']
+            ?? candidate.id
+            ?? candidate['@id']
+            ?? candidate.attributes?.id
+        );
+
+        return typeof resolvedId === 'string' && resolvedId.trim().length > 0
+            ? resolvedId
+            : null;
+    };
+
+    const fetchExpertEmailData = async (expertId: string, accessToken: string): Promise<string | null> => {
+        try {
+            const response = await axios.get<ExpertEmailDataResponse>(
+                `${import.meta.env.VITE_API_URL}/cordra/experts/${encodeURIComponent(expertId)}/email-data`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        ...(MARKETPLACE_API_TOKEN ? { 'x-marketplace-token': MARKETPLACE_API_TOKEN } : {}),
+                    },
+                }
+            );
+
+            const userEmail = response.data?.user_email;
+            return typeof userEmail === 'string' && userEmail.trim().length > 0
+                ? userEmail.trim()
+                : null;
+        } catch (error) {
+            console.error('Failed to retrieve expert email-data:', error);
+            return null;
+        }
+    };
 
     async function loginWithOrcid(code: string): Promise<OrcidLoginResult> {
         try {
@@ -82,12 +135,8 @@ export function useOrcidCallback() {
             
             // Try to get name from user object (if available)
             const nameValue = (userData_obj.name as string) ?? (userData_obj['schema:name'] as string) ?? '';
-
-            console.log('ORCID token response user:', userData_obj);
-            console.log('Extracted ORCID:', orcidValue, 'Name:', nameValue);
             
             if (!orcidValue || typeof orcidValue !== 'string') {
-                console.error('Invalid ORCID value:', orcidValue, 'Type:', typeof orcidValue);
                 throw new Error('ORCID not found in token response');
             }
 
@@ -98,9 +147,17 @@ export function useOrcidCallback() {
             };
             
             const existingExpert = await checkIfOrcidExists(userData.orcid);
+            const expertId = resolveExpertId(existingExpert);
+            const resolvedEmail = expertId && authToken
+                ? await fetchExpertEmailData(expertId, authToken)
+                : null;
+
+            const userDataWithEmail: OrcidUserData = resolvedEmail
+                ? { ...userData, email: resolvedEmail }
+                : userData;
 
             return {
-                userData,
+                userData: userDataWithEmail,
                 existingExpert
             };
         } catch (error: any) {
