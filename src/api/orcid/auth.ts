@@ -68,19 +68,30 @@ export function useOrcidCallback() {
                 storeAuthToken(authToken);
             }
 
+            console.log('ORCID token response:', response.data);
+
             // Extract ORCID data from nested person object or flat structure
             const person = (response.data as Record<string, unknown>)['schema:person'] 
                 ?? (response.data as Record<string, unknown>).person 
                 ?? response.data;
             const orcidValue = (person as Record<string, unknown>)['schema:orcid'] 
-                ?? (person as Record<string, unknown>).orcid;
+                ?? (person as Record<string, unknown>).orcid
+                ?? (response.data as Record<string, unknown>)['schema:orcid']
+                ?? (response.data as Record<string, unknown>).orcid;
             const nameValue = (person as Record<string, unknown>)['schema:name'] 
-                ?? (person as Record<string, unknown>).name 
+                ?? (person as Record<string, unknown>).name
+                ?? (response.data as Record<string, unknown>)['schema:name']
+                ?? (response.data as Record<string, unknown>).name
                 ?? '';
             const emailValue = (person as Record<string, unknown>)['schema:email'] 
-                ?? (person as Record<string, unknown>).email;
+                ?? (person as Record<string, unknown>).email
+                ?? (response.data as Record<string, unknown>)['schema:email']
+                ?? (response.data as Record<string, unknown>).email;
+            
+            console.log('Extracted ORCID:', orcidValue, 'Name:', nameValue, 'Email:', emailValue);
             
             if (!orcidValue || typeof orcidValue !== 'string') {
+                console.error('Invalid ORCID value:', orcidValue, 'Type:', typeof orcidValue);
                 throw new Error('ORCID not found in token response');
             }
 
