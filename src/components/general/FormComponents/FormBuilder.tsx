@@ -509,6 +509,7 @@ const FormBuilder = (props: Props) => {
                 {({ values, setFieldValue }) => (
                     <Form>
                         <FormSessionSync enabled={isExpertForm} />
+                        <LockedFieldSync lockedFieldValues={LockedFieldValues} />
                         {Object.entries(formSections).map(([title, section]) => (
                             <div key={title}>
                                 {((serviceTypes && section.applicableToServiceTypes?.some(type => serviceTypes.includes(type))) || !section.applicableToServiceTypes) &&
@@ -660,6 +661,27 @@ const FormSessionSync = ({ enabled }: { enabled: boolean }) => {
             draftValues: cloneDeep(values),
         });
     }, [enabled, values]);
+
+    return null;
+};
+
+const LockedFieldSync = ({ lockedFieldValues }: { lockedFieldValues?: Record<string, unknown> }) => {
+    const { values, setFieldValue } = useFormikContext<Dict>();
+
+    useEffect(() => {
+        Object.entries(lockedFieldValues ?? {}).forEach(([jsonPath, fieldValue]) => {
+            if (fieldValue === undefined || fieldValue === null || fieldValue === '') {
+                return;
+            }
+
+            const currentValue = jp.value(values, jsonPath);
+            if (currentValue === fieldValue) {
+                return;
+            }
+
+            setFieldValue(jsonPath.replace('$', ''), cloneDeep(fieldValue), false);
+        });
+    }, [lockedFieldValues, setFieldValue, values]);
 
     return null;
 };
