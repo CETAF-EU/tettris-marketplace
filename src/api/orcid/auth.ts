@@ -68,27 +68,23 @@ export function useOrcidCallback() {
                 storeAuthToken(authToken);
             }
 
-            console.log('ORCID token response:', response.data);
-
-            // Extract ORCID data from nested person object or flat structure
-            const person = (response.data as Record<string, unknown>)['schema:person'] 
-                ?? (response.data as Record<string, unknown>).person 
-                ?? response.data;
-            const orcidValue = (person as Record<string, unknown>)['schema:orcid'] 
-                ?? (person as Record<string, unknown>).orcid
-                ?? (response.data as Record<string, unknown>)['schema:orcid']
-                ?? (response.data as Record<string, unknown>).orcid;
-            const nameValue = (person as Record<string, unknown>)['schema:name'] 
-                ?? (person as Record<string, unknown>).name
-                ?? (response.data as Record<string, unknown>)['schema:name']
-                ?? (response.data as Record<string, unknown>).name
-                ?? '';
-            const emailValue = (person as Record<string, unknown>)['schema:email'] 
-                ?? (person as Record<string, unknown>).email
-                ?? (response.data as Record<string, unknown>)['schema:email']
-                ?? (response.data as Record<string, unknown>).email;
+            // ORCID response has structure: { access_token, token_type, user: { id, email, is_verified, ... } }
+            // The ORCID is stored in user.email as "ORCID@orcid.invalid"
+            const userData_obj = (response.data as Record<string, unknown>).user as Record<string, unknown> | undefined;
             
-            console.log('Extracted ORCID:', orcidValue, 'Name:', nameValue, 'Email:', emailValue);
+            if (!userData_obj) {
+                throw new Error('User data not found in token response');
+            }
+
+            // Extract ORCID from email field (format: "0009-0004-5632-8045@orcid.invalid")
+            const emailFromUser = userData_obj.email as string | undefined;
+            const orcidValue = emailFromUser?.replace('@orcid.invalid', '').trim() ?? null;
+            
+            // Try to get name from user object (if available)
+            const nameValue = (userData_obj.name as string) ?? (userData_obj['schema:name'] as string) ?? '';
+
+            console.log('ORCID token response user:', userData_obj);
+            console.log('Extracted ORCID:', orcidValue, 'Name:', nameValue);
             
             if (!orcidValue || typeof orcidValue !== 'string') {
                 console.error('Invalid ORCID value:', orcidValue, 'Type:', typeof orcidValue);
@@ -98,7 +94,7 @@ export function useOrcidCallback() {
             const userData: OrcidUserData = {
                 orcid: orcidValue,
                 name: typeof nameValue === 'string' ? nameValue : '',
-                ...(emailValue && typeof emailValue === 'string' ? { email: emailValue } : {}),
+                ...(typeof userData_obj.email === 'string' && !userData_obj.email.includes('@orcid.invalid') ? { email: userData_obj.email } : {}),
             };
             
             const existingExpert = await checkIfOrcidExists(userData.orcid);
