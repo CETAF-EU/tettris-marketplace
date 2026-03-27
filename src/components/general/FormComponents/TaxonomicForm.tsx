@@ -68,7 +68,7 @@ const TaxonomicForm = () => {
     const [isSessionHydrated, setIsSessionHydrated] = useState<boolean>(!globalThis.location.pathname.includes('/te'));
     const [isSessionSyncEnabled, setIsSessionSyncEnabled] = useState<boolean>(true);
 
-    const { userData, error } = useOrcidCallback();
+    const { userData, existingExpert: orcidCallbackExpert, error } = useOrcidCallback();
 
     const isExpertForm = globalThis.location.pathname.includes('/te');
 
@@ -131,10 +131,11 @@ const TaxonomicForm = () => {
         }
 
         const applyValidatedOrcidLogin = async () => {
-            const existingOrcidExpert = await checkIfOrcidExists(userData.orcid);
+            const existingOrcidExpert = orcidCallbackExpert ?? await checkIfOrcidExists(userData.orcid);
             const draftValues = getExpertDraftValues(existingOrcidExpert);
 
             setOrcidUserData(userData);
+            setEmail(userData.email ?? '');
             setExpertExists(existingOrcidExpert);
             setIsLoggedIn(true);
             setLoginMethod('orcid');
@@ -158,7 +159,7 @@ const TaxonomicForm = () => {
         void applyValidatedOrcidLogin().catch(() => {
             setLoginError('Unable to validate ORCID profile. Please try again.');
         });
-    }, [userData]);
+    }, [orcidCallbackExpert, userData]);
 
     const redirectToOrcidAuth = () => {
         const orcidAuthUrl = `https://orcid.org/oauth/authorize?client_id=${import.meta.env.VITE_ORCID_CLIENT_ID}&response_type=code&scope=/authenticate&redirect_uri=${import.meta.env.VITE_ORCID_REDIRECT_URI}`;
