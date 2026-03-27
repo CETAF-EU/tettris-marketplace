@@ -170,6 +170,23 @@ const TaxonomicForm = () => {
         globalThis.location.href = '/search?serviceType=taxonomicExpert';
     };
 
+    const handleClearOrcidSession = () => {
+        clearRegistrationSession();
+        setIsSessionSyncEnabled(true);
+        setCompleted(false);
+        setIsLoggedIn(false);
+        setMoreLogin(false);
+        setEmail('');
+        setExpertExists(null);
+        setLoginError('');
+        setLoginInfo('');
+        setPendingEmail('');
+        setTokenRequested(false);
+        setIsResendingToken(false);
+        setLoginMethod(null);
+        setOrcidUserData(null);
+    };
+
     const handleSubmissionCompleted = () => {
         setCompleted(true);
 
@@ -224,7 +241,12 @@ const TaxonomicForm = () => {
 
     const currentOrcidEmail = orcidUserData?.email ?? email;
     const hasVerifiedOrcidEmail = typeof currentOrcidEmail === 'string' && currentOrcidEmail.trim() !== '';
-    const requiresOrcidEmailVerification = isExpertForm && isLoggedIn && loginMethod === 'orcid' && !hasVerifiedOrcidEmail;
+    const hasExistingOrcidProfile = expertExists !== null;
+    const requiresOrcidEmailVerification = isExpertForm
+        && isLoggedIn
+        && loginMethod === 'orcid'
+        && !hasExistingOrcidProfile
+        && !hasVerifiedOrcidEmail;
 
     const handleOrcidEmailVerificationSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -348,6 +370,14 @@ const TaxonomicForm = () => {
                                                             type="button"
                                                         >
                                                             more
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-link p-0 ms-2"
+                                                            style={{ fontSize: '0.95rem' }}
+                                                            onClick={handleClearOrcidSession}
+                                                            type="button"
+                                                        >
+                                                            Clear session
                                                         </button>
                                                     </div>
                                                     {error && <p className="text-danger mt-3">{error}</p>}
@@ -571,6 +601,7 @@ const TaxonomicForm = () => {
                                                 isResendingToken={isResendingToken}
                                                 onSubmit={handleOrcidEmailVerificationSubmit}
                                                 onResend={handleResendToken}
+                                                onClearSession={handleClearOrcidSession}
                                                 onResetEmailFlow={() => {
                                                     setTokenRequested(false);
                                                     setPendingEmail('');
@@ -631,6 +662,7 @@ type OrcidEmailVerificationCardProps = {
     isResendingToken: boolean;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
     onResend: () => Promise<void>;
+    onClearSession: () => void;
     onResetEmailFlow: () => void;
 };
 
@@ -642,6 +674,7 @@ const OrcidEmailVerificationCard = ({
     isResendingToken,
     onSubmit,
     onResend,
+    onClearSession,
     onResetEmailFlow,
 }: OrcidEmailVerificationCardProps) => {
     return (
@@ -718,6 +751,13 @@ const OrcidEmailVerificationCard = ({
                                         Use another email
                                     </button>
                                 )}
+                                <button
+                                    type="button"
+                                    className="btn btn-link mt-2 ms-2"
+                                    onClick={onClearSession}
+                                >
+                                    Clear session
+                                </button>
                                 {loginInfo && <div className="text-success mt-2">{loginInfo}</div>}
                                 {loginError && <div className="text-danger mt-2">{loginError}</div>}
                             </form>
