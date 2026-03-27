@@ -14,7 +14,8 @@
             {
                 "jsonPath": "$['schema:person']['schema:email']",
                 "title": "Email",
-                "type": "string",
+                "type": "email",
+                "confirmationJsonPath": "$['ui']['emailConfirmation']",
                 "description": "The email address of the taxonomic expert.",
                 "required": true
             },

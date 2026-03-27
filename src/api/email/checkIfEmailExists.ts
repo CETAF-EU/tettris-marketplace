@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { TaxonomicExpert, CordraResultArray } from 'app/Types';
+import { TaxonomicExpert, CordraResultArray, Dict } from 'app/Types';
 /**
  * Checks if an expert with the given email already exists.
  * @param email - The email to check.
@@ -11,6 +11,13 @@ const checkIfEmailExists = async (email: string): Promise<TaxonomicExpert | null
 
     let taxonomicExperts: TaxonomicExpert[] = [];
     const filters = String.raw`/taxonomicExpert/@type:TaxonomicExpert AND (/taxonomicExpert/schema\:person/schema\:email:"${email}")`;
+
+    const normalizeExpertRecord = (expert: Dict, id?: string): TaxonomicExpert => ({
+        taxonomicExpert: {
+            ...(expert?.taxonomicExpert ?? expert),
+            '@id': expert?.taxonomicExpert?.['@id'] ?? expert?.['@id'] ?? id
+        }
+    } as TaxonomicExpert);
     
     try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/cordra/experts`, {
@@ -30,12 +37,12 @@ const checkIfEmailExists = async (email: string): Promise<TaxonomicExpert | null
         } & Partial<CordraResultArray>;
 
         if (Array.isArray(data.taxonomicExperts)) {
-            taxonomicExperts = data.taxonomicExperts;
+            taxonomicExperts = data.taxonomicExperts.map((expert) => normalizeExpertRecord(expert as Dict));
         } else if (Array.isArray(data.taxonomic_experts)) {
-            taxonomicExperts = data.taxonomic_experts;
+            taxonomicExperts = data.taxonomic_experts.map((expert) => normalizeExpertRecord(expert as Dict));
         } else if (Array.isArray(data.results)) {
             data.results.forEach((dataFragment) => {
-                const taxonomicExpert = dataFragment.attributes.content as TaxonomicExpert;
+                const taxonomicExpert = normalizeExpertRecord(dataFragment.attributes.content as Dict, dataFragment.id);
                 taxonomicExperts.push(taxonomicExpert);
             });
         }

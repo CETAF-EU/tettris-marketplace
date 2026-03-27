@@ -33,6 +33,8 @@ import { Color, getColor } from "components/general/ColorPage";
 import ORCIDField from "./ORCIDField";
 import ImageField from "./ImageField";
 import MultiRORField from "./MultiRORField";
+import EmailField from "./EmailField";
+import checkIfEmailExists from "api/email/checkIfEmailExists";
 
 
 /* Props Type */
@@ -75,11 +77,17 @@ const FormBuilder = (props: Props) => {
         const candidate = TaxonomicExpert as unknown as Dict;
 
         if (candidate.taxonomicExpert && typeof candidate.taxonomicExpert === 'object') {
-            return candidate.taxonomicExpert as Dict;
+            return {
+                ...(candidate.taxonomicExpert as Dict),
+                '@id': candidate.taxonomicExpert['@id'] ?? candidate['@id']
+            };
         }
 
         if (candidate.attributes?.content?.taxonomicExpert && typeof candidate.attributes.content.taxonomicExpert === 'object') {
-            return candidate.attributes.content.taxonomicExpert as Dict;
+            return {
+                ...(candidate.attributes.content.taxonomicExpert as Dict),
+                '@id': candidate.attributes.content.taxonomicExpert['@id'] ?? candidate.id ?? candidate['@id']
+            };
         }
 
         if (candidate['schema:person'] || candidate['@id']) {
@@ -266,7 +274,7 @@ const FormBuilder = (props: Props) => {
      * @returns JSX Component of form field
      */
     const ConstructFormField = (field: FormField, values: Dict, SetFieldValue: Function, fieldValues?: any) => {
-        return generateFieldComponent(field, fieldValues, SetFieldValue, values, setServiceTypes);
+        return generateFieldComponent(field, fieldValues, SetFieldValue, values, setServiceTypes, expertRecord?.['@id'], OrcidData?.email);
     };
 
     /**
@@ -377,6 +385,33 @@ const FormBuilder = (props: Props) => {
                                 setLoading(false);
                             };
                         } else if (window.location.pathname.includes('/te')) {
+                            const requiresManualEmail = !expertRecord?.['@id'] && !OrcidData?.email;
+                            const emailConfirmationJsonPath = "$['ui']['emailConfirmation']";
+
+                            if (requiresManualEmail) {
+                                const emailValue = (jp.value(values, "$['schema:person']['schema:email']") as string | undefined)?.trim() ?? '';
+                                const emailConfirmationValue = (jp.value(values, emailConfirmationJsonPath) as string | undefined)?.trim() ?? '';
+
+                                if (!emailValue || !emailConfirmationValue) {
+                                    setErrorMessage('Please provide and confirm your email address');
+                                    setLoading(false);
+                                    return;
+                                }
+
+                                if (emailValue.toLowerCase() !== emailConfirmationValue.toLowerCase()) {
+                                    setErrorMessage('Email addresses do not match');
+                                    setLoading(false);
+                                    return;
+                                }
+
+                                const existingEmailExpert = await checkIfEmailExists(emailValue);
+                                if (existingEmailExpert?.taxonomicExpert?.['@id']) {
+                                    setErrorMessage('This email address already exists in the database');
+                                    setLoading(false);
+                                    return;
+                                }
+                            }
+
                             if (OrcidData?.orcid) {
                                 jp.value(values, "$['schema:person']['schema:orcid']", OrcidData.orcid);
                             }
@@ -389,6 +424,7 @@ const FormBuilder = (props: Props) => {
                                 delete taxonomicExpertRecord['schema:person']['schema:noOrcid'];
                                 delete taxonomicExpertRecord['schema:person']['schema:noAffiliation'];
                             }
+                            delete taxonomicExpertRecord['ui'];
 
                             RemoveEmptyProperties(taxonomicExpertRecord);
                             CheckForIrrelevantClasses(taxonomicExpertRecord);
@@ -546,7 +582,7 @@ const FormBuilder = (props: Props) => {
 
 export default FormBuilder;
 
-function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValue: Function, values: Dict, setServiceTypes: (serviceTypes: string[]) => void) {
+function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValue: Function, values: Dict, setServiceTypes: (serviceTypes: string[]) => void, currentExpertId?: string, lockedEmail?: string) {
     switch (field.type) {
         case 'hidden': {
             return <HiddenField field={field} />;
@@ -689,6 +725,12 @@ function generateFieldComponent(field: FormField, fieldValues: any, SetFieldValu
         } case 'text': {
             return <TextField field={field}
                 values={values}
+                SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)} />;
+        } case 'email': {
+            return <EmailField field={field}
+                values={values}
+                currentExpertId={currentExpertId}
+                lockedEmail={lockedEmail}
                 SetFieldValue={(fieldName: string, value: string) => SetFieldValue(fieldName, value)} />;
         } case 'int': {
             return <IntField field={field}

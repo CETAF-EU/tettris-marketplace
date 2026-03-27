@@ -97,6 +97,7 @@ export type FormField = {
     title: string,
     description: string,
     type: string,
+    confirmationJsonPath?: string,
     const?: string,
     options?: string[],
     mapping?: {
