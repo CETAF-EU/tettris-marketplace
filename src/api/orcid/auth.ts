@@ -60,9 +60,15 @@ const attachEmailToExpert = (expert: TaxonomicExpert | null, email: string | nul
     const nextPerson: Dict = {
         ...person,
         'schema:email': normalizedEmail,
+        email: normalizedEmail,
     };
 
-    const expertId = expertRecord['@id'];
+    const expertId = (
+        expertRecord['@id']
+        ?? candidate.id
+        ?? candidate['@id']
+        ?? candidate.attributes?.id
+    );
     if (typeof expertId !== 'string' || expertId.trim().length === 0) {
         return expert;
     }
@@ -78,6 +84,39 @@ const attachEmailToExpert = (expert: TaxonomicExpert | null, email: string | nul
             '@id': expertId,
         },
     };
+};
+
+const extractExpertRecord = (candidate: unknown): Dict | null => {
+    if (!candidate || typeof candidate !== 'object') {
+        return null;
+    }
+
+    const source = candidate as Dict;
+    const content = source.attributes?.content as Dict | undefined;
+
+    const normalizedRecord = (
+        source.taxonomicExpert
+        ?? source.taxonomic_expert
+        ?? source.attributes?.content?.taxonomicExpert
+        ?? source.attributes?.content?.taxonomic_expert
+        ?? content
+        ?? source
+    ) as Dict | undefined;
+
+    if (!normalizedRecord || typeof normalizedRecord !== 'object') {
+        return null;
+    }
+
+    // Some payloads are doubly wrapped (e.g. { taxonomicExpert: { taxonomicExpert: {...} } }).
+    if (normalizedRecord.taxonomicExpert && typeof normalizedRecord.taxonomicExpert === 'object') {
+        return extractExpertRecord(normalizedRecord.taxonomicExpert);
+    }
+
+    if (normalizedRecord.taxonomic_expert && typeof normalizedRecord.taxonomic_expert === 'object') {
+        return extractExpertRecord(normalizedRecord.taxonomic_expert);
+    }
+
+    return normalizedRecord;
 };
 
 export function useOrcidCallback() {
@@ -151,12 +190,11 @@ export function useOrcidCallback() {
             );
 
             const payload = response.data;
-            const expertContainer = payload.taxonomic_expert ?? payload.taxonomicExpert;
             const expertRecord = (
-                expertContainer?.taxonomicExpert
-                ?? expertContainer?.taxonomic_expert
-                ?? expertContainer
-            ) as Dict | undefined;
+                extractExpertRecord(payload.taxonomic_expert)
+                ?? extractExpertRecord(payload.taxonomicExpert)
+                ?? extractExpertRecord(payload)
+            );
             const person = (expertRecord?.['schema:person'] ?? expertRecord?.person) as Dict | undefined;
             const emailFromPerson = person?.['schema:email'] ?? person?.email;
 
