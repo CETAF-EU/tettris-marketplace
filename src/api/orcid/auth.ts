@@ -25,6 +25,61 @@ type ExpertEmailDataResponse = {
     email_source?: string;
 };
 
+const attachEmailToExpert = (expert: TaxonomicExpert | null, email: string | null): TaxonomicExpert | null => {
+    if (!expert || !email) {
+        return expert;
+    }
+
+    const normalizedEmail = email.trim();
+    if (!normalizedEmail) {
+        return expert;
+    }
+
+    const candidate = expert as unknown as Dict;
+    const content = candidate.attributes?.content as Dict | undefined;
+
+    const expertRecord = (
+        candidate.taxonomicExpert
+        ?? candidate.taxonomic_expert
+        ?? content?.taxonomicExpert
+        ?? content?.taxonomic_expert
+        ?? (content && typeof content === 'object' ? content : null)
+        ?? candidate
+    ) as Dict | undefined;
+
+    if (!expertRecord || typeof expertRecord !== 'object') {
+        return expert;
+    }
+
+    const person = (
+        expertRecord['schema:person']
+        ?? expertRecord.person
+        ?? {}
+    ) as Dict;
+
+    const nextPerson: Dict = {
+        ...person,
+        'schema:email': normalizedEmail,
+    };
+
+    const expertId = expertRecord['@id'];
+    if (typeof expertId !== 'string' || expertId.trim().length === 0) {
+        return expert;
+    }
+
+    const nextExpertRecord: Dict = {
+        ...expertRecord,
+        'schema:person': nextPerson,
+    };
+
+    return {
+        taxonomicExpert: {
+            ...nextExpertRecord,
+            '@id': expertId,
+        },
+    };
+};
+
 export function useOrcidCallback() {
     const [userData, setUserData] = useState<OrcidUserData | null>(null);
     const [existingExpert, setExistingExpert] = useState<TaxonomicExpert | null>(null);
@@ -174,10 +229,11 @@ export function useOrcidCallback() {
             const userDataWithEmail: OrcidUserData = resolvedEmail
                 ? { ...userData, email: resolvedEmail }
                 : userData;
+            const existingExpertWithEmail = attachEmailToExpert(existingExpert, resolvedEmail);
 
             return {
                 userData: userDataWithEmail,
-                existingExpert
+                existingExpert: existingExpertWithEmail
             };
         } catch (error: any) {
             clearStoredAuthToken();
