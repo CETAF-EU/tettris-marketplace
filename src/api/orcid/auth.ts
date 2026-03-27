@@ -19,7 +19,10 @@ interface OrcidLoginResult {
 }
 
 type ExpertEmailDataResponse = {
+    taxonomic_expert?: Dict;
+    taxonomicExpert?: Dict;
     user_email?: string;
+    email_source?: string;
 };
 
 export function useOrcidCallback() {
@@ -88,10 +91,26 @@ export function useOrcidCallback() {
                 }
             );
 
-            const userEmail = response.data?.user_email;
-            return typeof userEmail === 'string' && userEmail.trim().length > 0
-                ? userEmail.trim()
-                : null;
+            const payload = response.data;
+            const expertContainer = payload.taxonomic_expert ?? payload.taxonomicExpert;
+            const expertRecord = (
+                expertContainer?.taxonomicExpert
+                ?? expertContainer?.taxonomic_expert
+                ?? expertContainer
+            ) as Dict | undefined;
+            const person = (expertRecord?.['schema:person'] ?? expertRecord?.person) as Dict | undefined;
+            const emailFromPerson = person?.['schema:email'] ?? person?.email;
+
+            if (typeof emailFromPerson === 'string' && emailFromPerson.trim().length > 0) {
+                return emailFromPerson.trim();
+            }
+
+            const userEmail = payload.user_email;
+            if (typeof userEmail === 'string' && userEmail.trim().length > 0 && !userEmail.endsWith('@orcid.invalid')) {
+                return userEmail.trim();
+            }
+
+            return null;
         } catch (error) {
             console.error('Failed to retrieve expert email-data:', error);
             return null;
