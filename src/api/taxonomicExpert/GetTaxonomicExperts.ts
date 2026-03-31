@@ -11,43 +11,56 @@ const GetTaxonomicExperts = async ({
 }: {
     pageNumber: number;
     pageSize: number;
-    searchFilters: { [searchFilter: string]: string };
+    searchFilters: { [searchFilter: string]: string | string[] };
 }) => {
     let filters = '/taxonomicExpert/@type:TaxonomicExpert';
     filters += String.raw` AND /taxonomicExpert/schema\:status:accepted`;
 
+    const appendOrFilter = (clauses: string[]) => {
+        if (!clauses.length) return;
+
+        filters += clauses.length === 1
+            ? String.raw` AND ${clauses[0]}`
+            : ` AND (${clauses.join(' OR ')})`;
+    };
+
     if (!isEmpty(searchFilters)) {
         Object.entries(searchFilters).forEach(([key, value]) => {
-            if (!value) return;
+            const values = (Array.isArray(value) ? value : [value]).filter((item) => !!item);
 
-            if (key === 'query') {
-                const escaped = value.replaceAll(/([*?\\:])/g, String.raw`\$1`);
-                filters += String.raw` AND ((/taxonomicExpert/schema\:person/schema\:name:${escaped}*) OR ` +
-                    String.raw`(/taxonomicExpert/schema\:person/schema\:name:${escaped}~10) OR ` +
-                    String.raw`(/taxonomicExpert/schema\:Taxon/schema\:spatialCoverage/_:${escaped}*) OR ` +
-                    String.raw`(/taxonomicExpert/schema\:Taxon/schema\:spatialCoverage/_:${escaped}~) OR ` +
-                    String.raw`(/taxonomicExpert/schema\:occupation/schema\:educationalLevel/_:${escaped}~) OR ` +
-                    String.raw`(/taxonomicExpert/schema\:occupation/schema\:educationalLevel/_:${escaped}*))`;
-            }
+            if (!values.length) return;
 
-            if (key === 'location') {
-                filters += String.raw` AND /taxonomicExpert/schema\:person/schema\:location:${value}`;
-            }
+            switch (key) {
+                case 'query': {
+                    const firstValue = values[0];
+                    if (!firstValue) return;
 
-            if (key === 'language') {
-                filters += String.raw` AND /taxonomicExpert/schema\:person/schema\:language/_:${value}`;
-            }
-
-            if (key === 'taxonomicGroup') {
-                filters += String.raw` AND /taxonomicExpert/schema\:Taxon/schema\:discipline/_:${value}`;
-            }
-
-            if (key === 'subTaxonomicGroup') {
-                filters += String.raw` AND /taxonomicExpert/schema\:Taxon/schema\:additionalType/_:${value}`;
-            }
-
-            if (key === 'appliedResearch') {
-                filters += String.raw` AND /taxonomicExpert/schema\:Taxon/schema\:ResearchProject/_:${value}`;
+                    const escaped = firstValue.replaceAll(/([*?\\:])/g, String.raw`\$1`);
+                    filters += String.raw` AND ((/taxonomicExpert/schema\:person/schema\:name:${escaped}*) OR ` +
+                        String.raw`(/taxonomicExpert/schema\:person/schema\:name:${escaped}~10) OR ` +
+                        String.raw`(/taxonomicExpert/schema\:Taxon/schema\:spatialCoverage/_:${escaped}*) OR ` +
+                        String.raw`(/taxonomicExpert/schema\:Taxon/schema\:spatialCoverage/_:${escaped}~) OR ` +
+                        String.raw`(/taxonomicExpert/schema\:occupation/schema\:educationalLevel/_:${escaped}~) OR ` +
+                        String.raw`(/taxonomicExpert/schema\:occupation/schema\:educationalLevel/_:${escaped}*))`;
+                    break;
+                }
+                case 'location':
+                    appendOrFilter(values.map((item) => String.raw`/taxonomicExpert/schema\:person/schema\:location:${item}`));
+                    break;
+                case 'language':
+                    appendOrFilter(values.map((item) => String.raw`/taxonomicExpert/schema\:person/schema\:language/_:${item}`));
+                    break;
+                case 'taxonomicGroup':
+                    appendOrFilter(values.map((item) => String.raw`/taxonomicExpert/schema\:Taxon/schema\:discipline/_:${item}`));
+                    break;
+                case 'subTaxonomicGroup':
+                    appendOrFilter(values.map((item) => String.raw`/taxonomicExpert/schema\:Taxon/schema\:additionalType/_:${item}`));
+                    break;
+                case 'appliedResearch':
+                    appendOrFilter(values.map((item) => String.raw`/taxonomicExpert/schema\:Taxon/schema\:ResearchProject/_:${item}`));
+                    break;
+                default:
+                    break;
             }
         });
     }
