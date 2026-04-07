@@ -1,8 +1,8 @@
 /* Import Dependencies */
 import classNames from 'classnames';
 import { format } from 'date-fns';
-import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 
 /* Import Hooks */
@@ -26,12 +26,14 @@ import DetailsBlock from './components/DetailsBlock';
 import MultimediaBlock from './components/MultimediaBlock';
 import Footer from 'components/general/footer/Footer';
 import { BreadCrumbs, Spinner } from 'components/general/CustomComponents';
+import { BuildEntityRoute, Slugify } from 'app/Utilities';
 
 
 const TaxonomicService = () => {
     /* Hooks */
     const dispatch = useAppDispatch();
     const params = useParams();
+    const navigate = useNavigate();
     const fetch = useFetch();
 
     /* Base variables */
@@ -39,6 +41,18 @@ const TaxonomicService = () => {
     const [errorMessage, setErrorMessage] = useState<string | undefined>();
     const [displaySpinner, setDisplaySpinner] = useState<boolean>(false);
     const taxonomicServiceID: string = `${params.prefix}/${params.suffix}`;
+
+    useEffect(() => {
+        const serviceName = taxonomicService?.taxonomicService['schema:service']?.['schema:name'];
+        if (!serviceName) return;
+
+        const expectedSlug = Slugify(serviceName);
+        const currentSlug = params.name ? decodeURIComponent(params.name) : undefined;
+
+        if (!currentSlug || currentSlug !== expectedSlug) {
+            navigate(BuildEntityRoute('ts', taxonomicServiceID, serviceName), { replace: true });
+        }
+    }, [navigate, params.name, taxonomicService, taxonomicServiceID]);
 
     /* Fetch taxonomic service */
     fetch.Fetch({

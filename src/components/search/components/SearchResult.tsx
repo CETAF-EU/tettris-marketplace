@@ -13,6 +13,7 @@ import { setTaxonomicExpert } from 'redux-store/TaxonomicExpertSlice';
 
 /* Import Types */
 import { TaxonomicExpert, TaxonomicService } from 'app/Types';
+import { BuildEntityRoute, BuildSlugOnlyRoute } from 'app/Utilities';
 
 /* Import Styles */
 import styles from 'components/search/search.module.scss';
@@ -38,8 +39,19 @@ const SearchResult = (props: Props) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    const id = taxonomicService?.taxonomicService['@id'].replace(import.meta.env.VITE_HANDLE_URL as string, '') ?? taxonomicExpert?.taxonomicExpert['@id'].replace(import.meta.env.VITE_HANDLE_URL as string, '');
-    const url = taxonomicService ? `/ts/${id}` : `/te/${id}`;
+    const handle = taxonomicService?.taxonomicService['@id'] ?? taxonomicExpert?.taxonomicExpert['@id'] ?? '';
+    const name = taxonomicService
+        ? taxonomicService.taxonomicService['schema:service']['schema:name']
+        : taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'];
+    let url: string;
+
+    if (taxonomicService) {
+        url = BuildEntityRoute('ts', handle, name);
+    } else if (name) {
+        url = BuildSlugOnlyRoute('te', name);
+    } else {
+        url = BuildEntityRoute('te', handle, name);
+    }
     
     const handleClick = (
         e: React.MouseEvent<HTMLAnchorElement>,
@@ -89,7 +101,7 @@ const SearchResult = (props: Props) => {
                                 </Col>
                                 
                                     <Col xs="auto" lg={{ span: 3 }}
-                                        className={!logoImage ? 'd-lg-block' : 'd-lg-none'}
+                                        className={logoImage ? 'd-lg-none' : 'd-lg-block'}
                                     >
                                         <p className="fw-bold fs-5 fs-lg-4 text-end textOverflow">{taxonomicService.taxonomicService['schema:availableLanguage']?.join(' / ').toUpperCase()}</p>
                                     </Col>
@@ -113,7 +125,7 @@ const SearchResult = (props: Props) => {
                                     <p className="fs-5 fs-lg-4">{taxonomicService.taxonomicService['schema:service']['schema:serviceType']}</p>
                                 </Col>
                                 <Col xs="auto" lg="auto"
-                                    className={!logoImage ? 'd-lg-block' : 'd-lg-none'}
+                                    className={logoImage ? 'd-lg-none' : 'd-lg-block'}
                                 >
                                     <p className="fs-5 fs-lg-4 fw-bold">{taxonomicService.taxonomicService['schema:dateCreated'] &&
                                         format(taxonomicService.taxonomicService['schema:dateCreated'], 'MMM dd - yyyy')}

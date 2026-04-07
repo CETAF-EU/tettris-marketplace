@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { MultiValue } from "react-select";
 import { useSearchParams } from "react-router-dom";
 
 /* Import Types */
@@ -14,7 +15,7 @@ import { getColor } from "components/general/ColorPage";
 /* Props Type */
 type Props = {
 	filter: FilterType;
-	currentValue?: string | number | boolean | Date;
+	currentValue?: string | number | boolean | Date | string[];
 	hasDefault?: boolean;
 	SetFilterValue: Function;
 	SubmitForm: Function;
@@ -22,7 +23,7 @@ type Props = {
 
 const Filter = ({ filter, currentValue, hasDefault, SetFilterValue, SubmitForm }: Props) => {
 	const [searchParams] = useSearchParams();
-	const dropDownColor = getColor(window.location, true);
+	const dropDownColor = getColor(globalThis.location, true);
 
 	const serviceTypeClass = classNames({
 		"tr-smooth": true,
@@ -34,16 +35,23 @@ const Filter = ({ filter, currentValue, hasDefault, SetFilterValue, SubmitForm }
 	switch (filter.type) {
 		case "select": {
 			if (!filter.options) return <></>;
+			const isMultiSelect = filter.name !== "serviceType";
+			const selectedOptions = isMultiSelect
+				? filter.options.filter((option) =>
+					Array.isArray(currentValue) && currentValue.includes(option.value)
+				)
+				: [];
 			const selectedOption: DropdownItem | undefined = filter.options.find((option) => option.value === currentValue);
-			const searchInputRef = (filter as any).searchInputRef ?? undefined;
 
 			return (
 				<>
 					<p className={`${serviceTypeClass} fs-5 fw-lightBold`}>{MakeReadableString(filter.name)}</p>
 					<Dropdown
 						items={filter.options}
+						isMulti={isMultiSelect}
+						selectedItems={selectedOptions}
 						selectedItem={
-							currentValue
+							!isMultiSelect && currentValue
 								? {
 									label: MakeReadableString(selectedOption?.label ?? `${currentValue}`),
 									value: `${currentValue}`,
@@ -54,14 +62,12 @@ const Filter = ({ filter, currentValue, hasDefault, SetFilterValue, SubmitForm }
 						hasDefault={hasDefault}
 						styles={{ color: dropDownColor }}
 						searchable
-						onOpen={() => {
-							setTimeout(() => {
-								searchInputRef?.current?.focus();
-							}, 50);
-						}}
-						searchInputRef={searchInputRef}
-						OnChange={(item: DropdownItem) => {
-							SetFilterValue(item.value);
+						OnChange={(item: DropdownItem | MultiValue<DropdownItem> | null) => {
+							if (isMultiSelect) {
+								SetFilterValue(Array.isArray(item) ? item.map((selectedItem) => selectedItem.value) : []);
+							} else {
+								SetFilterValue(item && !Array.isArray(item) ? (item as DropdownItem).value : "");
+							}
 							SubmitForm();
 						}}
 					/>

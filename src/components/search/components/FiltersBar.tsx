@@ -106,9 +106,17 @@ const FiltersBar = ({ ToggleFilters }: Props) => {
 
     const { filters, hint } = useMemo(() => determineFilters(), [searchParams.toString()]);
 
+    const isMultiSelectFilter = (filter: FilterType) => filter.type === 'select' && filter.name !== 'serviceType';
+
     const initialValues = useMemo(() => {
         const values: Dict = { query: searchParams.get('query') ?? '' };
         filters.forEach((filter) => {
+        if (isMultiSelectFilter(filter)) {
+            const selectedValues = searchParams.getAll(filter.name);
+            values[filter.name] = selectedValues.length ? selectedValues : [];
+            return;
+        }
+
         values[filter.name] = searchParams.get(filter.name) ?? filter.default ?? '';
         });
         return values;
@@ -119,7 +127,7 @@ const FiltersBar = ({ ToggleFilters }: Props) => {
         filters.forEach(filter => {
         if (filter.name === 'serviceType') return; // don't reset serviceType
         searchParams.delete(filter.name);
-        newValues[filter.name] = filter.default ?? '';
+        newValues[filter.name] = isMultiSelectFilter(filter) ? [] : filter.default ?? '';
         });
         searchParams.delete('query');
         newValues['query'] = '';
@@ -134,7 +142,7 @@ const FiltersBar = ({ ToggleFilters }: Props) => {
         'tc-tertiary': searchParams.get('serviceType') === 'taxonomicExpert'
     });
 
-    const variant: Color = getColor(window.location) as Color;
+    const variant: Color = getColor(globalThis.location) as Color;
 
     return (
         <Formik
@@ -143,8 +151,15 @@ const FiltersBar = ({ ToggleFilters }: Props) => {
         onSubmit={async (values) => {
             Object.entries(values).forEach(([key, value]) => {
             searchParams.delete(key);
+            if (Array.isArray(value)) {
+                value
+                    .filter((item) => !!item)
+                    .forEach((item) => searchParams.append(key, `${item}`));
+                return;
+            }
+
             if (value && value !== 'taxonomicService') {
-                searchParams.set(key, value);
+                searchParams.set(key, `${value}`);
             }
             });
             setSearchParams(searchParams);
@@ -186,7 +201,7 @@ const FiltersBar = ({ ToggleFilters }: Props) => {
                         filter={filter}
                         currentValue={values[filter.name as keyof typeof values]}
                         hasDefault={!!filters.find(originalFilter => originalFilter.name === filter.name)?.default}
-                        SetFilterValue={(value: string | number | boolean) => setFieldValue(filter.name, value)}
+                        SetFilterValue={(value: string | number | boolean | string[]) => setFieldValue(filter.name, value)}
                         SubmitForm={() => submitForm()}
                         />
                     </Col>
