@@ -8,6 +8,7 @@ import TaxonomicForm from "components/general/FormComponents/TaxonomicForm";
 
 /* Routes associated with the Taxonomic Service page */
 const routes = [
+    <Route key="taxonomicServiceCanonical" path="/ts/:prefix/:suffix/:name" element={<TaxonomicService />} />,
     <Route key="taxonomicService" path="/ts/:prefix/:suffix" element={<TaxonomicService />} />,
     <Route key="TaxonomicForm" path="/ts/suggestNewTaxonomicService" element={<TaxonomicForm />} />
 ];

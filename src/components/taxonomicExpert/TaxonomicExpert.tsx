@@ -1,6 +1,6 @@
 /* Import Dependencies */
-import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row, } from 'react-bootstrap';
 
 // /* Import Hooks */
@@ -15,6 +15,7 @@ import { TaxonomicExpert as TaxonomicServiceType, } from 'app/Types';
 
 // /* Import API */
 import GetTaxonomicExpert from 'api/taxonomicExpert/GetTaxonomicExpert';
+import GetTaxonomicExpertByName from 'api/taxonomicExpert/GetTaxonomicExpertByName';
 
 /* Import Components */
 import Header from 'components/general/header/Header';
@@ -25,24 +26,45 @@ import TopBar from './components/TopBar';
 import ExperienceBlock from './components/ExperienceBlock';
 import TrainingBlock from './components/TrainingBlock';
 import TaxonomicBlock from './components/TaxonomicBlock';
+import { BuildSlugOnlyRoute, HandleToPath, Slugify } from 'app/Utilities';
 
 
 const TaxonomicExpert = () => {
     /* Hooks */
     const dispatch = useAppDispatch();
     const params = useParams();
+    const navigate = useNavigate();
     const fetch = useFetch();
 
     // /* Base variables */
     const taxonomicExpert: TaxonomicServiceType | undefined = useAppSelector(getTaxonomicExpert);
     const [errorMessage, setErrorMessage] = useState<string | undefined>();
     const [displaySpinner, setDisplaySpinner] = useState<boolean>(false);
-    const taxonomicServiceID: string = `${params.prefix}/${params.suffix}`;
+    const isLegacyHandleRoute = !!(params.prefix && params.suffix);
+    const taxonomicExpertID = isLegacyHandleRoute ? `${params.prefix}/${params.suffix}` : undefined;
+    const routeName = params.name;
+
+    useEffect(() => {
+        const expertName = taxonomicExpert?.taxonomicExpert?.['schema:person']?.['schema:name'];
+        if (!expertName) return;
+
+        const expectedSlug = Slugify(expertName);
+        const currentSlug = routeName ? decodeURIComponent(routeName) : undefined;
+        const canonicalPath = BuildSlugOnlyRoute('te', expertName);
+        const handleFromStore = taxonomicExpert?.taxonomicExpert?.['@id']
+            ? HandleToPath(taxonomicExpert.taxonomicExpert['@id'])
+            : undefined;
+        const isLegacyPathForCurrentExpert = !!(isLegacyHandleRoute && handleFromStore && handleFromStore === taxonomicExpertID);
+
+        if (isLegacyPathForCurrentExpert || !currentSlug || currentSlug !== expectedSlug || globalThis.location.pathname !== canonicalPath) {
+            navigate(canonicalPath, { replace: true });
+        }
+    }, [isLegacyHandleRoute, navigate, routeName, taxonomicExpert, taxonomicExpertID]);
 
 
     /* Fetch taxonomic service */
     fetch.Fetch({
-        Method: GetTaxonomicExpert,
+        Method: isLegacyHandleRoute ? GetTaxonomicExpert : GetTaxonomicExpertByName,
         Handler: (taxonomicExpert: TaxonomicServiceType) => {
             dispatch(setTaxonomicExpert(taxonomicExpert));
             dispatch(setIsApiOnline(true));
@@ -54,7 +76,9 @@ const TaxonomicExpert = () => {
                 dispatch(setIsApiOnline(false));
             }
         },
-        params: { handle: taxonomicServiceID }
+        params: isLegacyHandleRoute
+            ? { handle: taxonomicExpertID }
+            : { name: routeName }
     });
 
     // /* Time out to check if the taxonomic service is still being loaded after 1.5 seconds */
@@ -97,7 +121,7 @@ const TaxonomicExpert = () => {
                                 </Row>
                                 {/* Top bar */}
                                 <Row className='m-1'>
-                                    <TopBar taxonomicExpert={taxonomicExpert} expertHandle={taxonomicServiceID} />
+                                    <TopBar taxonomicExpert={taxonomicExpert} expertHandle={HandleToPath(taxonomicExpert.taxonomicExpert['@id'])} />
                                 </Row>
                                 <Row className="flex-grow-1">
                                     <Col>
@@ -129,7 +153,10 @@ const TaxonomicExpert = () => {
                                 <Col className="d-flex flex-column justify-content-center align-items-center">
                                     <Row>
                                         <Col>
-                                            <p>{`An error occurred whilst searching for Taxonomic Service with ID: ${taxonomicServiceID}`}</p>
+                                            <p>{isLegacyHandleRoute
+                                                ? `An error occurred whilst searching for Taxonomic Service with ID: ${taxonomicExpertID}`
+                                                : `An error occurred whilst searching for Taxonomic Expert with name: ${routeName}`
+                                            }</p>
                                         </Col>
                                     </Row>
                                     <Row className="mt-2">
