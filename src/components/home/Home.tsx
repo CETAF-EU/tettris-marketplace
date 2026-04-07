@@ -17,6 +17,7 @@ import styles from './home.module.scss';
 /* Import API */
 import GetTaxonomicServices from 'api/taxonomicService/GetTaxonomicServices';
 import GetTaxonomicExperts from 'api/taxonomicExpert/GetTaxonomicExperts';
+import { pollinatorCollections } from 'components/pollinatorCollections/pollinatorCollectionsData';
 
 /* Import Components */
 import Header from "components/general/header/Header";
@@ -52,17 +53,6 @@ const Home = () => {
                 }
             },
             {
-                alias: 'referenceCollections',
-                Method: GetTaxonomicServices,
-                params: {
-                    pageSize: 1,
-                    pageNumber: 0,
-                    searchFilters: {
-                        "schema:Service/schema:serviceType": 'referenceCollection'
-                    }
-                }
-            },
-            {
                 alias: 'taxonomicExpertise',
                 Method: GetTaxonomicExperts,
                 params: {
@@ -74,7 +64,7 @@ const Home = () => {
         Handler: (results: { [alias: string]: { metadata: Dict } }) => {
             setCounts({
                 taxonomicServices: results.taxonomicServices.metadata.totalRecords,
-                referenceCollections: 0,
+                referenceCollections: pollinatorCollections.length,
                 taxonomicExpertise: results.taxonomicExpertise.metadata.totalRecords,
             });
             dispatch(setIsApiOnline(true))
@@ -158,7 +148,7 @@ const Home = () => {
                                             <HomeCategory title="Reference Collections"
                                                 subTitle="Go explore"
                                                 count={counts.referenceCollections}
-                                                link={import.meta.env.VITE_DEV === 'true' ? "/search?serviceType=referenceCollection" : "/referenceCollection"}
+                                                link="/search?serviceType=referenceCollection"
                                                 color="secondary"
                                             />
                                         </Col>
