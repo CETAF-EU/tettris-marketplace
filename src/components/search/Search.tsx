@@ -2,7 +2,7 @@
 import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 /* Import Hooks */
 import { usePaginator, useAppDispatch } from 'app/Hooks';
@@ -42,6 +42,7 @@ const Search = () => {
     /* Base variables */
     const serviceType = searchParams.get('serviceType');
     const isTaxonomicExpert = serviceType === 'taxonomicExpert';
+    const includePollinatorResult = serviceType === 'referenceCollection';
 
     const paginator = usePaginator({
         Initiate: () => {
@@ -68,6 +69,7 @@ const Search = () => {
         resultKey: isTaxonomicExpert ? 'taxonomicExperts' : 'taxonomicServices',
         allowSearchParams: true
     });
+    const displayedResults = (paginator.totalRecords ?? 0) + (includePollinatorResult ? 1 : 0);
 
     /* On search: check if there are any more records to be shown with the show more button */
     useEffect(() => {
@@ -104,7 +106,7 @@ const Search = () => {
         }
     }, [paginator]);
 
-    const variant: Color = getColor(window.location) as Color;
+    const variant: Color = getColor(globalThis.location) as Color;
     
     /* ClassNames */
     const searchResultsClassScrollBlock = classNames({
@@ -144,24 +146,10 @@ const Search = () => {
                                 <FiltersBar />
                             </Col>
                         </Row>
-                        {/* link to pollinator collections data */}
-                        {!searchParams.get('serviceType') && (
-                            <Row className="mt-3">
-                                <Col>
-                                    <p className="mb-0 fs-4 fw-lightBold">
-                                        Looking for linked pollinator collection descriptors and the EuSurvey model used to collect them ?{' '}
-                                        <Link to="/pollinator-collections" className="tc-secondary">
-                                            Open the dedicated page
-                                        </Link>.
-                                    </p>
-                                </Col>
-                            </Row>
-                        )}
-                        {!searchParams.get('serviceType') && <div className="mt-2" />}
                         {/* Results Count */}
                         <Row className="mt-2">
                             <Col>
-                                <p className="fs-4 fw-lightBold">{`${paginator.totalRecords ?? 0} results`}</p>
+                                <p className="fs-4 fw-lightBold">{`${displayedResults} results`}</p>
                             </Col>
                         </Row>
                         {/* Search Results body */}
@@ -170,7 +158,7 @@ const Search = () => {
                                 {/* Search Result blocks */}
                                 <Row className={searchResultsClass}>
                                     <Col>
-                                        {paginator.totalRecords === 0 ?
+                                        {displayedResults === 0 ?
                                             <Row className="h-100 align-items-center">
                                                 <Col>
                                                     <p className="text-center">No records found</p>
