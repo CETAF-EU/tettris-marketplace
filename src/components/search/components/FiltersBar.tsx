@@ -13,7 +13,6 @@ import { Dict, Filter as FilterType } from 'app/Types';
 
 /* Import Sources */
 import Filters from 'sources/searchFilters/Filters.json';
-import DevFilters from 'sources/searchFilters/DevFilters.json';
 import TaxonomicServiceFilters from 'sources/searchFilters/TaxonomicServiceFilters.json';
 import TaxonimicExpertFilters from 'sources/searchFilters/TaxonomicExpertFilters.json';
 
@@ -35,7 +34,7 @@ const FiltersBar = ({ ToggleFilters }: Props) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [currentServiceType, setCurrentServiceType] = useState(searchParams.get('serviceType') ?? '');
 
-    const FiltersType: FilterType[] = import.meta.env.VITE_DEV === 'true' ? [...DevFilters.filters] : [...Filters.filters];
+    const FiltersType: FilterType[] = [...Filters.filters];
     const taxonomicServicefilters: FilterType[] = [...TaxonomicServiceFilters.taxonomicServiceFilters];
     const taxonomicExpertFilters: FilterType[] = TaxonimicExpertFilters.taxonomicExpertFilters.map(filter => ({
         ...filter,

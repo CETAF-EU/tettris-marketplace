@@ -13,6 +13,10 @@
                 {
                     "label": "Taxonomic Expert",
                     "value": "taxonomicExpert"
+                },
+                {
+                    "label": "Reference Collection",
+                    "value": "referenceCollection"
                 }
             ]
         }
