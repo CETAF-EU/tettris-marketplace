@@ -44,7 +44,7 @@ const TextField = (props: Props) => {
             <FormFieldTitle field={field}
                 values={values}
             />
-            <MDXEditor key={`${field.jsonPath}-${initialMarkdown}`}
+            <MDXEditor key={field.jsonPath}
                 markdown={initialMarkdown}
                 className={`${formFieldClass} b-grey br-corner mt-1 z-0`}
                 
