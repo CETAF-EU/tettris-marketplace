@@ -7,7 +7,7 @@ export function getColor(location: Location, returnHex: boolean = false): Color 
 
     // Check for serviceType in query params OR specific pathname conditions
     const isTaxonomicExpert = serviceType === "taxonomicExpert" || location.pathname.includes("/te");
-    const isReferenceCollection = serviceType === "referenceCollection" || location.pathname.includes("/tc");
+    const isReferenceCollection = serviceType === "referenceCollection" || location.pathname.includes("/tc") || location.pathname.includes("/rf");
 
     if (returnHex) {
         if (isReferenceCollection) return "#1e5741";
