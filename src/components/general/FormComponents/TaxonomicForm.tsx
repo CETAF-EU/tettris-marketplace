@@ -70,14 +70,21 @@ const TaxonomicForm = () => {
     const { userData, existingExpert: orcidCallbackExpert, isLoading: isOrcidCallbackLoading, error } = useOrcidCallback();
 
     const isExpertForm = globalThis.location.pathname.includes('/te');
+    const isReferenceCollectionForm = globalThis.location.pathname.includes('/rf');
 
-    const title = isExpertForm
-        ? 'Register as a new taxonomic expert'
-        : 'Suggest a new taxonomic e-service';
+    let title = 'Suggest a new taxonomic e-service';
+    if (isExpertForm) {
+        title = 'Register as a new taxonomic expert';
+    } else if (isReferenceCollectionForm) {
+        title = 'Reference collections are handled by the help desk';
+    }
 
-    const description = isExpertForm
-        ? 'Welcome to the Taxonomic Expert form. This registration form allows you to create a public profile in the CETAF Taxonomic e-Service and Expertise Marketplace.\n\nFor each field, we explain why the information is requested and how it will be used. The information you provide is intended to help others discover, understand and contact taxonomic experts and service providers.\n\nParticipation is voluntary. You will be asked to give explicit consent before submitting your profile.'
-        : 'Use this form to suggest new taxonomic e-services or tools that should be listed in the CETAF Marketplace.\nPlease fill in the required fields and add as much additional information as you can.\nThe CETAF secretariat will review and curate your submission before adding it to the marketplace.\nTo be accepted it needs to be a taxonomic tool or service and it needs to be of sufficient quality\nPlease propose only services that are in production and maintained.';
+    let description = 'Use this form to suggest new taxonomic e-services or tools that should be listed in the CETAF Marketplace.\nPlease fill in the required fields and add as much additional information as you can.\nThe CETAF secretariat will review and curate your submission before adding it to the marketplace.\nTo be accepted it needs to be a taxonomic tool or service and it needs to be of sufficient quality\nPlease propose only services that are in production and maintained.';
+    if (isExpertForm) {
+        description = 'Welcome to the Taxonomic Expert form. This registration form allows you to create a public profile in the CETAF Taxonomic e-Service and Expertise Marketplace.\n\nFor each field, we explain why the information is requested and how it will be used. The information you provide is intended to help others discover, understand and contact taxonomic experts and service providers.\n\nParticipation is voluntary. You will be asked to give explicit consent before submitting your profile.';
+    } else if (isReferenceCollectionForm) {
+        description = 'Reference collections are managed through the help desk. Please email support@dissco.jitbit.com and the team will help you with your request.';
+    }
 
     const sended = isExpertForm
         ? 'Your submission is received and will be processed by the Marketplace! A CETAF administrator will review the request. The review can take up to 5 working days. Your profile will be published on the Marketplace once the review is completed.\nThank you for using the Taxonomic Marketplace!'
@@ -570,7 +577,34 @@ const TaxonomicForm = () => {
                                 </Col>
                             </Row>
                         )}
-                        {(!isExpertForm || isLoggedIn) && (
+                        {isReferenceCollectionForm ? (
+                            <Row className="mt-3">
+                                <Col>
+                                    <Card className="w-100 px-4 py-3">
+                                        <Row>
+                                            <Col>
+                                                <h1 className={color}>
+                                                    {submissionHeading}
+                                                </h1>
+                                                <p className="mt-3 fs-4" style={{ whiteSpace: 'pre-line' }}>
+                                                    {submissionDescription}
+                                                </p>
+                                            </Col>
+                                        </Row>
+                                        <Row className="mt-3">
+                                            <Col>
+                                                <p className="fs-4 mb-2">
+                                                    Please send your request to the help desk:
+                                                </p>
+                                                <a href="mailto:support@dissco.jitbit.com" className="tc-tertiary fs-4 fw-lightBold">
+                                                    support@dissco.jitbit.com
+                                                </a>
+                                            </Col>
+                                        </Row>
+                                    </Card>
+                                </Col>
+                            </Row>
+                        ) : (!isExpertForm || isLoggedIn) && (
                             <Row className="mt-3">
                                 <Col>
                                     <Card className="w-100 px-4 py-3">

@@ -47,12 +47,28 @@ const TopBar = () => {
     let path = "/ts/suggestNewTaxonomicService" 
     if (searchParams.get('serviceType') === 'referenceCollection') {
         textButton = "Suggest a new reference collection"        
+        path = "/rf/suggestNewReferenceCollection"
     }
     else if (searchParams.get('serviceType') === 'taxonomicExpert') {
         textButton = "Add my expertise"
         path = "/te/registerYourExpertise"
     }
-    const variant: Color = getColor(window.location) as Color;
+    const variant: Color = getColor(globalThis.location) as Color;
+    const handleClearFilters = () => {
+        const serviceType = searchParams.get('serviceType');
+
+        if (serviceType === 'referenceCollection') {
+            setSearchParams({ serviceType: 'referenceCollection' });
+            return;
+        }
+
+        if (serviceType === 'taxonomicExpert') {
+            setSearchParams({ serviceType: 'taxonomicExpert' });
+            return;
+        }
+
+        setSearchParams({});
+    };
 
 
     return (
@@ -80,7 +96,7 @@ const TopBar = () => {
                     <Button type="button"
                         variant="primary"
                         className="bgc-error fs-5 ms-2 mt-3"
-                        OnClick={() => setSearchParams(searchParams.get('serviceType') === 'referenceCollection' ? { serviceType: 'referenceCollection' } : searchParams.get('serviceType') === 'taxonomicExpert' ? { serviceType: 'taxonomicExpert' } : {})}
+                        OnClick={handleClearFilters}
                     >
                         <FontAwesomeIcon icon={faFilterCircleXmark} />
                     </Button>
