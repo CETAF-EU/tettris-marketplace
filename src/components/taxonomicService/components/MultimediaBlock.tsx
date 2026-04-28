@@ -37,10 +37,19 @@ const MultimediaBlock = (props: Props) => {
                                     className="mb-3"
                                 >
                                     <div className={`${styles.imageBackground} h-100 w-100 d-flex justify-content-center`}>
-                                        <img src={multimediaItem['schema:contentUrl']}
-                                            alt={multimediaItem['schema:contentUrl']}
-                                            className={`${styles.multimediaItem} object-fit-contain`}
-                                        />
+                                        {(multimediaItem['schema:contentUrl'].startsWith('https://www.youtube.com/watch?v=')|
+                                        multimediaItem['schema:contentUrl'].startsWith('https://youtu.be/')) ? (
+                                            <iframe 
+											src="https://www.youtube-nocookie.com/embed/{multimediaItem['schema:contentUrl'].replace(/(?:https?:\/\/)?(?:www\.)?youtu(?:(\.be\/|be.com\/.*?v=))/, '')}" 
+											title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""
+                                            className={`${styles.multimediaItem} object-fit-contain`}>
+											</iframe>
+                                        ):(
+                                            <img src={multimediaItem['schema:contentUrl']}
+                                                alt={multimediaItem['schema:contentUrl']}
+                                                className={`${styles.multimediaItem} object-fit-contain`}
+                                            />
+                                        )}
                                     </div>
                                 </Col>
                             ))}
