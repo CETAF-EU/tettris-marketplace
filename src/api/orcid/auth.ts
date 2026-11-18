@@ -247,7 +247,12 @@ export function useOrcidCallback() {
 
             // Extract ORCID from email field (format: "0009-0004-5632-8045@orcid.invalid")
             const emailFromUser = userData_obj.email as string | undefined;
-            const orcidValue = emailFromUser?.replace('@orcid.invalid', '').trim() ?? null;
+            const claimedOrcid = userData_obj.orcid_id;
+            const orcidValue = typeof claimedOrcid === 'string'
+                ? claimedOrcid.trim()
+                : (emailFromUser?.endsWith('@orcid.invalid')
+                    ? emailFromUser.slice(0, -'@orcid.invalid'.length).trim()
+                    : null);
             
             // Try to get name from user object (if available)
             const nameValue = (userData_obj.name as string) ?? (userData_obj['schema:name'] as string) ?? '';
