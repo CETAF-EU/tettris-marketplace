@@ -433,7 +433,13 @@ const TaxonomicForm = () => {
                                                                     return;
                                                                 }
 
-                                                                setEmail(pendingEmail);
+                                                                // Look up pending profiles only after the email code is verified.
+                                                                const authenticatedEmail = pendingEmail;
+                                                                const existingEmailExpert = await checkIfEmailExists(authenticatedEmail);
+                                                                const draftValues = getExpertDraftValues(existingEmailExpert);
+
+                                                                setExpertExists(existingEmailExpert);
+                                                                setEmail(authenticatedEmail);
                                                                 setIsLoggedIn(true);
                                                                 setLoginMethod('email');
                                                                 setTokenRequested(false);
@@ -442,11 +448,13 @@ const TaxonomicForm = () => {
                                                                 setLoginInfo('');
 
                                                                 updateRegistrationSession({
+                                                                    draftValues,
+                                                                    expertProfile: existingEmailExpert,
                                                                     isLoggedIn: true,
                                                                     loginMethod: 'email',
                                                                     pendingEmail: '',
                                                                     tokenRequested: false,
-                                                                    verifiedEmail: pendingEmail,
+                                                                    verifiedEmail: authenticatedEmail,
                                                                 });
                                                                 return;
                                                             }
@@ -460,19 +468,7 @@ const TaxonomicForm = () => {
                                                                 return;
                                                             }
 
-                                                            const existingEmailExpert = await checkIfEmailExists(emailValue);
-                                                            const draftValues = getExpertDraftValues(existingEmailExpert);
-                                                            setExpertExists(existingEmailExpert);
-
-                                                            updateRegistrationSession({
-                                                                draftValues,
-                                                                expertProfile: existingEmailExpert,
-                                                                loginMethod: 'email',
-                                                                pendingEmail: emailValue,
-                                                                tokenRequested: false,
-                                                                verifiedEmail: '',
-                                                            });
-
+                                                            // Do not search private profiles before email verification.
                                                             const tokenRequestSucceeded = await requestUserToken(emailValue);
                                                             if (!tokenRequestSucceeded) {
                                                                 setLoginError('Unable to send verification token. Please try again later.');
