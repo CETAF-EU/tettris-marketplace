@@ -24,12 +24,16 @@ jobs:
         node-version: 22.x
   
     - name: Install dependencies
-      run: npm install
-      
-    - name: Build        
+      run: npm ci
+
+    - name: Run baseline Vitest tests
+      run: npx vitest run
+
+    - name: Build
       run: npm run build
 
   build-and-push-image:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: build
 
