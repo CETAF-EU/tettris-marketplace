@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getStoredAuthToken } from 'api/auth/session';
 import { TaxonomicExpert, CordraResultArray, Dict } from 'app/Types';
 /**
  * Checks if an expert with the given ORCID already exists.
@@ -15,7 +16,7 @@ const checkIfOrcidExists = async (orcid: string): Promise<TaxonomicExpert | null
     }
 
     let taxonomicExperts: TaxonomicExpert[] = [];
-    const filters = String.raw`/taxonomicExpert/@type:TaxonomicExpert AND (/taxonomicExpert/schema\:person/schema\:orcid:"${orcid}")`;
+    // The API builds an authenticated ownership query; no private-field public search.
 
     const extractExpertRecord = (candidate: unknown): TaxonomicExpert['taxonomicExpert'] | null => {
         if (!candidate || typeof candidate !== 'object') {
@@ -101,15 +102,19 @@ const checkIfOrcidExists = async (orcid: string): Promise<TaxonomicExpert | null
     };
 
     try {
+        const authToken = getStoredAuthToken();
+        if (!authToken) return null;
+
         const commonHeaders = {
             'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+            Authorization: `Bearer ${authToken}`,
         };
 
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/cordra/experts`, {
             params: {
-                query: filters,
-                pageNumber: 0,
-                pageSize: 1
+                scope: 'mine',
+                pageNumber: 1,
+                pageSize: 100
             },
             headers: commonHeaders
         });
@@ -119,9 +124,9 @@ const checkIfOrcidExists = async (orcid: string): Promise<TaxonomicExpert | null
         if (taxonomicExperts.length === 0 && response.data?.metadata?.totalRecords > 0) {
             const fallbackResponse = await axios.get(`${import.meta.env.VITE_API_URL}/cordra/experts`, {
                 params: {
-                    query: filters,
+                    scope: 'mine',
                     pageNumber: 1,
-                    pageSize: 1
+                    pageSize: 100
                 },
                 headers: commonHeaders
             });
@@ -135,9 +140,8 @@ const checkIfOrcidExists = async (orcid: string): Promise<TaxonomicExpert | null
             return typeof expertOrcid === 'string' && expertOrcid.trim().toUpperCase() === normalizedOrcid;
         }) ?? null;
 
-        // The Cordra query already filters by ORCID. Keep first normalized match as fallback
-        // when profile keys are shaped differently and strict field extraction misses it.
-        const existingExpert = exactOrcidMatch ?? taxonomicExperts[0] ?? null;
+        // Never substitute another profile when the ORCID does not match.
+        const existingExpert = exactOrcidMatch;
 
         if (existingExpert) {
             console.log('Orcid exists:', existingExpert.taxonomicExpert?.['schema:person']?.['schema:orcid']);
