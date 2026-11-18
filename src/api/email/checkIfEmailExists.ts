@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getStoredAuthToken } from 'api/auth/session';
 import { TaxonomicExpert, CordraResultArray, Dict } from 'app/Types';
 /**
  * Checks if an expert with the given email already exists.
@@ -10,7 +11,7 @@ const checkIfEmailExists = async (email: string): Promise<TaxonomicExpert | null
     console.log('Checking if email exists:', email);
 
     let taxonomicExperts: TaxonomicExpert[] = [];
-    const filters = String.raw`/taxonomicExpert/@type:TaxonomicExpert AND (/taxonomicExpert/schema\:person/schema\:email:"${email}")`;
+    // The API builds an authenticated ownership query; no private-field public search.
 
     const extractExpertRecord = (candidate: unknown): TaxonomicExpert['taxonomicExpert'] | null => {
         if (!candidate || typeof candidate !== 'object') {
@@ -96,15 +97,19 @@ const checkIfEmailExists = async (email: string): Promise<TaxonomicExpert | null
     };
     
     try {
+        const authToken = getStoredAuthToken();
+        if (!authToken) return null;
+
         const commonHeaders = {
             'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+            Authorization: `Bearer ${authToken}`,
         };
 
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/cordra/experts`, {
             params: {
-                query: filters,
-                pageNumber: 0,
-                pageSize: 1,
+                scope: 'mine',
+                pageNumber: 1,
+                pageSize: 100,
             },
             headers: commonHeaders,
         });
@@ -120,9 +125,9 @@ const checkIfEmailExists = async (email: string): Promise<TaxonomicExpert | null
         if (taxonomicExperts.length === 0 && (data as Dict)?.metadata?.totalRecords > 0) {
             const fallbackResponse = await axios.get(`${import.meta.env.VITE_API_URL}/cordra/experts`, {
                 params: {
-                    query: filters,
+                    scope: 'mine',
                     pageNumber: 1,
-                    pageSize: 1,
+                    pageSize: 100,
                 },
                 headers: commonHeaders,
             });
