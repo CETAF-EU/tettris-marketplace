@@ -10,6 +10,7 @@ import Header from 'components/general/header/Header';
 import Footer from 'components/general/footer/Footer';
 import { BreadCrumbs } from 'components/general/CustomComponents';
 import FormBuilder from 'components/general/FormComponents/FormBuilder';
+import ServiceEmailLogin from 'components/general/FormComponents/ServiceEmailLogin';
 import { Color, getColor } from '../ColorPage';
 import { useOrcidCallback } from 'api/orcid/auth';
 import checkIfEmailExists from 'api/email/checkIfEmailExists';
@@ -55,6 +56,7 @@ const getExpertDraftValues = (expert: TaxonomicExpert | null): Dict => {
 const TaxonomicForm = () => {
     const [completed, setCompleted] = useState<boolean>(false);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [serviceEmailVerified, setServiceEmailVerified] = useState<boolean>(false);
     const [moreLogin, setMoreLogin] = useState<boolean>(false);
     const [email, setEmail] = useState<string>('');
     const [expertExists, setExpertExists] = useState<TaxonomicExpert | null>(null);
@@ -71,6 +73,7 @@ const TaxonomicForm = () => {
     const { userData, existingExpert: orcidCallbackExpert, isLoading: isOrcidCallbackLoading, error } = useOrcidCallback();
 
     const isExpertForm = globalThis.location.pathname.includes('/te');
+    const isServiceForm = globalThis.location.pathname.includes('/ts');
     const isReferenceCollectionForm = globalThis.location.pathname.includes('/rf');
 
     let title = 'Suggest a new taxonomic e-service';
@@ -579,6 +582,9 @@ const TaxonomicForm = () => {
                                 </Col>
                             </Row>
                         )}
+                        {isServiceForm && !serviceEmailVerified && (
+                            <ServiceEmailLogin onVerified={() => setServiceEmailVerified(true)} />
+                        )}
                         {isReferenceCollectionForm ? (
                             <Row className="mt-3">
                                 <Col>
@@ -606,7 +612,7 @@ const TaxonomicForm = () => {
                                     </Card>
                                 </Col>
                             </Row>
-                        ) : (!isExpertForm || isLoggedIn) && (
+                        ) : (isExpertForm ? isLoggedIn : (!isServiceForm || serviceEmailVerified)) && (
                             <Row className="mt-3">
                                 <Col>
                                     <Card className="w-100 px-4 py-3">
