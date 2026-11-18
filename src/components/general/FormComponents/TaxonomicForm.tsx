@@ -15,6 +15,7 @@ import { useOrcidCallback } from 'api/orcid/auth';
 import checkIfEmailExists from 'api/email/checkIfEmailExists';
 import requestUserToken from 'api/email/UserToken';
 import verifyUserToken from 'api/email/VerifyUserToken.ts';
+import linkOrcidEmail from 'api/auth/LinkOrcidEmail';
 import { Dict, TaxonomicExpert } from 'app/Types';
 import { cloneDeep } from 'lodash';
 import {
@@ -273,9 +274,14 @@ const TaxonomicForm = () => {
                 return;
             }
 
-            const isTokenValid = await verifyUserToken(pendingEmail, tokenValue);
-            if (!isTokenValid) {
-                setLoginError('Invalid or expired token. Please try again.');
+            try {
+                if (!orcidUserData?.orcid) {
+                    throw new Error('Your ORCID session is missing. Please sign in again.');
+                }
+                // Keep the ORCID identity in the signed token when linking email.
+                await linkOrcidEmail(pendingEmail, tokenValue, orcidUserData.orcid);
+            } catch {
+                setLoginError('Unable to verify this email for your ORCID account. Check the code and try again.');
                 return;
             }
 
