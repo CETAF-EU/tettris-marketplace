@@ -1,5 +1,6 @@
 /* Import Dependencies */
 import axios from 'axios';
+import { getStoredAuthToken } from 'api/auth/session';
 import { format } from 'date-fns';
 
 /* Import Types */
@@ -23,6 +24,9 @@ const GetTaxonomicExpert = async ({ handle }: { handle?: string }) => {
                 {
                     headers: {
                         'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+                        ...(getStoredAuthToken()
+                            ? { Authorization: `Bearer ${getStoredAuthToken()}` }
+                            : {}),
                     },
                 }
             );
