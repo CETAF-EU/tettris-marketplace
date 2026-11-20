@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getStoredAuthToken } from 'api/auth/session';
 
 const SendEmail = async (serviceName: string, message: string) => {
     try {
@@ -10,7 +11,10 @@ const SendEmail = async (serviceName: string, message: string) => {
             },
             {
                 headers: {
-                    "x-marketplace-token": import.meta.env.VITE_MARKETPLACE_API_TOKEN
+                    "x-marketplace-token": import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+                    ...(getStoredAuthToken()
+                        ? { Authorization: `Bearer ${getStoredAuthToken()}` }
+                        : {}),
                 }
             }
         );

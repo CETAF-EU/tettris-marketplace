@@ -10,11 +10,13 @@ import Header from 'components/general/header/Header';
 import Footer from 'components/general/footer/Footer';
 import { BreadCrumbs } from 'components/general/CustomComponents';
 import FormBuilder from 'components/general/FormComponents/FormBuilder';
+import ServiceEmailLogin from 'components/general/FormComponents/ServiceEmailLogin';
 import { Color, getColor } from '../ColorPage';
 import { useOrcidCallback } from 'api/orcid/auth';
 import checkIfEmailExists from 'api/email/checkIfEmailExists';
 import requestUserToken from 'api/email/UserToken';
 import verifyUserToken from 'api/email/VerifyUserToken.ts';
+import linkOrcidEmail from 'api/auth/LinkOrcidEmail';
 import { Dict, TaxonomicExpert } from 'app/Types';
 import { cloneDeep } from 'lodash';
 import {
@@ -54,6 +56,7 @@ const getExpertDraftValues = (expert: TaxonomicExpert | null): Dict => {
 const TaxonomicForm = () => {
     const [completed, setCompleted] = useState<boolean>(false);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [serviceEmailVerified, setServiceEmailVerified] = useState<boolean>(false);
     const [moreLogin, setMoreLogin] = useState<boolean>(false);
     const [email, setEmail] = useState<string>('');
     const [expertExists, setExpertExists] = useState<TaxonomicExpert | null>(null);
@@ -70,6 +73,7 @@ const TaxonomicForm = () => {
     const { userData, existingExpert: orcidCallbackExpert, isLoading: isOrcidCallbackLoading, error } = useOrcidCallback();
 
     const isExpertForm = globalThis.location.pathname.includes('/te');
+    const isServiceForm = globalThis.location.pathname.includes('/ts');
     const isReferenceCollectionForm = globalThis.location.pathname.includes('/rf');
 
     let title = 'Suggest a new taxonomic e-service';
@@ -273,9 +277,14 @@ const TaxonomicForm = () => {
                 return;
             }
 
-            const isTokenValid = await verifyUserToken(pendingEmail, tokenValue);
-            if (!isTokenValid) {
-                setLoginError('Invalid or expired token. Please try again.');
+            try {
+                if (!orcidUserData?.orcid) {
+                    throw new Error('Your ORCID session is missing. Please sign in again.');
+                }
+                // Keep the ORCID identity in the signed token when linking email.
+                await linkOrcidEmail(pendingEmail, tokenValue, orcidUserData.orcid);
+            } catch {
+                setLoginError('Unable to verify this email for your ORCID account. Check the code and try again.');
                 return;
             }
 
@@ -433,7 +442,13 @@ const TaxonomicForm = () => {
                                                                     return;
                                                                 }
 
-                                                                setEmail(pendingEmail);
+                                                                // Look up pending profiles only after the email code is verified.
+                                                                const authenticatedEmail = pendingEmail;
+                                                                const existingEmailExpert = await checkIfEmailExists(authenticatedEmail);
+                                                                const draftValues = getExpertDraftValues(existingEmailExpert);
+
+                                                                setExpertExists(existingEmailExpert);
+                                                                setEmail(authenticatedEmail);
                                                                 setIsLoggedIn(true);
                                                                 setLoginMethod('email');
                                                                 setTokenRequested(false);
@@ -442,11 +457,13 @@ const TaxonomicForm = () => {
                                                                 setLoginInfo('');
 
                                                                 updateRegistrationSession({
+                                                                    draftValues,
+                                                                    expertProfile: existingEmailExpert,
                                                                     isLoggedIn: true,
                                                                     loginMethod: 'email',
                                                                     pendingEmail: '',
                                                                     tokenRequested: false,
-                                                                    verifiedEmail: pendingEmail,
+                                                                    verifiedEmail: authenticatedEmail,
                                                                 });
                                                                 return;
                                                             }
@@ -460,19 +477,7 @@ const TaxonomicForm = () => {
                                                                 return;
                                                             }
 
-                                                            const existingEmailExpert = await checkIfEmailExists(emailValue);
-                                                            const draftValues = getExpertDraftValues(existingEmailExpert);
-                                                            setExpertExists(existingEmailExpert);
-
-                                                            updateRegistrationSession({
-                                                                draftValues,
-                                                                expertProfile: existingEmailExpert,
-                                                                loginMethod: 'email',
-                                                                pendingEmail: emailValue,
-                                                                tokenRequested: false,
-                                                                verifiedEmail: '',
-                                                            });
-
+                                                            // Do not search private profiles before email verification.
                                                             const tokenRequestSucceeded = await requestUserToken(emailValue);
                                                             if (!tokenRequestSucceeded) {
                                                                 setLoginError('Unable to send verification token. Please try again later.');
@@ -577,6 +582,9 @@ const TaxonomicForm = () => {
                                 </Col>
                             </Row>
                         )}
+                        {isServiceForm && !serviceEmailVerified && (
+                            <ServiceEmailLogin onVerified={() => setServiceEmailVerified(true)} />
+                        )}
                         {isReferenceCollectionForm ? (
                             <Row className="mt-3">
                                 <Col>
@@ -604,7 +612,7 @@ const TaxonomicForm = () => {
                                     </Card>
                                 </Col>
                             </Row>
-                        ) : (!isExpertForm || isLoggedIn) && (
+                        ) : (isExpertForm ? isLoggedIn : (!isServiceForm || serviceEmailVerified)) && (
                             <Row className="mt-3">
                                 <Col>
                                     <Card className="w-100 px-4 py-3">

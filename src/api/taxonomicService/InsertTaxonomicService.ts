@@ -1,5 +1,6 @@
 /* Import Dependencies */
 import axios from 'axios';
+import { getStoredAuthToken } from 'api/auth/session';
 import { format } from 'date-fns';
 
 /* Import Types */
@@ -32,6 +33,9 @@ const InsertTaxonomicService = async ({ taxonomicServiceRecord }: { taxonomicSer
                     headers: {
                         'Content-Type': 'application/json',
                         'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,
+                        ...(getStoredAuthToken()
+                            ? { Authorization: `Bearer ${getStoredAuthToken()}` }
+                            : {}),
                     },
                 }
             );
