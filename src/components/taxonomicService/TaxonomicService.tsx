@@ -9,7 +9,8 @@ import { Container, Row, Col } from 'react-bootstrap';
 import { useAppSelector, useAppDispatch, useFetch } from 'app/Hooks';
 
 /* Import Store */
-import { setIsApiOnline } from 'redux-store/AppStore';
+import { getApiRequestStatus } from 'api/apiStatus';
+import { setApiStatus } from 'redux-store/AppStore';
 import { getTaxonomicService, setTaxonomicService } from 'redux-store/TaxonomicServiceSlice';
 
 /* Import Types */
@@ -45,14 +46,12 @@ const TaxonomicService = () => {
         Method: GetTaxonomicService,
         Handler: (taxonomicService: TaxonomicServiceType) => {
             dispatch(setTaxonomicService(taxonomicService));
-            dispatch(setIsApiOnline(true));
+            dispatch(setApiStatus('available'));
         },
         ErrorHandler: (error: Error) => {
             setErrorMessage(error.message);
 
-            if (error?.cause !== 200) {
-                dispatch(setIsApiOnline(false));
-            }
+            dispatch(setApiStatus(getApiRequestStatus(error)));
         },
         params: { handle: taxonomicServiceID }
     });
