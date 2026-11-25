@@ -54,7 +54,7 @@ const GetTaxonomicServices = async ({
 
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/cordra/services`, {
         params: {
-            pageNumber,
+            pageNumber: Math.max(1, pageNumber),
             pageSize,
             query: filters,
         },
