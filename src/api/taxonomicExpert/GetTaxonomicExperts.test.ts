@@ -37,6 +37,12 @@ describe('expert search client baseline', () => {
     expect(requestOptions?.params?.pageSize).toBe(10);
   });
 
-  // This checks frontend behavior only. Server-side approval-state enforcement
-  // remains a separate, currently unresolved security requirement (GAP-04).
+  it.each([[0, 1], [1, 1], [2, 2]])('maps page %i to API page %i', async (requested, expected) => {
+    vi.mocked(axios.get).mockResolvedValue({
+      data: { taxonomicExperts: [], metadata: { totalRecords: 0 } },
+    });
+    await GetTaxonomicExperts({ pageNumber: requested, pageSize: 1, searchFilters: {} });
+    expect(axios.get).toHaveBeenCalledOnce();
+    expect(vi.mocked(axios.get).mock.calls[0][1]?.params?.pageNumber).toBe(expected);
+  });
 });

@@ -7,7 +7,8 @@ import { Col, Container, Row, } from 'react-bootstrap';
 import { useAppSelector, useAppDispatch, useFetch } from 'app/Hooks';
 
 // /* Import Store */
-import { setIsApiOnline } from 'redux-store/AppStore';
+import { getApiRequestStatus } from 'api/apiStatus';
+import { setApiStatus } from 'redux-store/AppStore';
 import { getTaxonomicExpert, setTaxonomicExpert } from 'redux-store/TaxonomicExpertSlice';
 
 // /* Import Types */
@@ -45,14 +46,12 @@ const TaxonomicExpert = () => {
         Method: GetTaxonomicExpert,
         Handler: (taxonomicExpert: TaxonomicServiceType) => {
             dispatch(setTaxonomicExpert(taxonomicExpert));
-            dispatch(setIsApiOnline(true));
+            dispatch(setApiStatus('available'));
         },
         ErrorHandler: (error: Error) => {
             setErrorMessage(error.message);
 
-            if (error?.cause !== 200) {
-                dispatch(setIsApiOnline(false));
-            }
+            dispatch(setApiStatus(getApiRequestStatus(error)));
         },
         params: { handle: taxonomicServiceID }
     });

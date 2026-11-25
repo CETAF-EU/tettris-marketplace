@@ -7,7 +7,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import { useAppSelector } from 'app/Hooks';
 
 /* Import Store */
-import { getIsApiOnline } from 'redux-store/AppStore';
+import { getApiStatus } from 'redux-store/AppStore';
 
 /* Import Webroot */
 import CETAFLogo from 'webroot/img/cetafLogo.png';
@@ -25,7 +25,7 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
  */
 const Header = () => {
     /* Base variables */
-    const isApiOnline = useAppSelector(getIsApiOnline);
+    const apiStatus = useAppSelector(getApiStatus);
 
     return (
         <Container fluid
@@ -56,11 +56,11 @@ const Header = () => {
                                         </h3>
                                     </Link>
                                 </Col>
-                                {isApiOnline === false &&
+                                {apiStatus !== 'available' &&
                                     <Col xs={{ span: 12 }} lg
                                         className="d-flex justify-content-end align-items-center mt-2 mt-lg-0"
                                     >
-                                        <p className="tc-error fw-lightBold"><FontAwesomeIcon icon={faInfoCircle} /> API service is offline</p>
+                                        <p className="tc-error fw-lightBold"><FontAwesomeIcon icon={faInfoCircle} /> {apiStatus === 'unreachable' ? 'Cannot reach the Marketplace API' : 'Some Marketplace data could not be loaded'}</p>
                                     </Col>
                                 }
                             </Row>
