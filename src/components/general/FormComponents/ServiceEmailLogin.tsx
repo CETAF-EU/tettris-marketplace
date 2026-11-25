@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react';
 
 import requestUserToken from 'api/email/UserToken';
+import { useCodeRetry } from 'api/email/useCodeRetry';
+import type { CodeFailure } from 'api/email/codeFeedback';
 import verifyUserToken from 'api/email/VerifyUserToken';
 
 type Props = {
@@ -18,11 +20,18 @@ const ServiceEmailLogin = ({ onVerified }: Props) => {
     const [working, setWorking] = useState(false);
     const [error, setError] = useState('');
     const [info, setInfo] = useState('');
+    const retry = useCodeRetry();
+    const showFailure = (failure: CodeFailure) => {
+        setInfo('');
+        setError(failure.message);
+        retry.apply(failure);
+    };
 
     const requestCode = async (targetEmail: string) => {
+        setInfo('');
         const sent = await requestUserToken(targetEmail);
-        if (!sent) {
-            setError('Unable to send your verification code. Please try again.');
+        if (!sent.ok) {
+            showFailure(sent);
             return false;
         }
         setCodeRequested(true);
@@ -33,16 +42,17 @@ const ServiceEmailLogin = ({ onVerified }: Props) => {
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (working) return;
+        if (working || retry.locked || (!codeRequested && retry.requestBlocked)) return;
         setWorking(true);
         setError('');
+        setInfo('');
         try {
             if (!codeRequested) {
                 await requestCode(email.trim());
             } else {
                 const verified = await verifyUserToken(email.trim(), code.trim());
-                if (!verified) {
-                    setError('Invalid or expired code. Check your email and try again.');
+                if (!verified.ok) {
+                    showFailure(verified);
                 } else {
                     onVerified();
                 }
@@ -67,7 +77,7 @@ const ServiceEmailLogin = ({ onVerified }: Props) => {
                         className="form-control mb-3"
                         autoComplete="email"
                         value={email}
-                        onChange={(event) => setEmail(event.target.value)}
+                        onChange={(event) => { setEmail(event.target.value); retry.reset(); setError(''); }}
                         disabled={codeRequested || working}
                         required
                     />
@@ -84,11 +94,12 @@ const ServiceEmailLogin = ({ onVerified }: Props) => {
                                 maxLength={6}
                                 value={code}
                                 onChange={(event) => setCode(event.target.value)}
+                                disabled={working || retry.locked}
                                 required
                             />
                         </>
                     )}
-                    <button type="submit" className="btn btn-primary" disabled={working}>
+                    <button type="submit" className="btn btn-primary" disabled={working || retry.locked || (!codeRequested && retry.requestBlocked)}>
                         {working ? 'Please wait...' : (codeRequested ? 'Verify code' : 'Send verification code')}
                     </button>
                     {codeRequested && (
@@ -96,7 +107,7 @@ const ServiceEmailLogin = ({ onVerified }: Props) => {
                             <button
                                 type="button"
                                 className="btn btn-link ms-2"
-                                disabled={working}
+                                disabled={working || retry.requestBlocked}
                                 onClick={async () => {
                                     setWorking(true);
                                     try {
@@ -113,6 +124,7 @@ const ServiceEmailLogin = ({ onVerified }: Props) => {
                                 className="btn btn-link ms-2"
                                 disabled={working}
                                 onClick={() => {
+                                    retry.reset();
                                     setCodeRequested(false);
                                     setCode('');
                                     setError('');
@@ -124,7 +136,7 @@ const ServiceEmailLogin = ({ onVerified }: Props) => {
                         </>
                     )}
                     {info && <p className="text-success mt-3" role="status">{info}</p>}
-                    {error && <p className="text-danger mt-3" role="alert">{error}</p>}
+                    {error && <p className="text-danger mt-3" role="alert">{retry.expired ? 'You can now request a new code.' : error}{retry.seconds > 0 && ` Try again in ${retry.seconds} seconds.`}</p>}
                 </form>
             </div>
         </section>
