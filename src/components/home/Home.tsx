@@ -6,7 +6,8 @@ import { Container, Row, Col } from 'react-bootstrap';
 import { useAppDispatch, useFetch } from 'app/Hooks';
 
 /* Import Store */
-import { setIsApiOnline } from 'redux-store/AppStore';
+import { getApiRequestStatus } from 'api/apiStatus';
+import { setApiStatus } from 'redux-store/AppStore';
 
 /* Import Types */
 import { Dict } from 'app/Types';
@@ -49,7 +50,7 @@ const Home = () => {
                 Method: GetTaxonomicServices,
                 params: {
                     pageSize: 1,
-                    pageNumber: 0
+                    pageNumber: 1
                 }
             },
             {
@@ -57,7 +58,7 @@ const Home = () => {
                 Method: GetTaxonomicExperts,
                 params: {
                     pageSize: 1,
-                    pageNumber: 0
+                    pageNumber: 1
                 }
             }
         ],
@@ -67,9 +68,9 @@ const Home = () => {
                 referenceCollections: pollinatorCollections.length,
                 taxonomicExpertise: results.taxonomicExpertise.metadata.totalRecords,
             });
-            dispatch(setIsApiOnline(true))
+            dispatch(setApiStatus('available'))
         },
-        ErrorHandler: () => dispatch(setIsApiOnline(false))
+        ErrorHandler: (error: unknown) => dispatch(setApiStatus(getApiRequestStatus(error)))
     });
 
     return (
