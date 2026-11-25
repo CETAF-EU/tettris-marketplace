@@ -236,6 +236,7 @@ const TaxonomicForm = () => {
             return;
         }
 
+        retry.reset();
         setLoginError('');
         setLoginInfo('A new verification token has been sent. Check your email inbox.');
     };
@@ -557,6 +558,7 @@ const TaxonomicForm = () => {
                                                                     id="token"
                                                                     name="token"
                                                                     autoComplete="one-time-code"
+                                                                    disabled={retry.locked || isSubmittingCode}
                                                                     required
                                                                 />
                                                             </div>
@@ -600,7 +602,7 @@ const TaxonomicForm = () => {
                                                             Go back to search expert
                                                         </button>
                                                         {loginInfo && <div className="text-success mt-2">{loginInfo}</div>}
-                                                        {loginError && <div className="text-danger mt-2" role="alert">{loginError}{retry.seconds > 0 && ` Try again in ${retry.seconds} seconds.`}</div>}
+                                                        {loginError && <div className="text-danger mt-2" role="alert">{retry.expired ? 'You can now request a new code.' : loginError}{retry.seconds > 0 && ` Try again in ${retry.seconds} seconds.`}</div>}
                                                     </form>
                                                 </div>
                                             </Col>
@@ -829,7 +831,7 @@ const OrcidEmailVerificationCard = ({
                                     Clear session
                                 </button>
                                 {loginInfo && <div className="text-success mt-2">{loginInfo}</div>}
-                                {loginError && <div className="text-danger mt-2" role="alert">{loginError}{retry.seconds > 0 && ` Try again in ${retry.seconds} seconds.`}</div>}
+                                {loginError && <div className="text-danger mt-2" role="alert">{retry.expired ? 'You can now request a new code.' : loginError}{retry.seconds > 0 && ` Try again in ${retry.seconds} seconds.`}</div>}
                             </form>
                         </Col>
                     </Row>
