@@ -16,6 +16,7 @@ export function useCodeRetry() {
 
     return {
         seconds,
+        expired: retry.until > 0 && seconds === 0,
         locked: seconds > 0 && retry.kind === 'account_locked',
         requestBlocked: seconds > 0,
         apply: (failure: CodeFailure) => {
