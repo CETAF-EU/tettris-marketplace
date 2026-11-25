@@ -1,6 +1,6 @@
 /* Import Dependencies */
 import classNames from 'classnames';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 
@@ -8,7 +8,8 @@ import { useSearchParams } from 'react-router-dom';
 import { usePaginator, useAppDispatch } from 'app/Hooks';
 
 /* Import Store */
-import { setIsApiOnline } from 'redux-store/AppStore';
+import { getApiRequestStatus } from 'api/apiStatus';
+import { setApiStatus } from 'redux-store/AppStore';
 import { setTaxonomicServices, concatToTaxonomicServices } from 'redux-store/TaxonomicServiceSlice';
 import { setTaxonomicExperts, concatToTaxonomicExperts } from 'redux-store/TaxonomicExpertSlice';
 
@@ -56,14 +57,14 @@ const Search = () => {
             } else {
                 dispatch(concatToTaxonomicServices(records as TaxonomicService[]));
             }
-            dispatch(setIsApiOnline(true));
+            dispatch(setApiStatus('available'));
 
             if (!records.length) {
                 setNoMoreResults(true);
             }
         },
-        ErrorHandler: () => {
-            dispatch(setIsApiOnline(false));
+        ErrorHandler: (error: unknown) => {
+            dispatch(setApiStatus(getApiRequestStatus(error)));
         },
         pageSize: 12,
         resultKey: isTaxonomicExpert ? 'taxonomicExperts' : 'taxonomicServices',
@@ -71,40 +72,10 @@ const Search = () => {
     });
     const displayedResults = (paginator.totalRecords ?? 0) + (includePollinatorResult ? 1 : 0);
 
-    /* On search: check if there are any more records to be shown with the show more button */
-    useEffect(() => {
-        if (!noMoreResults) {
-            const searchFilters = [...searchParams.entries()].reduce((filtersObject, [key, value]) => {
-                return {
-                    ...filtersObject,
-                    [key]: value
-                }
-            }, {});
-
-            if (searchParams.get('serviceType') === 'taxonomicExpert') {
-                GetTaxonomicExperts({
-                    pageNumber: paginator.currentPage + 1,
-                    pageSize: 12,
-                    searchFilters
-                }).then(({ taxonomicExperts }) => {
-                    if (!taxonomicExperts.length) {
-                        setNoMoreResults(true);
-                    }
-                });
-            }
-            else {
-                GetTaxonomicServices({
-                    pageNumber: paginator.currentPage + 1,
-                    pageSize: 12,
-                    searchFilters
-                }).then(({ taxonomicServices }) => {
-                    if (!taxonomicServices.length) {
-                        setNoMoreResults(true);
-                    }
-                });
-            }
-        }
-    }, [paginator]);
+    // The API already returns the total count. Do not fetch a speculative
+    // next page on every render (especially when the current request fails).
+    const hasMoreResults = !noMoreResults && !paginator.errorMessage &&
+        paginator.currentPage * 12 < (paginator.totalRecords ?? 0);
 
     const variant: Color = getColor(globalThis.location) as Color;
     
@@ -149,7 +120,7 @@ const Search = () => {
                         {/* Results Count */}
                         <Row className="mt-2">
                             <Col>
-                                <p className="fs-4 fw-lightBold">{`${displayedResults} results`}</p>
+                                <p className="fs-4 fw-lightBold">{paginator.errorMessage ? 'Results unavailable' : `${displayedResults} results`}</p>
                             </Col>
                         </Row>
                         {/* Search Results body */}
@@ -161,7 +132,7 @@ const Search = () => {
                                         {displayedResults === 0 ?
                                             <Row className="h-100 align-items-center">
                                                 <Col>
-                                                    <p className="text-center">No records found</p>
+                                                    <p className="text-center">{paginator.errorMessage ? 'Unable to load records. Please try again.' : 'No records found'}</p>
                                                 </Col>
                                             </Row>
                                             : <SearchResults />
@@ -171,7 +142,7 @@ const Search = () => {
                                 {/* Load more button */}
                                 <Row className={loadMoreBlockClass}>
                                     <Col className="d-flex justify-content-center">
-                                        {(!paginator.loading && !noMoreResults && paginator.totalRecords > 0) &&
+                                        {(!paginator.loading && hasMoreResults) &&
                                             <Button type="button"
                                                 variant={variant}
                                                 OnClick={() => paginator.Next?.()}
@@ -179,12 +150,15 @@ const Search = () => {
                                                 Load more
                                             </Button>
                                         }
-                                        {(!paginator.loading && noMoreResults && paginator.totalRecords > 0) &&
+                                        {(!paginator.loading && !hasMoreResults && !paginator.errorMessage && paginator.totalRecords > 0) &&
                                             <Row className="h-100 align-items-center">
                                                 <Col>
                                                     <p>{`No ${paginator.totalRecords > 0 ? 'more ' : ''}results found`}</p>
                                                 </Col>
                                             </Row>
+                                        }
+                                        {!paginator.loading && paginator.errorMessage && displayedResults > 0 &&
+                                            <p role="alert">Unable to load records. Please try again.</p>
                                         }
                                         {paginator.loading &&
                                             <Spinner />
