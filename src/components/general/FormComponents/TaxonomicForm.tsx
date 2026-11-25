@@ -15,6 +15,8 @@ import { Color, getColor } from '../ColorPage';
 import { useOrcidCallback } from 'api/orcid/auth';
 import checkIfEmailExists from 'api/email/checkIfEmailExists';
 import requestUserToken from 'api/email/UserToken';
+import { codeFailure, type CodeFailure } from 'api/email/codeFeedback';
+import { useCodeRetry } from 'api/email/useCodeRetry';
 import verifyUserToken from 'api/email/VerifyUserToken.ts';
 import linkOrcidEmail from 'api/auth/LinkOrcidEmail';
 import { Dict, TaxonomicExpert } from 'app/Types';
@@ -65,6 +67,13 @@ const TaxonomicForm = () => {
     const [pendingEmail, setPendingEmail] = useState<string>('');
     const [tokenRequested, setTokenRequested] = useState<boolean>(false);
     const [isResendingToken, setIsResendingToken] = useState<boolean>(false);
+    const [isSubmittingCode, setIsSubmittingCode] = useState(false);
+    const retry = useCodeRetry();
+    const showCodeFailure = (failure: CodeFailure) => {
+        setLoginInfo('');
+        setLoginError(failure.message);
+        retry.apply(failure);
+    };
     const [loginMethod, setLoginMethod] = useState<RegistrationLoginMethod | null>(null);
     const [orcidUserData, setOrcidUserData] = useState<RegistrationOrcidUserData | null>(null);
     const [isSessionHydrated, setIsSessionHydrated] = useState<boolean>(!globalThis.location.pathname.includes('/te'));
@@ -182,6 +191,7 @@ const TaxonomicForm = () => {
     };
 
     const handleClearOrcidSession = () => {
+        retry.reset();
         clearRegistrationSession();
         setIsSessionSyncEnabled(true);
         setCompleted(false);
@@ -210,6 +220,8 @@ const TaxonomicForm = () => {
     };
 
     const handleResendToken = async () => {
+        if (retry.requestBlocked || isResendingToken || isSubmittingCode) return;
+        setLoginInfo('');
         if (!pendingEmail) {
             setLoginError('No email available to resend the token.');
             return;
@@ -219,11 +231,12 @@ const TaxonomicForm = () => {
         const tokenRequestSucceeded = await requestUserToken(pendingEmail);
         setIsResendingToken(false);
 
-        if (!tokenRequestSucceeded) {
-            setLoginError('Unable to resend verification token. Please try again later.');
+        if (!tokenRequestSucceeded.ok) {
+            showCodeFailure(tokenRequestSucceeded);
             return;
         }
 
+        retry.reset();
         setLoginError('');
         setLoginInfo('A new verification token has been sent. Check your email inbox.');
     };
@@ -261,6 +274,10 @@ const TaxonomicForm = () => {
 
     const handleOrcidEmailVerificationSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (isSubmittingCode || isResendingToken || retry.locked || (!tokenRequested && retry.requestBlocked)) return;
+        setIsSubmittingCode(true);
+        setLoginInfo('');
+        try {
 
         const form = event.currentTarget;
         const emailInput = form.elements.namedItem('orcidEmail') as HTMLInputElement | null;
@@ -283,8 +300,8 @@ const TaxonomicForm = () => {
                 }
                 // Keep the ORCID identity in the signed token when linking email.
                 await linkOrcidEmail(pendingEmail, tokenValue, orcidUserData.orcid);
-            } catch {
-                setLoginError('Unable to verify this email for your ORCID account. Check the code and try again.');
+            } catch (error) {
+                showCodeFailure(codeFailure(error, 'Unable to verify this email for your ORCID account. Check the code and try again.'));
                 return;
             }
 
@@ -325,8 +342,8 @@ const TaxonomicForm = () => {
         }
 
         const tokenRequestSucceeded = await requestUserToken(emailValue);
-        if (!tokenRequestSucceeded) {
-            setLoginError('Unable to send verification token. Please try again later.');
+        if (!tokenRequestSucceeded.ok) {
+            showCodeFailure(tokenRequestSucceeded);
             return;
         }
 
@@ -339,6 +356,9 @@ const TaxonomicForm = () => {
             pendingEmail: emailValue,
             tokenRequested: true,
         });
+        } finally {
+            setIsSubmittingCode(false);
+        }
     };
 
     return (
@@ -420,7 +440,10 @@ const TaxonomicForm = () => {
                                                     <form
                                                         onSubmit={async (event) => {
                                                             event.preventDefault();
-
+                                                            if (isSubmittingCode || isResendingToken || retry.locked || (!tokenRequested && retry.requestBlocked)) return;
+                                                            setIsSubmittingCode(true);
+                                                            setLoginInfo('');
+                                                            try {
                                                             const form = event.currentTarget;
                                                             const emailInput = form.elements.namedItem('email') as HTMLInputElement | null;
                                                             const emailConfirmInput = form.elements.namedItem('emailConfirm') as HTMLInputElement | null;
@@ -437,8 +460,8 @@ const TaxonomicForm = () => {
                                                                 }
 
                                                                 const isTokenValid = await verifyUserToken(pendingEmail, tokenValue);
-                                                                if (!isTokenValid) {
-                                                                    setLoginError('Invalid or expired token. Please try again.');
+                                                                if (!isTokenValid.ok) {
+                                                                    showCodeFailure(isTokenValid);
                                                                     return;
                                                                 }
 
@@ -479,8 +502,8 @@ const TaxonomicForm = () => {
 
                                                             // Do not search private profiles before email verification.
                                                             const tokenRequestSucceeded = await requestUserToken(emailValue);
-                                                            if (!tokenRequestSucceeded) {
-                                                                setLoginError('Unable to send verification token. Please try again later.');
+                                                            if (!tokenRequestSucceeded.ok) {
+                                                                showCodeFailure(tokenRequestSucceeded);
                                                                 return;
                                                             }
 
@@ -495,6 +518,9 @@ const TaxonomicForm = () => {
                                                                 pendingEmail: emailValue,
                                                                 tokenRequested: true,
                                                             });
+                                                            } finally {
+                                                                setIsSubmittingCode(false);
+                                                            }
                                                         }}
                                                     >
                                                         <div className="mb-3">
@@ -504,6 +530,7 @@ const TaxonomicForm = () => {
                                                                 className={`form-control${loginError ? ' is-invalid' : ''}`}
                                                                 id="email"
                                                                 name="email"
+                                                                onChange={() => { retry.reset(); setLoginError(''); }}
                                                                 defaultValue={pendingEmail}
                                                                 disabled={tokenRequested}
                                                                 required
@@ -531,20 +558,21 @@ const TaxonomicForm = () => {
                                                                     id="token"
                                                                     name="token"
                                                                     autoComplete="one-time-code"
+                                                                    disabled={retry.locked || isSubmittingCode}
                                                                     required
                                                                 />
                                                             </div>
                                                         )}
 
-                                                        <button type="submit" className="btn btn-primary mt-2">
-                                                            {tokenRequested ? 'Verify token' : 'Register'}
+                                                        <button type="submit" className="btn btn-primary mt-2" disabled={isSubmittingCode || isResendingToken || retry.locked || (!tokenRequested && retry.requestBlocked)}>
+                                                            {isSubmittingCode ? 'Please wait...' : tokenRequested ? 'Verify token' : 'Register'}
                                                         </button>
                                                         {tokenRequested && (
                                                             <button
                                                                 type="button"
                                                                 className="btn btn-link mt-2 ms-2"
                                                                 onClick={handleResendToken}
-                                                                disabled={isResendingToken}
+                                                                disabled={isResendingToken || isSubmittingCode || retry.requestBlocked}
                                                             >
                                                                 {isResendingToken ? 'Resending...' : 'Resend token'}
                                                             </button>
@@ -554,6 +582,7 @@ const TaxonomicForm = () => {
                                                                 type="button"
                                                                 className="btn btn-link mt-2 ms-2"
                                                                 onClick={() => {
+                                                                    retry.reset();
                                                                     setTokenRequested(false);
                                                                     setPendingEmail('');
                                                                     setExpertExists(null);
@@ -573,7 +602,7 @@ const TaxonomicForm = () => {
                                                             Go back to search expert
                                                         </button>
                                                         {loginInfo && <div className="text-success mt-2">{loginInfo}</div>}
-                                                        {loginError && <div className="text-danger mt-2">{loginError}</div>}
+                                                        {loginError && <div className="text-danger mt-2" role="alert">{retry.expired ? 'You can now request a new code.' : loginError}{retry.seconds > 0 && ` Try again in ${retry.seconds} seconds.`}</div>}
                                                     </form>
                                                 </div>
                                             </Col>
@@ -633,10 +662,13 @@ const TaxonomicForm = () => {
                                                 pendingEmail={pendingEmail}
                                                 tokenRequested={tokenRequested}
                                                 isResendingToken={isResendingToken}
+                                                isSubmittingCode={isSubmittingCode}
+                                                retry={retry}
                                                 onSubmit={handleOrcidEmailVerificationSubmit}
                                                 onResend={handleResendToken}
                                                 onClearSession={handleClearOrcidSession}
                                                 onResetEmailFlow={() => {
+                                                    retry.reset();
                                                     setTokenRequested(false);
                                                     setPendingEmail('');
                                                     setLoginError('');
@@ -694,6 +726,8 @@ type OrcidEmailVerificationCardProps = {
     pendingEmail: string;
     tokenRequested: boolean;
     isResendingToken: boolean;
+    isSubmittingCode: boolean;
+    retry: ReturnType<typeof useCodeRetry>;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
     onResend: () => Promise<void>;
     onClearSession: () => void;
@@ -706,6 +740,8 @@ const OrcidEmailVerificationCard = ({
     pendingEmail,
     tokenRequested,
     isResendingToken,
+    isSubmittingCode,
+    retry,
     onSubmit,
     onResend,
     onClearSession,
@@ -729,6 +765,7 @@ const OrcidEmailVerificationCard = ({
                                         className={`form-control${loginError ? ' is-invalid' : ''}`}
                                         id="orcidEmail"
                                         name="orcidEmail"
+                                        onChange={retry.reset}
                                         defaultValue={pendingEmail}
                                         disabled={tokenRequested}
                                         required
@@ -755,14 +792,15 @@ const OrcidEmailVerificationCard = ({
                                             className={`form-control${loginError ? ' is-invalid' : ''}`}
                                             id="orcidEmailToken"
                                             name="orcidEmailToken"
+                                            disabled={retry.locked || isSubmittingCode}
                                             autoComplete="one-time-code"
                                             required
                                         />
                                     </div>
                                 )}
 
-                                <button type="submit" className="btn btn-primary mt-2">
-                                    {tokenRequested ? 'Verify token' : 'Request verification code'}
+                                <button type="submit" className="btn btn-primary mt-2" disabled={isSubmittingCode || isResendingToken || retry.locked || (!tokenRequested && retry.requestBlocked)}>
+                                    {isSubmittingCode ? 'Please wait...' : tokenRequested ? 'Verify token' : 'Request verification code'}
                                 </button>
                                 {tokenRequested && (
                                     <button
@@ -771,7 +809,7 @@ const OrcidEmailVerificationCard = ({
                                         onClick={() => {
                                             void onResend();
                                         }}
-                                        disabled={isResendingToken}
+                                        disabled={isResendingToken || isSubmittingCode || retry.requestBlocked}
                                     >
                                         {isResendingToken ? 'Resending...' : 'Resend token'}
                                     </button>
@@ -793,7 +831,7 @@ const OrcidEmailVerificationCard = ({
                                     Clear session
                                 </button>
                                 {loginInfo && <div className="text-success mt-2">{loginInfo}</div>}
-                                {loginError && <div className="text-danger mt-2">{loginError}</div>}
+                                {loginError && <div className="text-danger mt-2" role="alert">{retry.expired ? 'You can now request a new code.' : loginError}{retry.seconds > 0 && ` Try again in ${retry.seconds} seconds.`}</div>}
                             </form>
                         </Col>
                     </Row>

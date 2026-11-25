@@ -9,6 +9,8 @@ import { TaxonomicExpert } from 'app/Types';
 /* Import Components */
 import { Button } from 'components/general/CustomComponents';
 import requestUserToken from 'api/email/UserToken';
+import { useCodeRetry } from 'api/email/useCodeRetry';
+import type { CodeFailure } from 'api/email/codeFeedback';
 import verifyUserToken from 'api/email/VerifyUserToken';
 import { clearStoredAuthToken, getStoredAuthToken } from 'api/auth/session';
 import ContactTaxonomicExpert from 'api/taxonomicExpert/ContactTaxonomicExpert';
@@ -65,6 +67,12 @@ const TopBar = (props: Props) => {
     const [isResendingToken, setIsResendingToken] = useState(false);
     const [loginError, setLoginError] = useState('');
     const [loginInfo, setLoginInfo] = useState('');
+    const retry = useCodeRetry();
+    const showFailure = (failure: CodeFailure) => {
+        setLoginInfo('');
+        setLoginError(failure.message);
+        retry.apply(failure);
+    };
     const [contactSubject, setContactSubject] = useState('');
     const [contactMessage, setContactMessage] = useState('');
     const [contactError, setContactError] = useState('');
@@ -85,6 +93,7 @@ const TopBar = (props: Props) => {
     const datePublished = taxonomicExpert?.taxonomicExpert?.['schema:datePublished'] as string || null;
 
     const resetLoginState = () => {
+        retry.reset();
         setPendingEmail('');
         setTokenRequested(false);
         setIsSubmitting(false);
@@ -117,6 +126,8 @@ const TopBar = (props: Props) => {
     };
 
     const handleResendToken = async () => {
+        if (isSubmitting || isResendingToken || retry.requestBlocked) return;
+        setLoginInfo('');
         if (!pendingEmail) {
             setLoginError('No email available to resend the token.');
             return;
@@ -126,8 +137,8 @@ const TopBar = (props: Props) => {
         const tokenRequestSucceeded = await requestUserToken(pendingEmail);
         setIsResendingToken(false);
 
-        if (!tokenRequestSucceeded) {
-            setLoginError('Unable to resend verification token. Please try again later.');
+        if (!tokenRequestSucceeded.ok) {
+            showFailure(tokenRequestSucceeded);
             return;
         }
 
@@ -137,6 +148,8 @@ const TopBar = (props: Props) => {
 
     const handleLoginSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (isSubmitting || isResendingToken || retry.locked || (!tokenRequested && retry.requestBlocked)) return;
+        setLoginInfo('');
 
         const form = event.currentTarget;
         const emailInput = form.elements.namedItem('email') as HTMLInputElement;
@@ -158,8 +171,8 @@ const TopBar = (props: Props) => {
                 }
 
                 const isTokenValid = await verifyUserToken(pendingEmail, tokenValue);
-                if (!isTokenValid) {
-                    setLoginError('Invalid or expired token. Please try again.');
+                if (!isTokenValid.ok) {
+                    showFailure(isTokenValid);
                     return;
                 }
 
@@ -179,8 +192,8 @@ const TopBar = (props: Props) => {
             }
 
             const tokenRequestSucceeded = await requestUserToken(emailValue);
-            if (!tokenRequestSucceeded) {
-                setLoginError('Unable to send verification token. Please try again later.');
+            if (!tokenRequestSucceeded.ok) {
+                showFailure(tokenRequestSucceeded);
                 return;
             }
 
@@ -360,6 +373,7 @@ const TopBar = (props: Props) => {
                                     className={`form-control${loginError ? ' is-invalid' : ''}`}
                                     id="expert-email-login"
                                     name="email"
+                                    onChange={() => { retry.reset(); setLoginError(''); }}
                                     disabled={tokenRequested || isSubmitting}
                                     required
                                 />
@@ -384,15 +398,15 @@ const TopBar = (props: Props) => {
                                         id="expert-email-token"
                                         name="token"
                                         autoComplete="one-time-code"
-                                        disabled={isSubmitting}
+                                        disabled={isSubmitting || retry.locked}
                                         required
                                     />
                                 </div>
                             )}
                             {loginInfo && <div className="text-success mt-2">{loginInfo}</div>}
-                            {loginError && <div className="text-danger mt-2">{loginError}</div>}
+                            {loginError && <div className="text-danger mt-2" role="alert">{retry.expired ? 'You can now request a new code.' : loginError}{retry.seconds > 0 && ` Try again in ${retry.seconds} seconds.`}</div>}
                             <div className="d-flex flex-wrap gap-2 mt-3">
-                                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                                <button type="submit" className="btn btn-primary" disabled={isSubmitting || isResendingToken || retry.locked || (!tokenRequested && retry.requestBlocked)}>
                                     {isSubmitting ? 'Please wait...' : tokenRequested ? 'Verify token' : 'Request token'}
                                 </button>
                                 {tokenRequested && (
@@ -400,7 +414,7 @@ const TopBar = (props: Props) => {
                                         type="button"
                                         className="btn btn-link"
                                         onClick={handleResendToken}
-                                        disabled={isResendingToken || isSubmitting}
+                                        disabled={isResendingToken || isSubmitting || retry.requestBlocked}
                                     >
                                         {isResendingToken ? 'Resending...' : 'Resend token'}
                                     </button>
