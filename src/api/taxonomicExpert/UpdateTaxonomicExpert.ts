@@ -13,7 +13,7 @@ import { postImage } from 'api/image/PostImage';
  * @param updatedData The updated fields to merge into the taxonomic expert.
  * @returns The updated TaxonomicExpert or undefined.
  */
-const UpdateTaxonomicExpert = async ({ id, updatedData }: { id: string; updatedData: Dict;}): Promise<TaxonomicExpert | undefined> => {
+const UpdateTaxonomicExpert = async ({ id, updatedData, captchaSolution }: { id: string; updatedData: Dict; captchaSolution: string;}): Promise<TaxonomicExpert | undefined> => {
     let updatedExpert: TaxonomicExpert | undefined;
 
     if (!id || !updatedData) return;
@@ -40,6 +40,7 @@ const UpdateTaxonomicExpert = async ({ id, updatedData }: { id: string; updatedD
             `${import.meta.env.VITE_API_URL}/cordra/experts/${encodeURIComponent(id)}`,
             {
                 taxonomic_expert_record: taxonomicExpertRecord,
+                captcha_solution: captchaSolution,
             },
             {
                 headers: {
