@@ -16,20 +16,20 @@ describe('service registration notification', () => {
         const saved = { taxonomicService: { '@id': '20.5000/test' } };
         vi.mocked(axios.post).mockResolvedValue({ data: { taxonomic_service: saved } });
         const result = await InsertTaxonomicService({
-            taxonomicServiceRecord: { 'schema:service': { 'schema:name': 'Synthetic' } },
+            taxonomicServiceRecord: { 'schema:service': { 'schema:name': 'Synthetic' } }, captchaSolution: 'test-solution',
         });
         expect(result).toEqual(saved);
         expect(axios.post).toHaveBeenCalledTimes(1);
         expect(axios.post).toHaveBeenCalledWith(
             expect.stringMatching(/\/cordra\/services$/),
-            expect.objectContaining({ taxonomic_service_record: expect.objectContaining({ 'schema:status': 'proposed' }) }),
+            expect.objectContaining({ captcha_solution: 'test-solution', taxonomic_service_record: expect.objectContaining({ 'schema:status': 'proposed' }) }),
             expect.objectContaining({ headers: expect.objectContaining({ Authorization: 'Bearer synthetic-token' }) }),
         );
     });
 
     it('does not send a notification when creation fails', async () => {
         vi.mocked(axios.post).mockRejectedValue(new Error('Synthetic failure'));
-        await expect(InsertTaxonomicService({ taxonomicServiceRecord: {} })).rejects.toThrow('Synthetic failure');
+        await expect(InsertTaxonomicService({ taxonomicServiceRecord: {}, captchaSolution: 'test-solution' })).rejects.toThrow('Synthetic failure');
         expect(axios.post).toHaveBeenCalledTimes(1);
     });
 });
