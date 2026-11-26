@@ -5,7 +5,6 @@ import { format } from 'date-fns';
 
 /* Import Types */
 import { TaxonomicService, Dict } from 'app/Types';
-import SendEmail from 'api/email/SendEmail';
 
 
 /**
@@ -57,12 +56,6 @@ const InsertTaxonomicService = async ({ taxonomicServiceRecord }: { taxonomicSer
                 taxonomicService.taxonomicService['schema:dateModified'] = format(new Date(metadata.modifiedOn), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
             }
 
-            /* Send email */
-            if (taxonomicService?.taxonomicService) {
-                const url = "https://marketplace.cetaf.org/cordra/#objects/" + taxonomicService.taxonomicService['@id'];
-                const name = taxonomicService.taxonomicService['schema:service']['schema:name'] ? taxonomicService.taxonomicService['schema:service']['schema:name'] : "Taxonomic Service";
-                SendEmail(name, url);
-            }
         } catch (error) {
             console.error(error);
 
