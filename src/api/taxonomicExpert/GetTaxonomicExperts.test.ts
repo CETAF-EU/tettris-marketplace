@@ -23,7 +23,7 @@ describe('expert search client baseline', () => {
     const result = await GetTaxonomicExperts({
       pageNumber: 1,
       pageSize: 10,
-      searchFilters: {},
+      searchFilters: { location: 'United Kingdom', email: 'hidden@example.test', query: 'beetle' },
     });
 
     expect(result.metadata.totalRecords).toBe(1);
@@ -32,7 +32,9 @@ describe('expert search client baseline', () => {
 
     const [endpoint, requestOptions] = vi.mocked(axios.get).mock.calls[0];
     expect(endpoint).toContain('/cordra/experts');
-    expect(requestOptions?.params?.query).toContain('schema\\:status:accepted');
+    expect(requestOptions?.params?.query).toBe('beetle');
+    expect(requestOptions?.params?.location).toBe('United Kingdom');
+    expect(requestOptions?.params?.email).toBeUndefined();
     expect(requestOptions?.params?.pageNumber).toBe(1);
     expect(requestOptions?.params?.pageSize).toBe(10);
   });

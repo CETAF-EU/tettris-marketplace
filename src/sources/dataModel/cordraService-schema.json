@@ -257,7 +257,9 @@
         "schema:ratingValue": {
           "type": "number",
           "title": "Rating Value",
-          "description": "The rating for the content on a scale from 0 to 100"
+          "description": "The rating for the content on a scale from 0 to 100",
+          "minimum": 0,
+          "maximum": 100
         },
         "schema:ratingExplanation": {
           "type": "string",

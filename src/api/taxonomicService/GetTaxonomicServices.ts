@@ -1,11 +1,7 @@
 import axios from 'axios';
-import { isEmpty } from 'lodash';
 
 /* Import Types */
 import { TaxonomicService, Dict } from 'app/Types';
-
-/* Import Sources */
-import TaxonomicServiceFilters from 'sources/searchFilters/TaxonomicServiceFilters.json';
 
 const GetTaxonomicServices = async ({
     pageNumber,
@@ -16,47 +12,20 @@ const GetTaxonomicServices = async ({
     pageSize: number;
     searchFilters: { [searchFilter: string]: string };
 }) => {
-    let filters = '/taxonomicService/@type:TaxonomicService';
-    filters += String.raw` AND /taxonomicService/schema\:status:accepted`;
-
-    if (!isEmpty(searchFilters)) {
-        Object.entries(searchFilters).forEach(([key, value]) => {
-            const alias =
-                TaxonomicServiceFilters.taxonomicServiceFilters.find(
-                    taxonomicSearchFilter => taxonomicSearchFilter.name === key
-                )?.alias;
-            const escapedAlias = (alias ?? key).replaceAll(':', String.raw`\:`);
-
-            switch (key) {
-                case 'language':
-                case 'topicDiscipline':
-                    filters += String.raw` AND /taxonomicService/${escapedAlias}/_:${value}`;
-                    break;
-                case 'query':
-                    filters +=
-                        ` AND (` +
-                        String.raw`/taxonomicService/schema\:service/schema\:name:${value}*` +
-                        String.raw` OR /taxonomicService/schema\:taxonomicRange/_:${value}*` +
-                        String.raw` OR /taxonomicService/ods\:topicDiscipline/_:${value}*` +
-                        `)`;
-                    break;
-                case 'taxonomicRange':
-                    filters += String.raw` AND /taxonomicService/schema\:taxonomicRange/_:${value}*`;
-                    break;
-                case 'serviceType':
-                    filters += String.raw` AND /taxonomicService/schema\:Service/schema\:serviceType:${value}`;
-                    break;
-                default:
-                    filters += String.raw` AND /taxonomicService/${escapedAlias}:${value}`;
-            }
-        });
+    const filters: Record<string, string> = {};
+    for (const key of ["query","language","topicDiscipline","taxonomicRange","serviceType"]) {
+        const value = searchFilters?.[key];
+        if (value) filters[key] = value;
     }
+    // The generic catalogue selector is not a Cordra service type.
+    if (filters.serviceType === 'taxonomicService') delete filters.serviceType;
+    if (filters.serviceType === 'referenceCollection') filters.serviceType = 'Reference collection';
 
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/cordra/services`, {
         params: {
             pageNumber: Math.max(1, pageNumber),
             pageSize,
-            query: filters,
+            ...filters,
         },
         headers: {
             'x-marketplace-token': import.meta.env.VITE_MARKETPLACE_API_TOKEN,

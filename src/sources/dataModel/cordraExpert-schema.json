@@ -938,6 +938,13 @@
               }
             }
           }
+        },
+        "schema:ratingValue": {
+          "type": "number",
+          "title": "Rating Value",
+          "description": "Editorial quality rating from 0 to 100",
+          "minimum": 0,
+          "maximum": 100
         }
       }
     }
