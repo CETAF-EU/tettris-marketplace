@@ -8,7 +8,7 @@ vi.mock('api/auth/session', () => ({ getStoredAuthToken: () => 'synthetic-token'
 vi.mock('api/image/PostImage', () => ({ postImage: vi.fn() }));
 
 describe('expert CAPTCHA submission', () => {
-    beforeEach(() => vi.clearAllMocks());
+    beforeEach(() => { vi.clearAllMocks(); });
     const record = { 'schema:person': { 'schema:name': 'Synthetic' } };
     const saved = { taxonomicExpert: { '@id': '20.5000/test' } };
 
