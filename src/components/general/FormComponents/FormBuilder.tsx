@@ -3,7 +3,8 @@ import { useCaptchaHook } from "@aacn.eu/use-friendly-captcha";
 import { Formik, Form, useFormikContext } from "formik";
 import jp from 'jsonpath';
 import { cloneDeep, isEmpty, merge } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import axios from "axios";
 import { Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
@@ -68,7 +69,7 @@ type Props = {
 const FormBuilder = (props: Props) => {
     const { formTemplate, OrcidData, TaxonomicExpert, Email, LockedFieldValues, OnResetRegistration, SetCompleted } = props;
 
-    console.log('taxonomicExpert', TaxonomicExpert);
+    const submitting = useRef(false);
 
     const isExpertForm = globalThis.location.pathname.includes('/te');
 
@@ -365,6 +366,8 @@ const FormBuilder = (props: Props) => {
             <Formik initialValues={initialFormValues}
                 enableReinitialize={true}
                 onSubmit={async (values) => {
+                    if (submitting.current) return;
+                    setErrorMessage(undefined);
                     await new Promise((resolve) => setTimeout(resolve, 100));
 
                     /* Check if all required fields are present */
@@ -420,7 +423,9 @@ const FormBuilder = (props: Props) => {
                         }
                     });
 
-                    if (validationFlag && captchaHook.captchaStatus.solution !== null) {
+                    const captchaSolution = captchaHook.captchaStatus.solution;
+                    if (validationFlag && captchaSolution) {
+                        submitting.current = true;
                         /* Start loading indication */
                         setLoading(true);
 
@@ -446,13 +451,16 @@ const FormBuilder = (props: Props) => {
 
                             try {
                                 await InsertTaxonomicService({
-                                    taxonomicServiceRecord
+                                    taxonomicServiceRecord, captchaSolution
                                 })
 
                                 SetCompleted();
-                            } catch {
-                                setErrorMessage('Something went wrong during the submission of the Taxonomic Service, please try again');
+                            } catch (error) {
+                                const detail = axios.isAxiosError(error) ? error.response?.data?.detail : undefined;
+                                setErrorMessage(typeof detail === 'string' && detail.startsWith('CAPTCHA') ? detail : 'Something went wrong during the submission of the Taxonomic Service, please try again');
                             } finally {
+                                captchaHook.resetWidget();
+                                submitting.current = false;
                                 setLoading(false);
                             };
                         } else if (globalThis.location.pathname.includes('/te')) {
@@ -482,11 +490,11 @@ const FormBuilder = (props: Props) => {
                                 if (expertRecord?.['@id']) {
                                     await UpdateTaxonomicExpert({
                                         id: expertRecord['@id'],
-                                        updatedData: taxonomicExpertRecord
+                                        updatedData: taxonomicExpertRecord, captchaSolution
                                     });
                                 } else {
                                     await InsertTaxonomicExpert({
-                                        taxonomicExpertRecord
+                                        taxonomicExpertRecord, captchaSolution
                                     });
                                 }
 
@@ -495,14 +503,17 @@ const FormBuilder = (props: Props) => {
                                     draftValues: cloneDeep(values),
                                 });
                                 SetCompleted();
-                            } catch {
-                                setErrorMessage('Something went wrong during the submission of the Taxonomic Expert, please try again');
+                            } catch (error) {
+                                const detail = axios.isAxiosError(error) ? error.response?.data?.detail : undefined;
+                                setErrorMessage(typeof detail === 'string' && detail.startsWith('CAPTCHA') ? detail : 'Something went wrong during the submission of the Taxonomic Expert, please try again');
                             } finally {
+                                captchaHook.resetWidget();
+                                submitting.current = false;
                                 setLoading(false);
                             };
                         }
                     } else {
-                        setErrorMessage('Please provide values for all required fields')
+                        setErrorMessage(validationFlag ? 'Complete the CAPTCHA before submitting.' : 'Please provide values for all required fields')
                     }
                 }}
             >
@@ -613,7 +624,7 @@ const FormBuilder = (props: Props) => {
                                     <Col lg="auto">
                                         <Button type="submit"
                                             variant={color}
-                                            disabled={captchaHook.captchaStatus.solution === null}
+                                            disabled={loading || !captchaHook.captchaStatus.solution}
                                         >
                                             <p>
                                                 Submit

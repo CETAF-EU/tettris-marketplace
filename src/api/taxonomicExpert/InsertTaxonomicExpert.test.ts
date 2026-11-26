@@ -21,17 +21,17 @@ describe('expert registration client baseline', () => {
       data: { taxonomic_expert: { taxonomicExpert: record } },
     });
 
-    await InsertTaxonomicExpert({ taxonomicExpertRecord: record });
+    await InsertTaxonomicExpert({ taxonomicExpertRecord: record, captchaSolution: 'test-solution' });
 
     expect(axios.post).toHaveBeenCalledOnce();
     const [endpoint, body, options] = vi.mocked(axios.post).mock.calls[0];
     expect(endpoint).toContain('/cordra/experts');
-    expect(body).toEqual({ taxonomic_expert_record: record });
+    expect(body).toEqual({ taxonomic_expert_record: record, captcha_solution: 'test-solution' });
     expect(options?.headers?.Authorization).toBe('Bearer synthetic-local-token');
   });
 
   it('does not make an API request when no expert record is provided', async () => {
-    const result = await InsertTaxonomicExpert({});
+    const result = await InsertTaxonomicExpert({ captchaSolution: 'test-solution' });
     expect(result).toBeUndefined();
     expect(axios.post).not.toHaveBeenCalled();
   });

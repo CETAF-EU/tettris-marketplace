@@ -12,7 +12,7 @@ import { TaxonomicService, Dict } from 'app/Types';
  * @param taxonomicService The taxonomic service to insert
  * @returns An instance of Taxonomic Service or undefined
  */
-const InsertTaxonomicService = async ({ taxonomicServiceRecord }: { taxonomicServiceRecord?: Dict }) => {
+const InsertTaxonomicService = async ({ taxonomicServiceRecord, captchaSolution }: { taxonomicServiceRecord?: Dict; captchaSolution: string }) => {
     let taxonomicService: TaxonomicService | undefined;
 
     if (taxonomicServiceRecord) {
@@ -27,6 +27,7 @@ const InsertTaxonomicService = async ({ taxonomicServiceRecord }: { taxonomicSer
                 `${import.meta.env.VITE_API_URL}/cordra/services`,
                 {
                     taxonomic_service_record: normalizedTaxonomicServiceRecord,
+                    captcha_solution: captchaSolution,
                 },
                 {
                     headers: {
