@@ -8,8 +8,10 @@ import { postImage } from 'api/image/PostImage';
 
 const InsertTaxonomicExpert = async ({
     taxonomicExpertRecord,
+    captchaSolution,
 }: {
     taxonomicExpertRecord?: Dict;
+    captchaSolution: string;
 }) => {
     let taxonomicExpert: TaxonomicExpert | undefined;
 
@@ -31,6 +33,7 @@ const InsertTaxonomicExpert = async ({
                 `${import.meta.env.VITE_API_URL}/cordra/experts`,
                 {
                     taxonomic_expert_record: taxonomicExpertRecord,
+                    captcha_solution: captchaSolution,
                 },
                 {
                     headers: {
